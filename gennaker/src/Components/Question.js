@@ -5,15 +5,16 @@ import { useEffect, useState } from 'react';
 function Question (props) {
     const [content, setContent] = useState("");
 
-    fetch(props.filePath, {
+    useEffect(() => {fetch(props.filePath, {
         // This is needed for local access sadly
         headers : { 
           'Content-Type': 'text',
           'Accept': 'text'
-         }
-      })
+        }
+        })
         .then((res) => res.text())
         .then((text) => setContent(text));
+        }, [props.filePath]);
 
     return (
     <ReactMarkdown children={content} transformImageUri={uri =>
