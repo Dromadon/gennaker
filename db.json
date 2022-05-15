@@ -1,0 +1,27 @@
+{
+    "Meteo": {
+        "Communs": [
+            {
+                "filePath": "Meteo/Evolution_vent_sous_grain.md",
+                "difficulty": "low"
+            },
+            {
+                "filePath": "Meteo/Facteurs_brise_thermique.md",
+                "difficulty": "medium"
+            }
+        ]
+    },
+    "Conduite": {
+        "Communs": [
+            {
+                "filePath": "Conduite/vent_apparent_risee.md",
+                "difficulty": "low"
+            },
+            {
+                "filePath": "Conduite/Chronologie_virement_catamaran.md",
+                "difficulty": "high",
+                "support": ["catamaran"]
+            }
+        ]
+    }
+}

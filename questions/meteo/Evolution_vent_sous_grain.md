@@ -1,6 +1,6 @@
-# Décrivez l'évolution du vent dans la situation suivante
+### Décrivez l'évolution du vent dans la situation suivante
+*En force et en direction*
 
-![image](questions/meteo/images/grain.png)
 ![image](images/grain.png)
 
 # Correction
