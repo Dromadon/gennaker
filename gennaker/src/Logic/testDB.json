@@ -1,0 +1,55 @@
+{
+    "Meta":{
+        "Comments": "Meteo has no supports defined, Conduite has multiple supports described"
+    },
+    "Meteo": {
+        "Section1": [
+            {
+                "filePath": "Meteo/Section1/question1.md"
+            },
+            {
+                "filePath": "Meteo/Section1/question2.md"
+            }
+        ],
+        "Section2": [
+            {
+                "filePath": "Meteo/Section2/question1.md"
+            },
+            {
+                "filePath": "Meteo/Section2/question2.md"
+            }
+        ],
+        "Section3": [
+            {
+                "filePath": "Meteo/Section3/question1.md"
+            }
+        ]
+    },
+    "Conduite": {
+        "Section1": [
+            {
+                "filePath": "Conduite/Section1/question1.md",
+                "supports": ["catamaran"]
+            },
+            {
+                "filePath": "Conduite/Section1/question2.md",
+                "supports": ["catamaran"]
+            },
+            {
+                "filePath": "Conduite/Section1/question3.md",
+                "supports": ["deriveur"]
+            },
+            {
+                "filePath": "Conduite/Section1/question4.md",
+                "supports": ["catamaran", "deriveur"]
+            }
+        ]
+    },
+    "CategorieInexistante":{
+        "SectionInexistante": [
+            {
+                "filePath": "inexistent.md"
+            }
+        ]
+    }
+}

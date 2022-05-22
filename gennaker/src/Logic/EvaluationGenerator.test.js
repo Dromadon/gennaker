@@ -1,18 +1,75 @@
 import { generateEval } from './EvaluationGenerator';
+import testDB from './testDB.json';
+import testEvalStructureCatamaran from './testEvalStructureCatamaran.json';
 
-const Categories = ["Meteo", "Conduite"];
+const util = require('util');
+const evalParameters = {'support': 'catamaran'}
 
-test('generateEvalShouldReturnACategory', () => {
-    const evaluation = generateEval();
-    expect(evaluation).toHaveProperty("Meteo");
-});
+describe('generatorShouldReturnStructureAsDescribedByStructureJSON', () => {
+    //When
+    const evaluation = generateEval(testDB, testEvalStructureCatamaran, evalParameters);
 
-test('generateEvalShouldReturnCommunsInCategory', () => {
-    const evaluation = generateEval();
-    expect(evaluation["Meteo"]).toHaveProperty("Communs");
-});
+    test('generateEvalShouldReturnCategoriesFromEvalStructure', () => {
+        // Then
+        expect(evaluation).toHaveProperty('Meteo');
+        expect(evaluation).toHaveProperty('Conduite');
+    })
+    
+    test('generateEvalShouldNotReturnCategoriesNotInEvalStructure', () => {
+        // Then
+        expect(evaluation).not.toHaveProperty('CategorieInexistante');
+    })
+    
+    test('generateEvalShouldReturnSectionsFromEvalStructure', () => {
+        // Then
+        expect(evaluation['Meteo']).toHaveProperty('Section1');
+        expect(evaluation['Meteo']).toHaveProperty('Section2');
+        expect(evaluation['Conduite']).toHaveProperty('Section1');
+    })
+    
+    test('generateEvalShouldNotReturnSectionsNotEvalStructure', () => {
+        // Then
+        expect(evaluation['Meteo']).not.toHaveProperty('Section3');
+    })
+})
 
-/* test('generateEvalShouldReturnQuestionInDB', () => {
-    const questions = generateEval()["Meteo"]["Communs"];
-    expect(evaluation["Meteo"]["Communs"]).toHaveProperty("Communs");
-}) */
+describe('generatorShouldReturnQuestionsAsDescribedByStructure', () => {
+    const evaluation = generateEval(testDB, testEvalStructureCatamaran, evalParameters);
+    console.log(util.inspect(evaluation, {showHidden: false, depth: null, colors: true}))
+
+    test('generateEvalShouldReturnAllQuestionsWithFilePathProperty', () => {
+        // Then
+        //console.log(util.inspect(evaluation, {showHidden: false, depth: null, colors: true}))
+        Object.values(evaluation).forEach((category) => {
+            Object.values(category).forEach((section) => {
+                expect(section.length).toBeGreaterThan(0);
+                section.forEach((question) => {
+                    expect(question).toHaveProperty('filePath');
+                })
+                
+            })
+        })
+    })
+
+    test('generateEvalShouldReturnNumberOfQuestionsInSectionDescribedByStructure', () => {
+        // Then
+        expect(evaluation['Meteo']['Section1'].length).toEqual(1);
+    })
+
+    test('generateEvalShouldExcludeQuestionsWithBadSupport', () => {
+        // Then
+        /* 
+        This needs to be ran several times, because otherwise it could 
+        land randomly on working case 
+        Improvement idea: launch it 10 times, try to mock the random generation (hard)
+        */
+        evaluation['Conduite']['Section1'].forEach((question) => {
+            expect(question['supports']).toEqual(expect.arrayContaining(['catamaran']));
+        });
+    })
+
+    test('generateEvalShouldIncludeQuestionsWithoutDefinedSupport', () => {
+        // Then
+        expect(evaluation['Meteo']['Section1'].length).toBeGreaterThan(0);
+    })
+})

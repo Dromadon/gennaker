@@ -1,0 +1,15 @@
+{
+    "Meteo": {
+        "Section1": {
+            "number": 1
+        },
+        "Section2": {
+            "number": 2
+        }
+    },
+    "Conduite" : {
+        "Section1": {
+            "number": 3
+        }
+    }
+}
