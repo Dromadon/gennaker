@@ -37,14 +37,14 @@ describe('generatorShouldReturnQuestionsAsDescribedByStructure', () => {
     const evaluation = generateEval(testDB, testEvalStructureCatamaran, evalParameters);
     console.log(util.inspect(evaluation, {showHidden: false, depth: null, colors: true}))
 
-    test('generateEvalShouldReturnAllQuestionsWithFilePathProperty', () => {
+    test('generateEvalShouldReturnAllQuestionsWithFileNameProperty', () => {
         // Then
         //console.log(util.inspect(evaluation, {showHidden: false, depth: null, colors: true}))
         Object.values(evaluation).forEach((category) => {
             Object.values(category).forEach((section) => {
                 expect(section.length).toBeGreaterThan(0);
                 section.forEach((question) => {
-                    expect(question).toHaveProperty('filePath');
+                    expect(question).toHaveProperty('fileName');
                 })
                 
             })
