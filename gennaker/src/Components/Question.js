@@ -17,8 +17,11 @@ function Question (props) {
         }, [props.filePath]);
 
     return (
-    <ReactMarkdown children={content} transformImageUri={uri =>
-        `${process.env.PUBLIC_URL}/${transformImageURI(uri, props.filePath)}`} />
+        <div>
+            <h3>Question</h3>
+            <ReactMarkdown children={content} transformImageUri={uri =>
+            `${process.env.PUBLIC_URL}/${transformImageURI(uri, props.filePath)}`} />
+        </div>
     )
 }
 
