@@ -1,6 +1,6 @@
 {
-    "Meteo": {
-        "Communs": [
+    "meteo": {
+        "brise_thermique": [
             {
                 "filePath": "Meteo/Evolution_vent_sous_grain.md",
                 "difficulty": "low"
@@ -9,7 +9,37 @@
                 "filePath": "Meteo/Facteurs_brise_thermique.md",
                 "difficulty": "medium"
             }
-        ]
+        ],
+        "depression": [
+            {
+                "filePath": "Meteo/Evolution_vent_sous_grain.md",
+                "difficulty": "low"
+            },
+            {
+                "filePath": "Meteo/Facteurs_brise_thermique.md",
+                "difficulty": "medium"
+            }
+        ],
+        "phenomene_local": [
+            {
+                "filePath": "Meteo/Evolution_vent_sous_grain.md",
+                "difficulty": "low"
+            },
+            {
+                "filePath": "Meteo/Facteurs_brise_thermique.md",
+                "difficulty": "medium"
+            }
+        ],
+        "divers": [
+            {
+                "filePath": "Meteo/Evolution_vent_sous_grain.md",
+                "difficulty": "low"
+            },
+            {
+                "filePath": "Meteo/Facteurs_brise_thermique.md",
+                "difficulty": "medium"
+            }
+        ],
     },
     "Conduite": {
         "Communs": [
