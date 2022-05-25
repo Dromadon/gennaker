@@ -1,0 +1,21 @@
+{
+    "meteo": {
+        "brise_thermique": {
+            "number": 1
+        },
+        "perturbation": {
+            "number": 1
+        },
+        "phenomene_local": {
+            "number": 1
+        },
+        "divers": {
+            "number": 2
+        }
+    },
+    "conduite" : {
+        "divers": {
+            "number": 1
+        }
+    }
+}

@@ -1,54 +1,56 @@
 {
     "meteo": {
+        "meta": {
+            "category_name": "Météo"
+        },
         "brise_thermique": [
             {
-                "filePath": "Meteo/Evolution_vent_sous_grain.md",
+                "filePath": "facteurs_brise_thermique.md",
                 "difficulty": "low"
             },
             {
-                "filePath": "Meteo/Facteurs_brise_thermique.md",
+                "filePath": "etablissement_brise_thermique.md",
                 "difficulty": "medium"
             }
         ],
         "depression": [
             {
-                "filePath": "Meteo/Evolution_vent_sous_grain.md",
-                "difficulty": "low"
+                "filePath": "evolution_depression.md",
+                "difficulty": "medium"
             },
             {
-                "filePath": "Meteo/Facteurs_brise_thermique.md",
-                "difficulty": "medium"
+                "filePath": "passage_perturbation.md",
+                "difficulty": "high"
             }
         ],
         "phenomene_local": [
             {
-                "filePath": "Meteo/Evolution_vent_sous_grain.md",
+                "filePath": "evolution_vent_sous_grain.md",
                 "difficulty": "low"
-            },
-            {
-                "filePath": "Meteo/Facteurs_brise_thermique.md",
-                "difficulty": "medium"
             }
         ],
         "divers": [
             {
-                "filePath": "Meteo/Evolution_vent_sous_grain.md",
+                "filePath": "bulletin_vs_modele.md",
                 "difficulty": "low"
             },
             {
-                "filePath": "Meteo/Facteurs_brise_thermique.md",
+                "filePath": "structure_bulletin.md",
                 "difficulty": "medium"
             }
-        ],
+        ]
     },
-    "Conduite": {
-        "Communs": [
+    "conduite": {
+        "meta": {
+            "category_name": "Conduite"
+        },
+        "divers": [
             {
-                "filePath": "Conduite/vent_apparent_risee.md",
+                "filePath": "vent_apparent_risee.md",
                 "difficulty": "low"
             },
             {
-                "filePath": "Conduite/Chronologie_virement_catamaran.md",
+                "filePath": "chronologie_virement_catamaran.md",
                 "difficulty": "high",
                 "support": ["catamaran"]
             }
