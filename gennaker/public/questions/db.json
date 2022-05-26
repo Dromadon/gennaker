@@ -5,37 +5,37 @@
         },
         "brise_thermique": [
             {
-                "filePath": "facteurs_brise_thermique.md",
+                "fileName": "facteurs_brise_thermique.md",
                 "difficulty": "low"
             },
             {
-                "filePath": "etablissement_brise_thermique.md",
+                "fileName": "etablissement_brise_thermique.md",
                 "difficulty": "medium"
             }
         ],
-        "depression": [
+        "perturbation": [
             {
-                "filePath": "evolution_depression.md",
+                "fileName": "evolution_depression.md",
                 "difficulty": "medium"
             },
             {
-                "filePath": "passage_perturbation.md",
+                "fileName": "passage_perturbation.md",
                 "difficulty": "high"
             }
         ],
         "phenomene_local": [
             {
-                "filePath": "evolution_vent_sous_grain.md",
+                "fileName": "evolution_vent_sous_grain.md",
                 "difficulty": "low"
             }
         ],
         "divers": [
             {
-                "filePath": "bulletin_vs_modele.md",
+                "fileName": "bulletin_vs_modele.md",
                 "difficulty": "low"
             },
             {
-                "filePath": "structure_bulletin.md",
+                "fileName": "structure_bulletin.md",
                 "difficulty": "medium"
             }
         ]
@@ -46,11 +46,11 @@
         },
         "divers": [
             {
-                "filePath": "vent_apparent_risee.md",
+                "fileName": "vent_apparent_risee.md",
                 "difficulty": "low"
             },
             {
-                "filePath": "chronologie_virement_catamaran.md",
+                "fileName": "chronologie_virement_catamaran.md",
                 "difficulty": "high",
                 "support": ["catamaran"]
             }
