@@ -5,6 +5,9 @@ export function generateEval(db, evalStructure, evalParameters) {
     let evaluation = {};
     const support = evalParameters["support"];
 
+    console.debug("Generating eval with following inputs")
+    console.debug(evalStructure)
+
     Object.entries(evalStructure).forEach(([categoryName, sectionsStructure]) => {
         evaluation[categoryName] = generateCategory(db[categoryName], sectionsStructure, support);
     })
