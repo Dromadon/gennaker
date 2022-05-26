@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 function Question (props) {
     const [content, setContent] = useState("");
+    const [displayedContent, setDisplayedContent] = useState("");
 
     useEffect(() => {fetch(props.filePath, {
         // This is needed for local access sadly
@@ -13,13 +14,12 @@ function Question (props) {
         }
         })
         .then((res) => res.text())
-        .then((text) => setContent(text));
+        .then((text) => {setContent(text); setDisplayedContent(text)});
         }, [props.filePath]);
 
     return (
         <div>
-            <h3>Question</h3>
-            <ReactMarkdown children={content} transformImageUri={uri =>
+            <ReactMarkdown children={displayedContent} transformImageUri={uri =>
             `${process.env.PUBLIC_URL}/${transformImageURI(uri, props.filePath)}`} />
         </div>
     )

@@ -7,8 +7,7 @@ class Evaluation extends Component {
     constructor(props) {
         super(props);        
         this.state = {
-            "isDBLoaded": false,
-            "isStructureLoaded": false,
+            "isDataLoaded": false,
             "isQuestionsReady": false,
             "error": false,
             "db": {},
@@ -16,25 +15,27 @@ class Evaluation extends Component {
             "evalParameters": {
                 "support": "catamaran"
             },
-            "questions": {}
+            "evaluation": {}
         }
     }
 
     componentDidMount() {
-        this.loadQuestionDB();
-        this.loadEvalStructure();
+        this.loadQuestionDBAndEvalStructure().then(([db, evalStructure]) => {
+            console.debug("DB and structure fetched");
+            this.setState({
+                "isDataLoaded": true,
+                "db": db,
+                "evalStructure": evalStructure
+            });
+            this.setState({
+                "evaluation": generateEval(db, evalStructure, this.state.evalParameters),
+                "isQuestionsReady": true
+            })
+        })
     }
 
     render() {
-        const { error, isDBLoaded, isStructureLoaded, isQuestionsReady } = this.state;
-
-        if (isDBLoaded & isStructureLoaded) {
-            console.debug("Generating questions");
-            this.setState({
-                "questions": generateEval(this.state.db, this.state.evalStructure, this.state.evalParameters),
-                "isQuestionsReady": true
-            })
-        }
+        const { error, isDataLoaded, isQuestionsReady, evaluation } = this.state;
 
         if (error) {
             return(<div>Error happened while loading content</div>);
@@ -42,53 +43,67 @@ class Evaluation extends Component {
             return(
                 <div>
                     <h2>Evaluation</h2>
-                    <Question filePath="questions/meteo/phenomene_local/evolution_vent_sous_grain.md" />
-                    <Question filePath="questions/meteo/incontournables/etablissement_brise_thermique.md" />
+                        {Object.keys(evaluation).map((category, index) => (
+                            this.renderCategory(category, evaluation[category])
+                        ))}
                 </div>
             )
-        } else if (isStructureLoaded) {
+        } else if (isDataLoaded) {
             return(<div>Creating questions…</div>)
-        } else if (isDBLoaded) {
-            return(<div>Loading eval parameters…</div>)
         } else {
             return(<div>Loading questions database…</div>)
         };
     };
 
-    loadQuestionDB() {
-        return(fetch("http://localhost:3000/questions/db.json", {
-            // This is needed for local access sadly
-            headers : { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-            })
-            .then(response => response.json()))
-            .then(responseJSON => { this.setState({
-                    "db": responseJSON,
-                    "isDBLoaded": true
-                })
-            })
+    renderCategory(categoryName, sections) {
+        return(
+            <div>
+                <h3>{categoryName}</h3>
+                {Object.keys(sections).map((section, index) => (
+                    this.renderSection(categoryName, section, sections[section])
+                ))}
+                <hr/>
+            </div>
+        )
     }
 
-    loadEvalStructure() {
-        fetch("http://localhost:3000/evaluations/catamaran.json", {
-            // This is needed for local access sadly
-            headers : { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-            })
-            .then(response => response.json())
-            .then(responseJSON => { this.setState({
-                "evalStructure": responseJSON,
-                "isStructureLoaded": true
-            })
-        })
+    renderSection(categoryName, sectionName, questions) {
+        return(
+            <div>
+                <h4>{sectionName}</h4>
+                {Object.keys(questions).map((question, index) => {
+                    const filePath = "questions/" + categoryName + "/" + sectionName + "/" + questions[question]["fileName"]
+                    return(
+                        <Question filePath={filePath}/>
+                    )
+                })}
+            </div>
+        )
     }
 
+    async loadQuestionDBAndEvalStructure() {
+        const [dbResponse, evalStructureResponse] = await Promise.all([
+            fetch("http://localhost:3000/questions/db.json", {
+            // This is needed for local access sadly
+                headers : { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                    }
+            }),
+            fetch("http://localhost:3000/evaluations/catamaran.json", {
+            // This is needed for local access sadly
+                headers : { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                    }
+            })
+        ])
 
-    
+        const db = await dbResponse.json();
+        const evalStructure = await evalStructureResponse.json();
+
+        return [db, evalStructure];
+    }
 }
 
 export {Evaluation}

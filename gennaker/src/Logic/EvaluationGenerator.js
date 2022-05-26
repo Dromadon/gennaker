@@ -7,8 +7,10 @@ export function generateEval(db, evalStructure, evalParameters) {
 
     console.debug("Generating eval with following inputs")
     console.debug(evalStructure)
+    console.debug(db)
 
     Object.entries(evalStructure).forEach(([categoryName, sectionsStructure]) => {
+        console.debug("Initiating category " + categoryName);
         evaluation[categoryName] = generateCategory(db[categoryName], sectionsStructure, support);
     })
     return evaluation;
@@ -18,6 +20,7 @@ function generateCategory(dbCategory, sectionsStructure, support) {
     let category = {};
 
     Object.entries(sectionsStructure).forEach(([sectionName, sectionStructure]) => {
+        console.debug("Initiating section " + sectionName);
         category[sectionName] = generateSection(dbCategory[sectionName], sectionStructure, support);
     })
 
@@ -34,8 +37,6 @@ function generateSection(dbSection, sectionStructure, support) {
 
 function filterSupport(dbSection, support) {
     return dbSection.filter((question) => {
-        if (!question.hasOwnProperty("supports") || question["supports"].includes("catamaran")) {
-            return true;
-        }
+        return(!question.hasOwnProperty("supports") || question["supports"].includes("catamaran"))
     })
 }
