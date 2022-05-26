@@ -2,7 +2,6 @@ import logo from './logo.svg';
 import './App.css';
 import React from 'react';
 import { Evaluation } from './Components/Evaluation';
-import { Question } from "./Components/Question";
 
 function App() {
   return (

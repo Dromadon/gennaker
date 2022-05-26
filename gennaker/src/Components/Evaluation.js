@@ -83,14 +83,14 @@ class Evaluation extends Component {
 
     async loadQuestionDBAndEvalStructure() {
         const [dbResponse, evalStructureResponse] = await Promise.all([
-            fetch("http://localhost:3000/questions/db.json", {
+            fetch(process.env.PUBLIC_URL +"/questions/db.json", {
             // This is needed for local access sadly
                 headers : { 
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                     }
             }),
-            fetch("http://localhost:3000/evaluations/catamaran.json", {
+            fetch(process.env.PUBLIC_URL + "/evaluations/catamaran.json", {
             // This is needed for local access sadly
                 headers : { 
                     'Content-Type': 'application/json',
