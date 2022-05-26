@@ -1,24 +1,56 @@
 {
-    "Meteo": {
-        "Communs": [
+    "meteo": {
+        "meta": {
+            "category_name": "Météo"
+        },
+        "brise_thermique": [
             {
-                "filePath": "Meteo/Evolution_vent_sous_grain.md",
+                "fileName": "facteurs_brise_thermique.md",
                 "difficulty": "low"
             },
             {
-                "filePath": "Meteo/Facteurs_brise_thermique.md",
+                "fileName": "etablissement_brise_thermique.md",
+                "difficulty": "medium"
+            }
+        ],
+        "perturbation": [
+            {
+                "fileName": "evolution_depression.md",
+                "difficulty": "medium"
+            },
+            {
+                "fileName": "passage_perturbation.md",
+                "difficulty": "high"
+            }
+        ],
+        "phenomene_local": [
+            {
+                "fileName": "evolution_vent_sous_grain.md",
+                "difficulty": "low"
+            }
+        ],
+        "divers": [
+            {
+                "fileName": "bulletin_vs_modele.md",
+                "difficulty": "low"
+            },
+            {
+                "fileName": "structure_bulletin.md",
                 "difficulty": "medium"
             }
         ]
     },
-    "Conduite": {
-        "Communs": [
+    "conduite": {
+        "meta": {
+            "category_name": "Conduite"
+        },
+        "divers": [
             {
-                "filePath": "Conduite/vent_apparent_risee.md",
+                "fileName": "vent_apparent_risee.md",
                 "difficulty": "low"
             },
             {
-                "filePath": "Conduite/Chronologie_virement_catamaran.md",
+                "fileName": "chronologie_virement_catamaran.md",
                 "difficulty": "high",
                 "support": ["catamaran"]
             }
