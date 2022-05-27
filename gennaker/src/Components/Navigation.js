@@ -1,6 +1,6 @@
 import React from "react"
 import {Container, Nav, Navbar} from "react-bootstrap"
-
+import {LinkContainer} from 'react-router-bootstrap'
 
 function Navigation (props) {
     return(
@@ -10,11 +10,17 @@ function Navigation (props) {
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">
-              <Nav.Link href="#">Générer une évaluation</Nav.Link>
-              <Nav.Link href="#">Fonctionnement des évaluations</Nav.Link>
+              <LinkContainer to="/settings">
+                <Nav.Link href="#">Générer une évaluation</Nav.Link>
+              </LinkContainer>
+              <LinkContainer to="/howitworks">
+                <Nav.Link href="#">Fonctionnement des évaluations</Nav.Link>
+              </LinkContainer>
             </Nav>
             <Nav>
-              <Nav.Link href="#">À propos</Nav.Link>
+              <LinkContainer to="/about">
+                <Nav.Link href="#">À propos</Nav.Link>
+              </LinkContainer>
             </Nav>
           </Navbar.Collapse>
           </Container>

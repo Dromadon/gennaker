@@ -48,9 +48,9 @@ class Evaluation extends Component {
                 <Row>
                     <Col sm={2}></Col>
                     <Col>
-                        <Container>
-                            <h2 class="text-center">Evaluation théorique du niveau 4 FFV en {support}</h2>
-                            <p class="lead">Votre objectif est de répondre de façon synthétique aux questions, en expliquant les points qui vous semblent essentiels dans votre raisonnement. Une bonne réponse sans explication n’est pas comptabilisée, mais de manière générale, une réponse ne doit pas excéder quelques lignes. Un schéma est souvent le bienvenu.</p>
+                        <Container className="">
+                            <h2 className="text-center mt-5">Evaluation théorique du niveau 4 FFV en {support}</h2>
+                            <p className="lead">Votre objectif est de répondre de façon synthétique aux questions, en expliquant les points qui vous semblent essentiels dans votre raisonnement. Une bonne réponse sans explication n’est pas comptabilisée, mais de manière générale, une réponse ne doit pas excéder quelques lignes. Un schéma est souvent le bienvenu.</p>
                             {Object.keys(evaluation).map((category, index) => (
                                 this.renderCategory(category, evaluation[category])
                             ))}

@@ -4,16 +4,20 @@ import React from 'react';
 import { Evaluation } from './Components/Evaluation';
 import { Navigation } from './Components/Navigation';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Route, Routes } from "react-router-dom";
 
-import Container from "react-bootstrap/Container"
+import Settings from './Components/Settings';
+import About from './Components/About';
 
 function App() {
   return (
     <div>
       <Navigation/>
-      <Container>
-        <Evaluation support="catamaran" evalStructure="evaluations/catamaran.json"/>
-      </Container>
+      <Routes>
+        <Route path="/" element={<Settings/>}/>
+        <Route path="/evaluation" element={<Evaluation support="catamaran" evalStructure="evaluations/catamaran.json"/>} />
+        <Route path="/about" element={<About/>}/>
+      </Routes>
     </div>
   );
 }
