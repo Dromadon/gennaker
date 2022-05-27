@@ -16,6 +16,8 @@ function Question (props) {
         .then((res) => res.text())
         .then((text) => {setContent(text); setDisplayedContent(text)});
         }, [props.filePath]);
+    
+    //Insert here code to remove correction if notdisplay props is given
 
     return (
         <div>
