@@ -19,8 +19,14 @@ function Question (props) {
         .then((res) => res.text())
         .then((text) => {
                 setContent(text); 
-                setQuestion(text.substr(0, text.indexOf(CORRECTION_MARKER)));
-                setCorrection(text.substr(text.indexOf(CORRECTION_MARKER), text.length-1))
+                const [question, correction] = text.split(CORRECTION_MARKER)
+                
+                setQuestion(question)
+                if(text.indexOf(CORRECTION_MARKER)>=0) {
+                    setCorrection(CORRECTION_MARKER+correction)
+                } else {
+                    setCorrection('');
+                }
             });
         }, [props.filePath]);
     

@@ -21,7 +21,8 @@ class Evaluation extends Component {
             "evalParameters": {
                 "support": "catamaran"
             },
-            "evaluation": {}
+            "evaluation": {},
+            "displayCorrection": false
         }
     }
 
@@ -65,7 +66,12 @@ class Evaluation extends Component {
                                 ))}
                             </Container>
                         </Col>
-                        <Col sm={12} md={2}></Col>
+                        <Col sm={12} md={2}>
+                            <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" onChange={this.toggleCorrectionDisplay}/>
+                            <label class="form-check-label" for="flexSwitchCheckDefault">Afficher les corrections</label>
+                            </div>
+                        </Col>
                     </Row>
                 </Container>
             )
@@ -95,7 +101,7 @@ class Evaluation extends Component {
                     const filePath = "/questions/" + categoryName + "/" + sectionName + "/" + questions[question]["fileName"]
                     return(
                         <div class="rounded p-3 mb-2 bg-light">
-                            <Question filePath={filePath} displayCorrection={true}/>
+                            <Question filePath={filePath} displayCorrection={this.state.displayCorrection}/>
                         </div>
                     )
                 })}
@@ -114,6 +120,10 @@ class Evaluation extends Component {
                 </Nav>
             </Navbar>
         )
+    }
+
+    toggleCorrectionDisplay = (event) => {
+        this.setState({"displayCorrection": !this.state.displayCorrection});
     }
 
     async loadQuestionDBAndEvalStructure() {
