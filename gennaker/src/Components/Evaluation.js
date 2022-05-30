@@ -5,6 +5,7 @@ import { generateEval } from '../Logic/EvaluationGenerator'
 import Container from "react-bootstrap/Container"
 import Col from "react-bootstrap/Col"
 import Row from "react-bootstrap/Row"
+import { Navbar } from 'react-bootstrap';
 
 class Evaluation extends Component {
 
@@ -39,25 +40,33 @@ class Evaluation extends Component {
     }
 
     render() {
-        const { error, isDataLoaded, isQuestionsReady, evaluation, evalParameters } = this.state;
+        const { error, isDataLoaded, isQuestionsReady, evaluation, evalParameters, db } = this.state;
         const support = evalParameters["support"]
         if (error) {
             return(<div>Error happened while loading content</div>);
         } else if (isQuestionsReady){
             return(
-                <Row>
-                    <Col sm={2}></Col>
-                    <Col>
-                        <Container className="">
-                            <h2 className="text-center mt-5">Evaluation théorique du niveau 4 FFV en {support}</h2>
+                <Container>
+                <Row className="justify-content-center mt-5">
+                        <Col sm={8}>
+                            <h2 className="text-center">Evaluation théorique du niveau 4 FFV en {support}</h2>
                             <p className="lead">Votre objectif est de répondre de façon synthétique aux questions, en expliquant les points qui vous semblent essentiels dans votre raisonnement. Une bonne réponse sans explication n’est pas comptabilisée, mais de manière générale, une réponse ne doit pas excéder quelques lignes. Un schéma est souvent le bienvenu.</p>
-                            {Object.keys(evaluation).map((category, index) => (
+                        </Col>
+                </Row>
+                <Row>
+                    <Col sm={12} md={2}>
+                        {this.renderNavBar(db, evaluation)}
+                    </Col>
+                    <Col sm={12} md={8}>
+                        <Container data-bs-spy="scroll" data-bs-target="#navbar-example3" data-bs-offset="0" tabindex="0">
+                            {Object.keys(evaluation).map((category) => (
                                 this.renderCategory(category, evaluation[category])
                             ))}
                         </Container>
                     </Col>
-                    <Col sm={2}></Col>
+                    <Col sm={12} md={2}></Col>
                 </Row>
+                </Container>
             )
         } else if (isDataLoaded) {
             return(<div>Creating questions…</div>)
@@ -68,9 +77,9 @@ class Evaluation extends Component {
 
     renderCategory(categoryName, sections) {
         return(
-            <Container fluid="lg">
+            <Container id={"category-"+categoryName} fluid="lg">
                 <h3>{this.state.db[categoryName]["meta"]["category_name"]}</h3>
-                {Object.keys(sections).map((section, index) => (
+                {Object.keys(sections).map((section) => (
                     this.renderSection(categoryName, section, sections[section])
                 ))}
                 <hr/>
@@ -92,6 +101,23 @@ class Evaluation extends Component {
             </div>
         )
     }
+
+    renderNavBar(db, evaluation) {
+        return(
+            <Navbar sticky="top">
+            <nav id="navbar-example3" class="navbar navbar-light bg-light flex-column align-items-stretch p-3">
+                <a class="navbar-brand" href="#">Catégories</a>
+                <nav class="nav nav-pills flex-column">
+                    {Object.keys(evaluation).map((category) => { 
+                        const categoryDisplayName = db[category]["meta"]["category_name"]
+                        return(<a class="nav-link" href={"category-"+category}>{categoryDisplayName}</a>)})}
+                </nav>
+            </nav>
+            </Navbar>
+        )
+    }
+
+
 
     async loadQuestionDBAndEvalStructure() {
         const [dbResponse, evalStructureResponse] = await Promise.all([
