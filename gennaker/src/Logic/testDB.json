@@ -2,7 +2,10 @@
     "Meta":{
         "Comments": "Meteo has no supports defined, Conduite has multiple supports described"
     },
-    "Meteo": {
+    "meteo": {
+        "meta": {
+            "categoryDisplayName": "Météo"
+        },
         "Section1": [
             {
                 "fileName": "question1.md"
@@ -25,7 +28,10 @@
             }
         ]
     },
-    "Conduite": {
+    "conduite": {
+        "meta": {
+            "categoryDisplayName": "Conduite"
+        },
         "Section1": [
             {
                 "fileName": "question1.md",
