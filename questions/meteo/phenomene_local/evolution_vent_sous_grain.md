@@ -1,4 +1,4 @@
-### Décrivez l'évolution du vent dans la situation suivante
+# Décrivez l'évolution du vent dans la situation suivante
 *En force et en direction*
 
 ![image](images/grain.png)

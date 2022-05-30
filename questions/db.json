@@ -1,7 +1,7 @@
 {
     "meteo": {
         "meta": {
-            "category_name": "Météo"
+            "categoryDisplayName": "Météo"
         },
         "brise_thermique": [
             {
@@ -42,7 +42,7 @@
     },
     "conduite": {
         "meta": {
-            "category_name": "Conduite"
+            "categoryDisplayName": "Conduite"
         },
         "divers": [
             {
