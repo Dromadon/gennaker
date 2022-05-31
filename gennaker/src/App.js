@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import React from 'react';
-import { Evaluation } from './Components/Evaluation';
+import { EvaluationPage } from './Components/EvaluationPage';
 import { Navigation } from './Components/Navigation';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Route, Routes } from "react-router-dom";
@@ -15,7 +15,7 @@ function App() {
       <Navigation/>
       <Routes>
         <Route path="/" element={<Settings/>}/>
-        <Route path="/evaluation" element={<Evaluation support="catamaran" evalStructure="evaluations/catamaran.json"/>} />
+        <Route path="/evaluation" element={<EvaluationPage support="catamaran" evalStructure="evaluations/catamaran.json"/>} />
         <Route path="/about" element={<About/>}/>
       </Routes>
     </div>
