@@ -43,7 +43,7 @@ function Question (props) {
                 children={correction} 
                 transformImageUri={uri =>
                     `${process.env.PUBLIC_URL}/${transformImageURI(uri, props.filePath)}`} 
-                components={{h1: ({node, ...props}) => <h6 class="text-danger" {...props} />}}
+                components={{h1: ({node, ...props}) => <h6 class="text-primary" {...props} />}}
             /> : null
             }
         </div>

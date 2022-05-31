@@ -68,7 +68,7 @@ class Evaluation extends Component {
                         </Col>
                         <Col sm={12} md={2}>
                             <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" onChange={this.toggleCorrectionDisplay}/>
+                            <input class="form-check-input btn-lg" type="checkbox" role="switch" id="flexSwitchCheckDefault" onChange={this.toggleCorrectionDisplay}/>
                             <label class="form-check-label" for="flexSwitchCheckDefault">Afficher les corrections</label>
                             </div>
                         </Col>
