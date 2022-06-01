@@ -1,0 +1,5 @@
+@media print {
+    .question {
+        break-inside: avoid;
+    }
+}

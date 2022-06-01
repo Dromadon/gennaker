@@ -1,23 +1,16 @@
 import React, { Component } from 'react';
 import {Question} from './Question';
 import Container from "react-bootstrap/Container"
+import "./questionPrint.css"
 
 class Evaluation extends Component {
-
-    constructor(props) {
-        super(props);  
-        this.db = props.db;
-        this.evaluation = props.evaluation;
-        this.displayCorrection = props.displayCorrection; 
-        //Does not update as it is not state TOFIX     
-    }
 
     render(){
         return(
         <div>
         <Container  data-bs-spy="scroll" data-bs-target="#navbar-questions" data-bs-offset="0" tabindex="0">
-        {Object.keys(this.evaluation).map((category) => (
-                renderCategory(this.db, category, this.evaluation[category], this.displayCorrection)
+        {Object.keys(this.props.evaluation).map((category) => (
+                renderCategory(this.props.db, category, this.props.evaluation[category], this.props.displayCorrection)
             ))}
         </Container>
         </div>
@@ -44,7 +37,7 @@ function renderSection(categoryName, sectionName, questions, displayCorrection) 
                 const filePath = "/questions/" + categoryName + "/" + sectionName + "/" + questions[question]["fileName"]
                 return(
                     <div class="rounded p-3 mb-2 bg-light">
-                        <Question filePath={filePath} displayCorrection={displayCorrection}/>
+                        <Question class="question" filePath={filePath} displayCorrection={displayCorrection}/>
                     </div>
                 )
             })}
