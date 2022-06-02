@@ -8,7 +8,7 @@ class Evaluation extends Component {
     render(){
         return(
         <div>
-        <Container  data-bs-spy="scroll" data-bs-target="#navbar-questions" data-bs-offset="0" tabindex="0">
+        <Container id="evaluation" data-bs-spy="scroll" data-bs-target="#navbar-questions" data-bs-offset="0" tabindex="0">
         {Object.keys(this.props.evaluation).map((category) => (
                 renderCategory(this.props.db, category, this.props.evaluation[category], this.props.displayCorrection)
             ))}
@@ -31,13 +31,20 @@ function renderCategory(db, categoryName, sections, displayCorrection) {
 }
 
 function renderSection(categoryName, sectionName, questions, displayCorrection) {
+    console.debug(questions)
+    console.debug(Object.keys(questions))
     return(
         <div>
-            {Object.keys(questions).map((question, index) => {
-                const filePath = "/questions/" + categoryName + "/" + sectionName + "/" + questions[question]["fileName"]
+            {questions.map((question) => {
+                const filePath = "/questions/" + categoryName + "/" + sectionName + "/" + question["fileName"]
+                
                 return(
                     <div class="rounded p-3 mb-2 bg-light">
-                        <Question class="question" filePath={filePath} displayCorrection={displayCorrection}/>
+                        <Question 
+                            class="question" 
+                            filePath={filePath} 
+                            answerSize={question["answerSize"]}
+                            displayCorrection={displayCorrection}/>
                     </div>
                 )
             })}

@@ -8,10 +8,12 @@
         },
         "Section1": [
             {
-                "fileName": "question1.md"
+                "fileName": "question1.md",
+                "answerSize": "lg"
             },
             {
-                "fileName": "question2.md"
+                "fileName": "question2.md",
+                "answerSize": "sm"
             }
         ],
         "Section2": [

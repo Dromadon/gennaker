@@ -6,11 +6,13 @@
         "brise_thermique": [
             {
                 "fileName": "facteurs_brise_thermique.md",
-                "difficulty": "low"
+                "difficulty": "low",
+                "answerSize": "lg"
             },
             {
                 "fileName": "etablissement_brise_thermique.md",
-                "difficulty": "medium"
+                "difficulty": "medium",
+                "answerSize": "xl"
             }
         ],
         "perturbation": [
@@ -32,11 +34,13 @@
         "divers": [
             {
                 "fileName": "bulletin_vs_modele.md",
-                "difficulty": "low"
+                "difficulty": "low",
+                "answerSize": "sm"
             },
             {
                 "fileName": "structure_bulletin.md",
-                "difficulty": "medium"
+                "difficulty": "medium",
+                "answerSize": "lg"
             }
         ]
     },
@@ -53,6 +57,11 @@
                 "fileName": "chronologie_virement_catamaran.md",
                 "difficulty": "high",
                 "support": ["catamaran"]
+            },
+            {
+                "fileName": "chronologie_virement_deriveur.md",
+                "difficulty": "high",
+                "support": ["deriveur"]
             }
         ]
     }

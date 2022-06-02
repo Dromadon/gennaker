@@ -10,7 +10,6 @@ import { NavHashLink } from 'react-router-hash-link';
 
 import ReactToPrint from 'react-to-print';
 
-
 class EvaluationPage extends Component {
 
     constructor(props) {
@@ -64,7 +63,7 @@ class EvaluationPage extends Component {
                             {this.renderNavBar(db, evaluation)}
                         </Col>
                         <Col sm={12} md={8}>
-                            <Evaluation ref={el => (this.componentRef = el)} db={db} evaluation={evaluation} displayCorrection={displayCorrection}/>
+                            <Evaluation id="evaluation" ref={el => (this.componentRef = el)} db={db} evaluation={evaluation} displayCorrection={displayCorrection}/>
                         </Col>
                         <Col sm={12} md={2}>
                             <Form>
@@ -108,10 +107,6 @@ class EvaluationPage extends Component {
 
     toggleCorrectionDisplay = (event) => {
         this.setState({"displayCorrection": !this.state.displayCorrection});
-    }
-
-    printEvaluation = (event) => {
-
     }
 
     async loadQuestionDBAndEvalStructure() {

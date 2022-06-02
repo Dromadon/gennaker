@@ -1,8 +1,17 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useEffect, useState } from 'react';
+import { Button } from 'react-bootstrap';
 
 const CORRECTION_MARKER="# Correction"
+const ANSWER_LINES_BY_SIZE={
+    "xs": 2,
+    "sm": 5,
+    "md": 8,
+    "lg": 11,
+    "xl": 14
+}
+const DEFAULT_ANSWER_SIZE="md"
 
 function Question (props) {
     const [content, setContent] = useState("");
@@ -30,7 +39,7 @@ function Question (props) {
             });
         }, [props.filePath]);
     
-    return (
+       return (
         <div>
             <ReactMarkdown 
                 children={question} 
@@ -39,13 +48,28 @@ function Question (props) {
                 components={{h1: ({node, ...props}) => <h6 {...props} />}}
             />
             { props.displayCorrection ? 
-            <ReactMarkdown 
-                children={correction} 
-                transformImageUri={uri =>
-                    `${process.env.PUBLIC_URL}/${transformImageURI(uri, props.filePath)}`} 
-                components={{h1: ({node, ...props}) => <h6 class="text-primary" {...props} />}}
-            /> : null
+                <ReactMarkdown 
+                    children={correction} 
+                    transformImageUri={uri =>
+                        `${process.env.PUBLIC_URL}/${transformImageURI(uri, props.filePath)}`} 
+                    components={{h1: ({node, ...props}) => <h6 class="text-primary" {...props} />}}
+                /> : <AnswerLines answerSize={props.answerSize}/>
+
             }
+        </div>
+    )
+}
+
+function AnswerLines(props) {
+    var answerLines = ANSWER_LINES_BY_SIZE[DEFAULT_ANSWER_SIZE];
+
+    if (props.answerSize != undefined && props.answerSize in ANSWER_LINES_BY_SIZE) {
+        answerLines = ANSWER_LINES_BY_SIZE[props.answerSize];
+    } 
+
+    return(
+        <div>
+            {[...Array(answerLines)].map(() => <br/>)}
         </div>
     )
 }
