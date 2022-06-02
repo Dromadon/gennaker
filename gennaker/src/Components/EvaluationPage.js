@@ -52,21 +52,21 @@ class EvaluationPage extends Component {
         } else if (isQuestionsReady){
             return(
                 <Container>
-                    <Row className="justify-content-center mt-5">
-                        <Col sm={8}>
-                            <h2 className="text-center">Evaluation théorique du niveau 4 FFV en {support}</h2>
-                            <p className="lead">Votre objectif est de répondre de façon synthétique aux questions, en expliquant les points qui vous semblent essentiels dans votre raisonnement. Une bonne réponse sans explication n’est pas comptabilisée, mais de manière générale, une réponse ne doit pas excéder quelques lignes. Un schéma est souvent le bienvenu.</p>
-                        </Col>
-                    </Row>
                     <Row>
                         <Col sm={12} md={2}>
                             {this.renderNavBar(db, evaluation)}
                         </Col>
-                        <Col sm={12} md={8}>
-                            <Evaluation id="evaluation" ref={el => (this.componentRef = el)} db={db} evaluation={evaluation} displayCorrection={displayCorrection}/>
+                        <Col className="px-0" sm={12} md={8}>
+                            <Evaluation id="evaluation" 
+                                ref={el => (this.componentRef = el)} 
+                                db={db} evaluation={evaluation} 
+                                evalParameters={evalParameters}
+                                displayCorrection={displayCorrection}/>
                         </Col>
                         <Col sm={12} md={2}>
+                            <Navbar sticky="top">
                             <Form>
+                                {/*Need to find why is button on the left ?!*/}
                                 <Form.Switch
                                    onChange={this.toggleCorrectionDisplay}
                                    id="toggleCorrection"
@@ -80,7 +80,10 @@ class EvaluationPage extends Component {
                                     return <Button size="md">Imprimer </Button>
                                 }}
                                 content={() => this.componentRef}
+                                sticky="top"
+                                bg="light"
                             />
+                            </Navbar>
                         </Col>
                     </Row>
                 </Container>
