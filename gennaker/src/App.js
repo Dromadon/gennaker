@@ -8,13 +8,15 @@ import { Route, Routes } from "react-router-dom";
 
 import Settings from './Components/Settings';
 import About from './Components/About';
+import './App.scss';
 
 function App() {
   return (
-    <div>
+    <div className="bg-gray-200">
       <Navigation/>
       <Routes>
         <Route path="/" element={<Settings/>}/>
+        <Route path="/settings" element={<Settings/>}/>
         <Route path="/evaluation" element={<EvaluationPage support="catamaran" evalStructure="evaluations/catamaran.json"/>} />
         <Route path="/about" element={<About/>}/>
       </Routes>

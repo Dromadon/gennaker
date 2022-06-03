@@ -40,7 +40,7 @@ function Question (props) {
         }, [props.filePath]);
     
        return (
-        <div>
+        <div className="question rounded p-3 mb-2">
             <ReactMarkdown 
                 children={question} 
                 transformImageUri={uri =>

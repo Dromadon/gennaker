@@ -5,7 +5,7 @@ import { generateEval } from '../Logic/EvaluationGenerator'
 import Container from "react-bootstrap/Container"
 import Col from "react-bootstrap/Col"
 import Row from "react-bootstrap/Row"
-import { Navbar, Nav, Form, Button } from 'react-bootstrap';
+import { Navbar, Nav, Form, Button, Stack } from 'react-bootstrap';
 import { NavHashLink } from 'react-router-hash-link';
 
 import ReactToPrint from 'react-to-print';
@@ -51,39 +51,17 @@ class EvaluationPage extends Component {
             return(<div>Error happened while loading content</div>);
         } else if (isQuestionsReady){
             return(
-                <Container>
+                <Container id="evaluationPage">
                     <Row>
-                        <Col sm={12} md={2}>
+                        <Col xs={12} lg={2}>
                             {this.renderNavBar(db, evaluation)}
                         </Col>
-                        <Col className="px-0" sm={12} md={8}>
+                        <Col className="px-0" sm={12} lg={10}>
                             <Evaluation id="evaluation" 
                                 ref={el => (this.componentRef = el)} 
                                 db={db} evaluation={evaluation} 
                                 evalParameters={evalParameters}
                                 displayCorrection={displayCorrection}/>
-                        </Col>
-                        <Col sm={12} md={2}>
-                            <Navbar sticky="top">
-                            <Form>
-                                {/*Need to find why is button on the left ?!*/}
-                                <Form.Switch
-                                   onChange={this.toggleCorrectionDisplay}
-                                   id="toggleCorrection"
-                                   label="Afficher la correction"
-                                   checked={this.state.displayCorrection}
-                                   className="btn-lg"
-                                />
-                            </Form>
-                            <ReactToPrint
-                                trigger={() => {
-                                    return <Button size="md">Imprimer </Button>
-                                }}
-                                content={() => this.componentRef}
-                                sticky="top"
-                                bg="light"
-                            />
-                            </Navbar>
                         </Col>
                     </Row>
                 </Container>
@@ -97,14 +75,33 @@ class EvaluationPage extends Component {
 
     renderNavBar(db, evaluation) {
         return(
-            <Navbar id="navbar-questions" sticky="top" bg="light" color="light" className="flex-column align-items-strech p-3">
+            <div className="lateralNavBar mt-3 p-3 sticky-lg-top rounded">
+            <Navbar id="navbar-questions" color="light" className="flex-column align-items-strech p-3 mt-3">
                 <a class="navbar-brand" href="#">Catégories</a>
                 <Nav class="nav nav-pills flex-column">
                     {Object.keys(evaluation).map((category) => { 
                         const categoryDisplayName = db[category]["meta"]["categoryDisplayName"]
-                        return(<NavHashLink activeStyle={{ color: 'red' }} class="nav-link" to={"#category-"+category}>{categoryDisplayName}</NavHashLink>)})}
+                        return(<NavHashLink class="nav-link" to={"#category-"+category}>{categoryDisplayName}</NavHashLink>)})}
                 </Nav>
             </Navbar>
+            <Form>
+                {/*Need to find why is button on the left ?!*/}
+                <Form.Switch
+                   onChange={this.toggleCorrectionDisplay}
+                   id="toggleCorrection"
+                   label="Afficher la correction"
+                   checked={this.state.displayCorrection}
+                   className="btn-md"
+                />
+            </Form>
+            <ReactToPrint
+                trigger={() => {
+                    return <Button size="md">Imprimer </Button>
+                }}
+                content={() => this.componentRef}
+                bg="primary"
+            />
+            </div>
         )
     }
 

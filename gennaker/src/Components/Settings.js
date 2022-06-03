@@ -1,15 +1,18 @@
 import React from 'react';
+import { Container, Form, Col} from 'react-bootstrap';
 
 class Settings extends React.Component {
     
     render() {
         return (
-            <div>
-                <h2>Settings Page</h2>
-                <main>
-                    <p>This section contains information about...</p>
-                </main>
-            </div>
+            <Container className="mt-3">
+                <Col lg="6" className="mx-auto">
+                <Form className="sm-col-6 me-auto">
+                    <h4>Lorem ipsum</h4>
+                </Form>
+                </Col>
+                
+            </Container>
         )
     }
 }

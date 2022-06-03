@@ -1,13 +1,12 @@
 import React from 'react';
-import { Container, Row } from 'react-bootstrap';
+import { Container, Col } from 'react-bootstrap';
 
 class About extends React.Component {
     
     render() {
         return (
-            <div>
                 <Container>
-                    <Row>
+                    <Col xs={8} className="mx-auto mt-3">
                     <h2>Quel est l’objectif de Gennaker ?</h2>
                     <main>
                         <p>
@@ -33,9 +32,8 @@ class About extends React.Component {
                         </p>
                     <h2>Comment contribuer</h2>
                     <h2>Contributeurs</h2>
-                    </Row>
+                    </Col>
                 </Container>
-            </div>
         )
     }
 }

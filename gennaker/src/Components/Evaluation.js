@@ -45,13 +45,10 @@ function renderSection(categoryName, sectionName, questions, displayCorrection) 
                 const filePath = "/questions/" + categoryName + "/" + sectionName + "/" + question["fileName"]
                 
                 return(
-                    <div class="rounded p-3 mb-2 bg-light">
                         <Question 
-                            class="question" 
                             filePath={filePath} 
                             answerSize={question["answerSize"]}
                             displayCorrection={displayCorrection}/>
-                    </div>
                 )
             })}
         </div>
