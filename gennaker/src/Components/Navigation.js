@@ -4,8 +4,8 @@ import {LinkContainer} from 'react-router-bootstrap'
 
 function Navigation (props) {
     return(
-        <Navbar collapseOnSelect expand="lg" bg="primary" variant="dark">
-          <Container>
+        <Navbar id="topNavBar" collapseOnSelect expand="lg" variant="dark">
+          <Container fluid>
           <Navbar.Brand href="#home">Gennaker</Navbar.Brand>
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">

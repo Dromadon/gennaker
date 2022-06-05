@@ -1,14 +1,21 @@
+@import "bootstrap";
+
+$primary: $blue-600;
+$dark: $blue-800;
+$secondary: $gray-200;
+
+$theme-colors: (
+  "primary": $primary,
+  "secondary": $secondary,
+  "dark": $dark,
+);
+
+
+@import "scss/lateralColumn.scss";
+@import "scss/question.scss";
+@import "scss/navBar.scss";
+@import "scss/body.scss";
+@import "scss/settings.scss";
+
 @import "~bootstrap/scss/bootstrap";
-
-
-.lateralNavBar {
-    background-color: $blue-100;
-}
-
-.question {
-    background-color: $gray-100;
-}
-
-.sticky-lg-top {
-    top: $spacer;
-}
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css");

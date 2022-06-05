@@ -51,12 +51,12 @@ class EvaluationPage extends Component {
             return(<div>Error happened while loading content</div>);
         } else if (isQuestionsReady){
             return(
-                <Container id="evaluationPage">
+                <Container fluid id="evaluationPage">
                     <Row>
-                        <Col xs={12} lg={2}>
+                        <Col xs={12} lg={2} className="lateralColumn">
                             {this.renderNavBar(db, evaluation)}
                         </Col>
-                        <Col className="px-0" sm={12} lg={10}>
+                        <Col sm={12} lg={10}>
                             <Evaluation id="evaluation" 
                                 ref={el => (this.componentRef = el)} 
                                 db={db} evaluation={evaluation} 
@@ -75,32 +75,33 @@ class EvaluationPage extends Component {
 
     renderNavBar(db, evaluation) {
         return(
-            <div className="lateralNavBar mt-3 p-3 sticky-lg-top rounded">
-            <Navbar id="navbar-questions" color="light" className="flex-column align-items-strech p-3 mt-3">
-                <a class="navbar-brand" href="#">Catégories</a>
-                <Nav class="nav nav-pills flex-column">
-                    {Object.keys(evaluation).map((category) => { 
-                        const categoryDisplayName = db[category]["meta"]["categoryDisplayName"]
-                        return(<NavHashLink class="nav-link" to={"#category-"+category}>{categoryDisplayName}</NavHashLink>)})}
-                </Nav>
-            </Navbar>
-            <Form>
-                {/*Need to find why is button on the left ?!*/}
-                <Form.Switch
-                   onChange={this.toggleCorrectionDisplay}
-                   id="toggleCorrection"
-                   label="Afficher la correction"
-                   checked={this.state.displayCorrection}
-                   className="btn-md"
-                />
-            </Form>
-            <ReactToPrint
-                trigger={() => {
-                    return <Button size="md">Imprimer </Button>
-                }}
-                content={() => this.componentRef}
-                bg="primary"
-            />
+            <div className="lateralNavBar sticky-lg-top">
+                <Navbar id="navbar-questions" color="light" className="flex-column align-items-start">
+                    <a class="navbar-brand" href="#">Catégories</a>
+                    <Nav class="nav nav-pills flex-column">
+                        {Object.keys(evaluation).map((category) => { 
+                            const categoryDisplayName = db[category]["meta"]["categoryDisplayName"]
+                            return(<NavHashLink class="nav-link" to={"#category-"+category}>{"> "+categoryDisplayName}</NavHashLink>)})}
+                    </Nav>
+                </Navbar>
+                <hr/>
+                <div className="vstack gap-3">
+                    <Form>
+                        <Form.Switch
+                        onChange={this.toggleCorrectionDisplay}
+                        id="toggleCorrection"
+                        label="Afficher la correction"
+                        checked={this.state.displayCorrection}
+                        className="btn-md"
+                        />
+                    </Form>
+                    <ReactToPrint
+                        trigger={() => {
+                            return <Button size="md" variant="primary">Imprimer </Button>
+                        }}
+                        content={() => this.componentRef}
+                    />
+                </div>
             </div>
         )
     }

@@ -10,7 +10,7 @@ class Evaluation extends Component {
     render(){
         return(
         <div>
-        <Container id="evaluation" data-bs-spy="scroll" data-bs-target="#navbar-questions" data-bs-offset="0" tabindex="0">
+        <Container fluid id="evaluation" data-bs-spy="scroll" data-bs-target="#navbar-questions" data-bs-offset="0" tabindex="0">
         <Row className="justify-content-center mt-5">
             <h2 className="text-center">Evaluation théorique du niveau 4 FFV en {this.props.evalParameters["support"]}</h2>
             <p><em>Votre objectif est de répondre de façon synthétique aux questions, en expliquant les points qui vous semblent essentiels dans votre raisonnement. Une bonne réponse sans explication n’est pas comptabilisée, mais de manière générale, une réponse ne doit pas excéder quelques lignes. Un schéma est souvent le bienvenu.</em></p>

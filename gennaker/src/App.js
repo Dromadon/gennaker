@@ -1,5 +1,4 @@
 import logo from './logo.svg';
-import './App.css';
 import React from 'react';
 import { EvaluationPage } from './Components/EvaluationPage';
 import { Navigation } from './Components/Navigation';
@@ -12,7 +11,7 @@ import './App.scss';
 
 function App() {
   return (
-    <div className="bg-gray-200">
+    <div>
       <Navigation/>
       <Routes>
         <Route path="/" element={<Settings/>}/>

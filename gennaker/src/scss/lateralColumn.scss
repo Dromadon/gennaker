@@ -1,0 +1,23 @@
+
+.lateralColumn {
+    background-color: $secondary;
+    color: $primary;
+}
+
+.lateralColumn a, a:visited, a:active{
+    color: $primary;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    color: $primary;
+}
+
+.lateralNavBar .navbar-brand a, a:visited {
+    color: $dark;
+}
+
+.lateralNavBar .sticky-lg-top {
+    top: $spacer;
+}
