@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import {Question} from './Question';
 import Container from "react-bootstrap/Container"
-import "./questionPrint.css"
-
 import {Row} from "react-bootstrap";
 
 class Evaluation extends Component {
@@ -29,7 +27,7 @@ class Evaluation extends Component {
 function renderCategory(db, categoryName, sections, displayCorrection) {
     return(
         <Container id={"category-"+categoryName} fluid="lg">
-            <h3>{db[categoryName]["meta"]["categoryDisplayName"]}</h3>
+            <h3 className="categoryTitle">{db[categoryName]["meta"]["categoryDisplayName"]}</h3>
             {Object.keys(sections).map((section) => (
                 renderSection(categoryName, section, sections[section], displayCorrection)
             ))}

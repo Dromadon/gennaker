@@ -81,7 +81,7 @@ class EvaluationPage extends Component {
                     <Nav class="nav nav-pills flex-column">
                         {Object.keys(evaluation).map((category) => { 
                             const categoryDisplayName = db[category]["meta"]["categoryDisplayName"]
-                            return(<NavHashLink class="nav-link" to={"#category-"+category}>{"> "+categoryDisplayName}</NavHashLink>)})}
+                            return(<NavHashLink class="nav-link" to={"#category-"+category}>{categoryDisplayName}</NavHashLink>)})}
                     </Nav>
                 </Navbar>
                 <hr/>

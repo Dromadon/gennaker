@@ -1,0 +1,10 @@
+@media print {
+    .categoryTitle {
+        break-before: avoid;
+        break-inside: avoid;
+    }
+
+    .question {
+        break-inside: avoid;
+    }
+}
