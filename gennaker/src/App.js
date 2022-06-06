@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import React from 'react';
 import { EvaluationPage } from './Components/EvaluationPage';
 import { Navigation } from './Components/Navigation';

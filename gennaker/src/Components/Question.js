@@ -13,7 +13,6 @@ const ANSWER_LINES_BY_SIZE={
 const DEFAULT_ANSWER_SIZE="md"
 
 function Question (props) {
-    const [content, setContent] = useState("");
     const [question, setQuestion] = useState("");
     const [correction, setCorrection] = useState("");
 
@@ -26,7 +25,6 @@ function Question (props) {
         })
         .then((res) => res.text())
         .then((text) => {
-                setContent(text); 
                 const [question, correction] = text.split(CORRECTION_MARKER)
                 
                 setQuestion(question)
@@ -62,7 +60,7 @@ function Question (props) {
 function AnswerLines(props) {
     var answerLines = ANSWER_LINES_BY_SIZE[DEFAULT_ANSWER_SIZE];
 
-    if (props.answerSize != undefined && props.answerSize in ANSWER_LINES_BY_SIZE) {
+    if (props.answerSize !== undefined && props.answerSize in ANSWER_LINES_BY_SIZE) {
         answerLines = ANSWER_LINES_BY_SIZE[props.answerSize];
     } 
 

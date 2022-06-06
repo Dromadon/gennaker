@@ -5,7 +5,7 @@ import { generateEval } from '../Logic/EvaluationGenerator'
 import Container from "react-bootstrap/Container"
 import Col from "react-bootstrap/Col"
 import Row from "react-bootstrap/Row"
-import { Navbar, Nav, Form, Button, Stack } from 'react-bootstrap';
+import { Navbar, Nav, Form, Button } from 'react-bootstrap';
 import { NavHashLink } from 'react-router-hash-link';
 
 import ReactToPrint from 'react-to-print';
@@ -46,7 +46,6 @@ class EvaluationPage extends Component {
 
     render() {
         const { error, isDataLoaded, isQuestionsReady, evaluation, evalParameters, db, displayCorrection } = this.state;
-        const support = evalParameters["support"]
         if (error) {
             return(<div>Error happened while loading content</div>);
         } else if (isQuestionsReady){
