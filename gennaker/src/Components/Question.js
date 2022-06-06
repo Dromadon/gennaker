@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useEffect, useState } from 'react';
-import { Button } from 'react-bootstrap';
 
 const CORRECTION_MARKER="# Correction"
 const ANSWER_LINES_BY_SIZE={
