@@ -1,16 +1,13 @@
 {
   "files": {
-    "main.css": "/gennaker/static/css/main.0b4e74b4.css",
-    "main.js": "/gennaker/static/js/main.56ae2da6.js",
-    "static/js/787.7200183e.chunk.js": "/gennaker/static/js/787.7200183e.chunk.js",
-    "static/media/logo.svg": "/gennaker/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
+    "main.css": "/gennaker/static/css/main.8004cbfa.css",
+    "main.js": "/gennaker/static/js/main.dc5c549e.js",
     "index.html": "/gennaker/index.html",
-    "main.0b4e74b4.css.map": "/gennaker/static/css/main.0b4e74b4.css.map",
-    "main.56ae2da6.js.map": "/gennaker/static/js/main.56ae2da6.js.map",
-    "787.7200183e.chunk.js.map": "/gennaker/static/js/787.7200183e.chunk.js.map"
+    "main.8004cbfa.css.map": "/gennaker/static/css/main.8004cbfa.css.map",
+    "main.dc5c549e.js.map": "/gennaker/static/js/main.dc5c549e.js.map"
   },
   "entrypoints": [
-    "static/css/main.0b4e74b4.css",
-    "static/js/main.56ae2da6.js"
+    "static/css/main.8004cbfa.css",
+    "static/js/main.dc5c549e.js"
   ]
 }
