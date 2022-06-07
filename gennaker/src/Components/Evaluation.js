@@ -6,6 +6,7 @@ import {Row} from "react-bootstrap";
 class Evaluation extends Component {
 
     render(){
+        console.debug(process.env.PUBLIC_URL);
         return(
         <div>
         <Container fluid id="evaluation" data-bs-spy="scroll" data-bs-target="#navbar-questions" data-bs-offset="0" tabindex="0">
@@ -37,11 +38,12 @@ function renderCategory(db, categoryName, sections, displayCorrection) {
 }
 
 function renderSection(categoryName, sectionName, questions, displayCorrection) {
+
     return(
         <div>
             {questions.map((question) => {
-                const filePath = "/questions/" + categoryName + "/" + sectionName + "/" + question["fileName"]
-                
+                const filePath = process.env.PUBLIC_URL + "/questions/" + categoryName + "/" + sectionName + "/" + question["fileName"]
+                console.debug(filePath);
                 return(
                         <Question 
                             filePath={filePath} 

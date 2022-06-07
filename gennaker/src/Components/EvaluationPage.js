@@ -45,6 +45,7 @@ class EvaluationPage extends Component {
     }
 
     render() {
+
         const { error, isDataLoaded, isQuestionsReady, evaluation, evalParameters, db, displayCorrection } = this.state;
         if (error) {
             return(<div>Error happened while loading content</div>);
@@ -106,6 +107,7 @@ class EvaluationPage extends Component {
     }
 
     toggleCorrectionDisplay = (event) => {
+        console.info("Displaying correction");
         this.setState({"displayCorrection": !this.state.displayCorrection});
     }
 
