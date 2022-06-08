@@ -1,11 +1,19 @@
 @media print {
     .categoryTitle {
-        break-before: avoid;
+        break-after: avoid;
         break-inside: avoid;
     }
 
     .question {
         break-inside: avoid;
+        background-color: white;
+    }
+
+    @page {
+        margin-top: 5mm; 
+        margin-bottom: 5mm; 
+        margin-left: 10mm; 
+        margin-right: 10mm
     }
 }
 
