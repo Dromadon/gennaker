@@ -75,7 +75,7 @@ class EvaluationPage extends Component {
 
     renderNavBar(db, evaluation) {
         return(
-            <div className="lateralNavBar sticky-lg-top">
+            <div className="lateralNavBar sticky-lg-top mb-3">
                 <Navbar id="navbar-questions" color="light" className="flex-column align-items-start">
                     <a class="navbar-brand" href="#">Catégories</a>
                     <Nav class="nav nav-pills flex-column">
