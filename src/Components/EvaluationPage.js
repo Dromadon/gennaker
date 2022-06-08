@@ -97,10 +97,11 @@ class EvaluationPage extends Component {
                     </Form>
                     <ReactToPrint
                         trigger={() => {
-                            return <Button size="md" variant="primary">Imprimer </Button>
+                            return <Button size="md" variant="primary"><div className="hstack"><i class="bi bi-printer-fill"></i><span class="mx-auto">Imprimer</span></div></Button>
                         }}
                         content={() => this.componentRef}
                     />
+                    <Button onClick={() => window.location.reload()} variant="success" size="md"><div className="hstack"><i class="bi bi-arrow-clockwise"></i><span class="mx-auto">Générer une nouvelle évaluation</span></div></Button>
                 </div>
             </div>
         )
