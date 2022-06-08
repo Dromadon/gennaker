@@ -41,7 +41,7 @@ function Question (props) {
             <ReactMarkdown 
                 children={question} 
                 transformImageUri={uri =>
-                    `${process.env.PUBLIC_URL}/${transformImageURI(uri, props.filePath)}`} 
+                    `${transformImageURI(uri, props.filePath)}`} 
                 components={{h1: ({node, ...props}) => <h6 {...props} />}}
             />
             { props.displayCorrection ? 
@@ -72,7 +72,10 @@ function AnswerLines(props) {
 }
 
 export function transformImageURI(uri, filePath) {
+    console.debug(uri);
+    console.debug(filePath);
     let strippedPath = filePath.substr(0, filePath.lastIndexOf("/")+1);
+    console.debug(strippedPath);
     return strippedPath + uri;
 }
 
