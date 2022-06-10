@@ -1,38 +1,42 @@
 # Contenu d’une éval catamaran
 
 # Météo
-* 1 question passage de dépression
-* 1 question brise thermique
+* 1 question macro passage de dépression ou brise
 * 1 question phénomène locaux/effets de site
-* 1 question diverse (prise d’information, échelle de beaufort, lecture de carte isobarique, etc.)
+* 1 question diverse (prise d’information, échelle de beaufort, différences entre modèles, lecture de carte isobarique, etc.)
 
 # Océanographie
-* 1 question calcul de marée
-* 1 question diverse sur la marée
+* 1 question calcul de marée + nav
 
 # Navigation
 * 1 question balisage
 * 1 question alignement
-* 1 question diverse (adaptation de route, cadre déformé, trajet à suivre, etc.)
+* 1 question diverse (adaptation de route, règles de route, routes de collision, trajet à suivre, etc.)
 
-# Conduite
+# Fonctionnement de l'engin
 * 1 question vent apparent
-* 1 question gain au/sous vent
-* 2 question diverse (gestion risée, trajectoire sous spi, passage de bouée, etc.)
-
-# Manœuvres
-* 1 chronologie de manœuvre (VdB ou Emp ou Auloffée/Abattée)
-* 2 questions diverses (sortie au trapèze/position, facteurs de succès VdB vent fort, envoi de spi, etc.)
-
-# Aéro-hydro
-* 1 dessin d’équilibre des forces aéro-hydro
-* 1 dessin de couple (enfournement/redressement, dessalage/ressalage, auloffée, abattée) 
-* 1 réglage fin/statique
-* 1 réglage de voile avec penons/vent apparent
-* 1 question diverse
+* 1 question parmi : 
+  * gain au vent/sous vent
+  * gestion risée
+  * trajectoire sous spi
+  * passage de bouée
+* 1 chronologie de manœuvre
+* 1 question parmi : 
+  * sortie au trap
+  * Vdb vent fort en cata
+  * abattée dans vent fort
+  * envoi de spi
+  * départ au planning en dériveur/planche
+  * etc.
+* 1 dessin d'équilibre des forces ou de couple (enfournement/redressement, dessalage/ressalage, auloffée, abattée)
+* 1 question réglage général contextualisée : paramètres vent et mer, "comment tu règles ton bateau ?"
+  * ex : au près serré dans du vent, comment régler mon creux ?
+* 1 question générique parmi : 
+  * penons et vent apparent 
+  * réglage statique 
 
 # Sécurité
-* 1 question
+* 1 question (trajectoire HLM, gestion d'une urgence (noyade hypothermie etc.), comment se préparer à aller dans l'eau froide, procédures d'alerte, ressalage, etc.)
 
 # Environnement
 * 2 questions
