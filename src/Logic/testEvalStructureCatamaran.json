@@ -1,5 +1,5 @@
 {
-    "Meteo": {
+    "meteo": {
         "Section1": {
             "number": 1
         },
@@ -7,7 +7,7 @@
             "number": 2
         }
     },
-    "Conduite" : {
+    "conduite" : {
         "Section1": {
             "number": 3
         }

@@ -11,8 +11,8 @@ describe('generatorShouldReturnStructureAsDescribedByStructureJSON', () => {
 
     test('generateEvalShouldReturnCategoriesFromEvalStructure', () => {
         // Then
-        expect(evaluation).toHaveProperty('Meteo');
-        expect(evaluation).toHaveProperty('Conduite');
+        expect(evaluation).toHaveProperty('meteo');
+        expect(evaluation).toHaveProperty('conduite');
     })
     
     test('generateEvalShouldNotReturnCategoriesNotInEvalStructure', () => {
@@ -22,14 +22,14 @@ describe('generatorShouldReturnStructureAsDescribedByStructureJSON', () => {
     
     test('generateEvalShouldReturnSectionsFromEvalStructure', () => {
         // Then
-        expect(evaluation['Meteo']).toHaveProperty('Section1');
-        expect(evaluation['Meteo']).toHaveProperty('Section2');
-        expect(evaluation['Conduite']).toHaveProperty('Section1');
+        expect(evaluation['meteo']).toHaveProperty('Section1');
+        expect(evaluation['meteo']).toHaveProperty('Section2');
+        expect(evaluation['conduite']).toHaveProperty('Section1');
     })
     
     test('generateEvalShouldNotReturnSectionsNotEvalStructure', () => {
         // Then
-        expect(evaluation['Meteo']).not.toHaveProperty('Section3');
+        expect(evaluation['meteo']).not.toHaveProperty('Section3');
     })
 })
 
@@ -53,7 +53,7 @@ describe('generatorShouldReturnQuestionsAsDescribedByStructure', () => {
 
     test('generateEvalShouldReturnNumberOfQuestionsInSectionDescribedByStructure', () => {
         // Then
-        expect(evaluation['Meteo']['Section1'].length).toEqual(1);
+        expect(evaluation['meteo']['Section1'].length).toEqual(1);
     })
 
     test('generateEvalShouldExcludeQuestionsWithBadSupport', () => {
@@ -63,13 +63,14 @@ describe('generatorShouldReturnQuestionsAsDescribedByStructure', () => {
         land randomly on working case 
         Improvement idea: launch it 10 times, try to mock the random generation (hard)
         */
-        evaluation['Conduite']['Section1'].forEach((question) => {
+       console.log(evaluation["conduite"]["Section1"])
+        evaluation['conduite']['Section1'].forEach((question) => {
             expect(question['supports']).toEqual(expect.arrayContaining(['catamaran']));
         });
     })
 
     test('generateEvalShouldIncludeQuestionsWithoutDefinedSupport', () => {
         // Then
-        expect(evaluation['Meteo']['Section1'].length).toBeGreaterThan(0);
+        expect(evaluation['meteo']['Section1'].length).toBeGreaterThan(0);
     })
 })

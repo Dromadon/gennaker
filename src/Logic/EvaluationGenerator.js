@@ -5,21 +5,22 @@ export function generateEval(db, evalStructure, evalParameters) {
     let evaluation = {};
     const support = evalParameters["support"];
 
-    console.debug("Generating eval with following inputs")
-    console.debug(evalStructure)
-    console.debug(db)
+    console.debug("Generating eval with following inputs");
+    console.debug(evalStructure);
+    console.debug(db);
+    console.debug(evalParameters);
 
-    Object.entries(evalStructure).forEach(([categoryName, sectionsStructure]) => {
+    Object.entries(evalStructure).forEach(([categoryName, categoryStructure]) => {
         console.debug("Initiating category " + categoryName);
-        evaluation[categoryName] = generateCategory(db[categoryName], sectionsStructure, support);
+        evaluation[categoryName] = generateCategory(db[categoryName], categoryStructure, support);
     })
     return evaluation;
 }
 
-function generateCategory(dbCategory, sectionsStructure, support) {
+function generateCategory(dbCategory, categoryStructure, support) {
     let category = {};
 
-    Object.entries(sectionsStructure).forEach(([sectionName, sectionStructure]) => {
+    Object.entries(categoryStructure).forEach(([sectionName, sectionStructure]) => {
         console.debug("Initiating section " + sectionName);
         category[sectionName] = generateSection(dbCategory[sectionName], sectionStructure, support);
     })
@@ -37,6 +38,6 @@ function generateSection(dbSection, sectionStructure, support) {
 
 function filterSupport(dbSection, support) {
     return dbSection.filter((question) => {
-        return(!question.hasOwnProperty("supports") || question["supports"].includes("catamaran"))
+        return(!question.hasOwnProperty("supports") || question["supports"].includes(support))
     })
 }
