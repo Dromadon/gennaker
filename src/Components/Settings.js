@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Form, Row, Col, Button} from 'react-bootstrap';
 import { useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import { createSearchParams, useNavigate } from "react-router-dom";
 
 function Settings(props) {
 
@@ -12,7 +12,13 @@ function Settings(props) {
 
     const handleSubmit = (event) => {
             event.preventDefault();
-            navigate("/evaluation");
+            navigate({
+                pathname: "/evaluation",
+                search: createSearchParams({
+                    support: support,
+                    length: length
+                }).toString()
+            });
         }
 
     const handleSupportChange = (event) => {
