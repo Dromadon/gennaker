@@ -21,7 +21,7 @@
   * trajectoire sous spi
   * passage de bouée
 * 1 chronologie de manœuvre
-* 1 question parmi : 
+* 1 question divers parmi : 
   * sortie au trap
   * Vdb vent fort en cata
   * abattée dans vent fort

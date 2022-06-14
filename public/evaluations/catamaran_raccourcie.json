@@ -8,9 +8,6 @@
         },
         "phenomene_local": {
             "number": 1
-        },
-        "divers": {
-            "number": 1
         }
     },
     "oceanographie" : {
@@ -24,9 +21,6 @@
         },
         "alignement" : {
             "number": 1
-        },
-        "divers" : {
-            "number": 1
         }
     },
     "conduite" : {
@@ -34,9 +28,6 @@
             "number": 1
         },
         "chronologie": {
-            "number": 1
-        },
-        "divers": {
             "number": 1
         }
     },
@@ -49,9 +40,6 @@
         },
         "réglage" : {
             "number": 1
-        },
-        "divers" : {
-            "number": 1
         }
     },
     "securite" : {
@@ -59,14 +47,9 @@
             "number": 1
         }
     },
-    "technologie" : { 
-        "divers" : {
-            "number": 1
-        }
-    },
     "environnement" : {
         "divers" : {
-            "number": 2
+            "number": 1
         }
     }
 }
