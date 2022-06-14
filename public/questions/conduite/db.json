@@ -1,0 +1,21 @@
+{
+    "meta": {
+        "categoryDisplayName": "Conduite"
+    },
+    "divers": [
+        {
+            "fileName": "vent_apparent_risee.md",
+            "difficulty": "low"
+        },
+        {
+            "fileName": "chronologie_virement_catamaran.md",
+            "difficulty": "high",
+            "supports": ["catamaran"]
+        },
+        {
+            "fileName": "chronologie_virement_deriveur.md",
+            "difficulty": "high",
+            "supports": ["deriveur"]
+        }
+    ]
+}

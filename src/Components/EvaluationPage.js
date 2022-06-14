@@ -38,7 +38,7 @@ function EvaluationPage(props) {
     }
 
     useEffect(() => {
-        loadQuestionDBAndEvalStructure().then(([db, evalStructure]) => {
+        loadQuestionDBAndEvalStructure(evalParameters["support"], evalParameters["length"]).then(([db, evalStructure]) => {
             console.debug("DB and structure fetched");
             setIsDataLoaded(true);
             setDB(db);
@@ -79,26 +79,44 @@ function EvaluationPage(props) {
     };
 }
 
-async function loadQuestionDBAndEvalStructure() {
-    const [dbResponse, evalStructureResponse] = await Promise.all([
-        fetch(process.env.PUBLIC_URL +"/questions/db.json", {
-        // This is needed for local access sadly
-            headers : { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-                }
-        }),
-        fetch(process.env.PUBLIC_URL + "/evaluations/catamaran.json", {
-        // This is needed for local access sadly
+async function loadQuestionDBAndEvalStructure(support, length) {
+    const evalStructureResponse = await fetch(process.env.PUBLIC_URL + "/evaluations/catamaran_standard.json", {
             headers : { 
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
                 }
         })
-    ])
-
-    const db = await dbResponse.json();
     const evalStructure = await evalStructureResponse.json();
+
+    const categoriesDB = await Promise.all(Object.keys(evalStructure).map(
+        //We put every category DB in an object with a single key
+        //being the category name
+        /* Each object is like:
+            {
+                meteo: {
+                    DB content fetched from db.json
+                }
+            }
+        //*/
+         async (category) => ({[category]: await (await fetch(process.env.PUBLIC_URL +"/questions/"+category+"/db.json", {
+                headers : { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+            })).json()}))
+    );
+    
+    //Then we merge all these category db objects in order to get
+    //a single object with each top key being a category
+    /*
+            {
+                meteo: {…},
+                conduite: {…},
+                navigation: {…},
+                …
+            }
+    //*/
+    const db = categoriesDB.reduce((item1, item2) => ({...item1, ...item2}));
 
     return [db, evalStructure];
 }
