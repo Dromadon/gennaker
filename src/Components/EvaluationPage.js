@@ -80,7 +80,7 @@ function EvaluationPage(props) {
 }
 
 async function loadQuestionDBAndEvalStructure(support, length) {
-    const evalStructureResponse = await fetch(process.env.PUBLIC_URL + "/evaluations/catamaran_standard.json", {
+    const evalStructureResponse = await fetch(process.env.PUBLIC_URL + "/evaluations/"+support+"_"+length+".json", {
             headers : { 
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'

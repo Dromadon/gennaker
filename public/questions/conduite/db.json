@@ -2,20 +2,44 @@
     "meta": {
         "categoryDisplayName": "Conduite"
     },
-    "divers": [
+    "chronologie": [
         {
-            "fileName": "vent_apparent_risee.md",
-            "difficulty": "low"
-        },
-        {
-            "fileName": "chronologie_virement_catamaran.md",
-            "difficulty": "high",
+            "fileName": "VL/chronologie_virement_catamaran.md",
             "supports": ["catamaran"]
         },
         {
-            "fileName": "chronologie_virement_deriveur.md",
-            "difficulty": "high",
+            "fileName": "VL/chronologie_empannage_catamaran.md",
+            "supports": ["catamaran"]
+        },
+        {
+            "fileName": "VL/chronologie_virement_deriveur.md",
             "supports": ["deriveur"]
+        },
+        {
+            "fileName": "VL/chronologie_empannage_deriveur.md",
+            "supports": ["deriveur"]
+        }
+    ],
+    "trajectoire": [
+        {
+            "fileName": "gain_sous_vent.md"
+        },
+        {
+            "fileName": "vent_apparent_risee.md"
+        }
+    ],
+    "divers": [
+        {
+            "fileName": "VL/envoi_spi.md",
+            "supports": ["catamaran", "deriveur"]
+
+        },
+        {
+            "fileName": "VL/sortie_trapeze.md",
+            "supports": ["catamaran", "deriveur"]
+        },
+        {
+            "fileName": "VL/PAV/waterstart.md"
         }
     ]
 }

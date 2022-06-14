@@ -1,0 +1,14 @@
+{
+    "meta": {
+        "categoryDisplayName": "Navigation"
+    },
+    "divers": [
+        {
+            "fileName": "composite.md"
+        },
+        {
+            "fileName": "VL/catamaran/parallelisme.md",
+            "supports": ["catamaran"]
+        }
+    ]
+}

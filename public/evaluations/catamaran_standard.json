@@ -41,13 +41,13 @@
         }
     },
     "fonctionnement_engin" : {
-        "équilibre_forces" : {
+        "equilibre_forces" : {
             "number": 1
         },
         "vent_apparent" : {
             "number": 1
         },
-        "réglage" : {
+        "reglage" : {
             "number": 1
         },
         "divers" : {

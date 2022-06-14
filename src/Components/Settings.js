@@ -52,7 +52,7 @@ function Settings(props) {
                             <h6>Longueur de l’évaluation <i className="bi bi-question-circle"></i></h6>
                             <Form.Group onChange={handleLengthChange} controlId="length">
                                 <Form.Check defaultChecked name="length" type="radio" label="Évaluation standard" value="standard"/>
-                                <Form.Check name="length" type="radio" label="Évaluation raccourcie" value="shortened"/>
+                                <Form.Check name="length" type="radio" label="Évaluation raccourcie" value="raccourcie"/>
                                 <Form.Check disabled name="length" type="radio" label="Test de positionnement" value="quick"/>
                             </Form.Group>
                             <hr/>

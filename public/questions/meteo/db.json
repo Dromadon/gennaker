@@ -5,40 +5,33 @@
     "brise_thermique": [
         {
             "fileName": "facteurs_brise_thermique.md",
-            "difficulty": "low",
             "answerSize": "lg"
         },
         {
             "fileName": "etablissement_brise_thermique.md",
-            "difficulty": "medium",
             "answerSize": "xl"
         }
     ],
     "perturbation": [
         {
-            "fileName": "evolution_depression.md",
-            "difficulty": "medium"
+            "fileName": "evolution_depression.md"
         },
         {
-            "fileName": "passage_perturbation.md",
-            "difficulty": "high"
+            "fileName": "passage_perturbation.md"
         }
     ],
     "phenomene_local": [
         {
-            "fileName": "evolution_vent_sous_grain.md",
-            "difficulty": "low"
+            "fileName": "evolution_vent_sous_grain.md"
         }
     ],
     "divers": [
         {
             "fileName": "bulletin_vs_modele.md",
-            "difficulty": "low",
             "answerSize": "sm"
         },
         {
             "fileName": "structure_bulletin.md",
-            "difficulty": "medium",
             "answerSize": "lg"
         }
     ]
