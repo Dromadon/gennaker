@@ -27,12 +27,11 @@ class Evaluation extends Component {
 
 function renderCategory(db, categoryName, sections, displayCorrection) {
     return(
-        <Container id={"category-"+categoryName} fluid="lg">
+        <Container id={"category-"+categoryName} fluid="lg" className="mt-3">
             <h3 className="categoryTitle">{db[categoryName]["meta"]["categoryDisplayName"]}</h3>
             {Object.keys(sections).map((section) => (
                 renderSection(categoryName, section, sections[section], displayCorrection)
             ))}
-            <hr/>
         </Container>
     )
 }

@@ -53,7 +53,7 @@ function Settings(props) {
                             <Form.Group onChange={handleLengthChange} controlId="length">
                                 <Form.Check defaultChecked name="length" type="radio" label="Évaluation standard" value="standard"/>
                                 <Form.Check name="length" type="radio" label="Évaluation raccourcie" value="raccourcie"/>
-                                <Form.Check disabled name="length" type="radio" label="Test de positionnement" value="quick"/>
+                                <Form.Check name="length" type="radio" label="Test de positionnement" value="positionnement"/>
                             </Form.Group>
                             <hr/>
                             <h6>Autres paramètres</h6>
