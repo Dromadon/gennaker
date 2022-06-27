@@ -28,7 +28,7 @@
   },
   "scripts": {
     "predeploy": "npm run build",
-    "deploy": "node ./node_modules/gh-pages/bin/gh-pages.js -d build",
+    "deploy": "node ./node_modules/gh-pages/bin/gh-pages.js -d build && ./deploy_404.sh",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!@toolz/allow-react)/\" --env=jsdom",
