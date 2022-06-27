@@ -2,7 +2,7 @@
 
 ![image](images/cardinale_ouest.png)
 
-*Source Wikipedia, licence CC-BY-SA 3.0*
+<small>Source Wikipedia, licence CC-BY-SA 3.0</small>
 
 **Que signifie-t-elle ?**
 
