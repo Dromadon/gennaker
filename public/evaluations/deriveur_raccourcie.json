@@ -1,0 +1,55 @@
+{
+    "meteo": {
+        "brise_thermique": {
+            "number": 1
+        },
+        "perturbation": {
+            "number": 1
+        },
+        "phenomene_local": {
+            "number": 1
+        }
+    },
+    "oceanographie" : {
+        "calcul_maree" : {
+            "number": 1
+        }
+    },
+    "navigation" : {
+        "balisage" : {
+            "number": 1
+        },
+        "alignement" : {
+            "number": 1
+        }
+    },
+    "conduite" : {
+        "trajectoire": {
+            "number": 1
+        },
+        "chronologie": {
+            "number": 1
+        }
+    },
+    "fonctionnement_engin" : {
+        "equilibre_forces" : {
+            "number": 1
+        },
+        "vent_apparent" : {
+            "number": 1
+        },
+        "reglage" : {
+            "number": 1
+        }
+    },
+    "securite" : {
+        "divers" : {
+            "number": 1
+        }
+    },
+    "environnement" : {
+        "divers" : {
+            "number": 1
+        }
+    }
+}
