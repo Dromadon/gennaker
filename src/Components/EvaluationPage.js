@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Evaluation } from './Evaluation';
 import { EvaluationLateralBar } from "./EvaluationLateralBar";
 import { generateEval } from '../Logic/EvaluationGenerator'
 
@@ -10,6 +9,7 @@ import Row from "react-bootstrap/Row"
 import { useSearchParams } from 'react-router-dom';
 
 import {useReactToPrint} from 'react-to-print';
+import { Evaluation } from './Evaluation';
 
 function EvaluationPage(props) {
     const [searchParams] = useSearchParams();

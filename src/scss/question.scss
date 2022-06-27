@@ -1,3 +1,11 @@
 .question {
     background-color: $gray-100;
 }
+
+.table table, th, tbody, tr, td {
+    border: thin solid $black !important;
+}
+
+.table {
+    border-collapse: collapse;
+}

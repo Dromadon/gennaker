@@ -3,9 +3,8 @@ import { NavHashLink } from 'react-router-hash-link';
 
 function EvaluationLateralBar (props) {
     return(
-        <div className="lateralNavBar sticky-lg-top mb-3">
-            <Navbar id="navbar-questions" color="light" className="flex-column align-items-start">
-                <a class="navbar-brand" href="#">Catégories</a>
+        <div className="lateralNavBar sticky-lg-top my-3">
+            <Navbar id="navbar-categories" color="light" className="flex-column align-items-start">
                 <Nav class="nav nav-pills flex-column">
                     {Object.keys(props.evaluation).map((category) => { 
                         const categoryDisplayName = props.db[category]["meta"]["categoryDisplayName"]

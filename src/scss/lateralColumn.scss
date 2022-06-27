@@ -14,9 +14,17 @@ a:hover {
     color: $primary;
 }
 
-.lateralNavBar .navbar-brand a, a:visited {
+.lateralNavBar a, a:visited {
+    font-weight: bold;
     color: $dark;
 }
+
+.lateralNavBar a .active {
+    font-weight: bold;
+    color: $primary;
+}
+
+
 
 .lateralNavBar .sticky-lg-top {
     top: $spacer;

@@ -1,6 +1,9 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useEffect, useState } from 'react';
+import rehypeRaw from 'rehype-raw'
+import remarkGfm from 'remark-gfm'
+
 
 const CORRECTION_MARKER="# Correction"
 const ANSWER_LINES_BY_SIZE={
@@ -37,20 +40,30 @@ function Question (props) {
         }, [props.filePath]);
     
        return (
-        <div className="question rounded p-3 mb-2">
-            <ReactMarkdown 
+        <div className="question no-break-inside d-block rounded p-3 mb-2">
+            <div class="question-content">
+                <ReactMarkdown 
                 children={question} 
                 transformImageUri={uri =>
                     `${transformImageURI(uri, props.filePath)}`} 
-                components={{h1: ({node, ...props}) => <h6 {...props} />}}
-            />
+                components={{
+                    h1: ({node, ...props}) => <h6 {...props}/>,
+                    img: ({node, ...props}) => <img class="img-fluid" {...props}/>,
+                    table: ({node, ...props}) => <table class="table table-sm table-borderless table-responsive" {...props}/>
+                }}
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeRaw]}
+            /></div>
             { props.displayCorrection ? 
                 <ReactMarkdown 
+                    class="question-correction"
                     children={correction} 
                     transformImageUri={uri =>
                         `${process.env.PUBLIC_URL}/${transformImageURI(uri, props.filePath)}`} 
-                    components={{h1: ({node, ...props}) => <h6 class="text-primary" {...props} />}}
-                /> : <AnswerLines answerSize={props.answerSize}/>
+                    components={{h1: ({node, ...props}) => <h6 class="text-primary" {...props}/>}}
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeRaw]}
+                /> : <div class="question-answer"><AnswerLines answerSize={props.answerSize}/></div>
 
             }
         </div>

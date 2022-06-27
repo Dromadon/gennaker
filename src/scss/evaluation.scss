@@ -1,22 +1,49 @@
+//*
 @media print {
+
+    //*
     .categoryTitle {
         break-after: avoid;
-        break-inside: avoid;
     }
 
+    .categoryTitle + div {
+        break-before: avoid;
+    }
+    //*/
+
+    //*
     .question {
+        display: block;
         break-inside: avoid;
         background-color: white;
     }
+    //*/
 
+    /*
+    .question-content {
+        display: block;
+        break-inside: avoid;
+        background-color: $green-100;
+    }
+    //*/
+
+    /*/
+    .question-answer {
+        display: block;
+        break-inside: avoid;
+        background-color: $blue-100;
+    }
+    //*/
+    
     @page {
-        margin-top: 5mm; 
-        margin-bottom: 5mm; 
+        margin-top: 10mm; 
+        margin-bottom: 10mm; 
         margin-left: 10mm; 
         margin-right: 10mm
     }
+    
 }
-
+//*/
 #evaluation h1, h2, h3, h4, h5, h6 {
     color: black;
 }

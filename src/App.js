@@ -11,11 +11,11 @@ import './App.scss';
 function App() {
   return (
     <div>
-      <Navigation/>
+      <Navigation />
       <Routes>
         <Route path="/" element={<Settings/>}/>
         <Route path="/settings" element={<Settings/>}/>
-        <Route path="/evaluation" element={<EvaluationPage support="catamaran" evalStructure="evaluations/catamaran.json"/>} />
+        <Route path="/evaluation" element={<EvaluationPage/>} />
         <Route path="/about" element={<About/>}/>
       </Routes>
     </div>
