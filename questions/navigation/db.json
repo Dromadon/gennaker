@@ -1,0 +1,36 @@
+{
+    "meta": {
+        "categoryDisplayName": "Navigation"
+    },
+    "alignement": [
+        {
+            "fileName": "alignement_1.md"
+        }
+    ],
+    "balisage": [
+        {
+            "fileName": "cardinale_est.md"
+        },
+        {
+            "fileName": "cardinale_sud.md"
+        },
+        {
+            "fileName": "cardinale_nord.md"
+        },
+        {
+            "fileName": "cardinale_ouest.md"
+        },
+        {
+            "fileName": "danger_isole_reverse.md"
+        }
+    ],
+    "divers": [
+        {
+            "fileName": "adaptation_balise_1.md",
+            "answerSize": "lg"
+        },
+        {
+            "fileName": "route_collision.md"
+        }
+    ]
+}

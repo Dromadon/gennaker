@@ -1,0 +1,19 @@
+{
+    "meta": {
+        "categoryDisplayName": "Sécurité"
+    },
+    "divers": [
+        {
+            "fileName": "VL/eau_froide.md"
+        },
+        {
+            "fileName": "VL/noyade.md"
+        },
+        {
+            "fileName": "VL/procedures_alerte.md"
+        },
+        {
+            "fileName": "VL/trajectoire_HLM_VL.md"
+        }
+    ]
+}

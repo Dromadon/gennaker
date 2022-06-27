@@ -1,0 +1,32 @@
+{
+    "meteo": {
+        "perturbation": {
+            "number": 1
+        }
+    },
+    "oceanographie" : {
+        "calcul_maree" : {
+            "number": 1
+        }
+    },
+    "navigation" : {
+        "balisage" : {
+            "number": 1
+        }
+    },
+    "conduite" : {
+        "chronologie": {
+            "number": 1
+        }
+    },
+    "fonctionnement_engin" : {
+        "reglage" : {
+            "number": 1
+        }
+    },
+    "securite" : {
+        "divers" : {
+            "number": 1
+        }
+    }
+}
