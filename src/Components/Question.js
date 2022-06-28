@@ -52,19 +52,19 @@ function Question (props) {
                     table: ({node, ...props}) => <table class="table table-sm table-borderless table-responsive" {...props}/>
                 }}
                 remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeRaw]}
-            /></div>
-            { props.displayCorrection ? 
-                <ReactMarkdown 
-                    class="question-correction"
-                    children={correction} 
-                    transformImageUri={uri =>
-                        `${process.env.PUBLIC_URL}/${transformImageURI(uri, props.filePath)}`} 
-                    components={{h1: ({node, ...props}) => <h6 class="text-primary" {...props}/>}}
-                    remarkPlugins={[remarkGfm]}
-                    rehypePlugins={[rehypeRaw]}
-                /> : <div class="question-answer"><AnswerLines answerSize={props.answerSize}/></div>
-
+                rehypePlugins={[rehypeRaw]}/>
+            </div>
+            { props.displayCorrection 
+                ?   <ReactMarkdown 
+                        class="question-correction"
+                        children={correction} 
+                        transformImageUri={uri =>
+                            `${process.env.PUBLIC_URL}/${transformImageURI(uri, props.filePath)}`} 
+                        components={{h1: ({node, ...props}) => <h6 class="text-primary" {...props}/>}}
+                        remarkPlugins={[remarkGfm]}
+                        rehypePlugins={[rehypeRaw]}
+                    /> 
+                :   <div class="question-answer"><AnswerLines answerSize={props.answerSize}/></div>
             }
         </div>
     )
