@@ -1,6 +1,6 @@
 # En remontant vers le port, vous croisez la balise suivante
 
-![image](images/cardinale_est.png)
+![cardinale_est](images/cardinale_est.png)
 
 <small>Source Wikipedia, licence CC-BY-SA 3.0</small>
 
