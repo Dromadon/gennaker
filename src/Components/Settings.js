@@ -55,11 +55,6 @@ function Settings(props) {
                                 <Form.Check name="length" type="radio" label="Évaluation raccourcie" value="raccourcie"/>
                                 <Form.Check name="length" type="radio" label="Test de positionnement" value="positionnement"/>
                             </Form.Group>
-                            <hr/>
-                            <h6>Autres paramètres</h6>
-                            <Form.Group>
-                                <Form.Check disabled type="switch" label="Afficher les questions en ordre aléatoire" id="disabled-custom-switch"/>
-                            </Form.Group>
                         </Col>          
                         <Col md={3} className="mb-5">
                             <Form.Group controlId="submit">

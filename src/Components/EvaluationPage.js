@@ -26,15 +26,21 @@ function EvaluationPage(props) {
     });
     const [evaluation, setEvaluation] = useState({});
     const [displayCorrection, setDisplayCorrection] = useState(false);
+    const [displayCategoryTitles, setDisplayCategoryTitle] = useState(true);
 
     const componentRef = useRef();
     const handlePrint = useReactToPrint({
         content: () => componentRef.current,
     });
 
-    const toggleCorrectionDisplay = (event) => {
+    const toggleDisplayCorrection = (event) => {
         console.info("Switching correction display");
         setDisplayCorrection(!displayCorrection);
+    }
+
+    const toggleDisplayCategoryTitles = (event) => {
+        console.info("Switching category titles display");
+        setDisplayCategoryTitle(!displayCategoryTitles);
     }
 
     useEffect(() => {
@@ -59,7 +65,9 @@ function EvaluationPage(props) {
                             db={db} 
                             evaluation={evaluation} 
                             displayCorrection={displayCorrection} 
-                            toggleCorrectionDisplay={toggleCorrectionDisplay}
+                            displayCategoryTitles={displayCategoryTitles}
+                            toggleDisplayCorrection={toggleDisplayCorrection}
+                            toggleDisplayCategoryTitles={toggleDisplayCategoryTitles}
                             handlePrint={handlePrint}/>
                     </Col>
                     <Col sm={12} lg={10}>
@@ -67,7 +75,8 @@ function EvaluationPage(props) {
                             ref={componentRef}
                             db={db} evaluation={evaluation} 
                             evalParameters={evalParameters}
-                            displayCorrection={displayCorrection}/>
+                            displayCorrection={displayCorrection}
+                            displayCategoryTitles={displayCategoryTitles}/>
                     </Col>
                 </Row>
             </Container>

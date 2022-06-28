@@ -7,12 +7,12 @@ class Evaluation extends Component {
         console.debug(process.env.PUBLIC_URL);
         return (
             <div className="mx-3 my-5">
-                <h2 className="text-center">Evaluation théorique du niveau 4 FFV en {this.props.evalParameters["support"]}</h2>
+                <h2 className="text-center">Évaluation théorique du niveau 4 FFV en {this.props.evalParameters["support"]}</h2>
                 <p><em>Votre objectif est de répondre de façon synthétique aux questions, en expliquant les points qui vous semblent essentiels dans votre raisonnement. Une bonne réponse sans explication n’est pas comptabilisée, mais de manière générale, une réponse ne doit pas excéder quelques lignes. Un schéma est souvent le bienvenu.</em></p>
                 <p className="text-center"><small><em>Cette évaluation a été générée par Gennaker </em>⛵</small></p>
                 <div data-bs-spy="scroll" data-bs-target="#navbar-categories" data-bs-offset="0" tabindex="0">
                     {Object.keys(this.props.evaluation).map((category) => (
-                        renderCategory(this.props.db, category, this.props.evaluation[category], this.props.displayCorrection)
+                        renderCategory(this.props.db, category, this.props.evaluation[category], this.props.displayCorrection, this.props.displayCategoryTitles)
                     ))}
                 </div>
             </div>
@@ -20,12 +20,14 @@ class Evaluation extends Component {
     }
 }
 
-function renderCategory(db, categoryName, sections, displayCorrection) {
+function renderCategory(db, categoryName, sections, displayCorrection, displayCategoryTitles) {
     return (
         <div className="mt-5">
-            <div class="categoryTitle">
-                <h3 id={"category-" + categoryName}>{db[categoryName]["meta"]["categoryDisplayName"]}</h3>
-            </div>
+            { displayCategoryTitles &&
+                <div class="categoryTitle">
+                    <h3 id={"category-" + categoryName}>{db[categoryName]["meta"]["categoryDisplayName"]}</h3>
+                </div>
+            }
             {Object.keys(sections).map((sectionName) => (
                 sections[sectionName].map((question) => {
                     const filePath = process.env.PUBLIC_URL + "/questions/" + categoryName + "/" + sectionName + "/" + question["fileName"]
