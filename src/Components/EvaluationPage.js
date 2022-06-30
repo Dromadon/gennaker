@@ -31,6 +31,7 @@ function EvaluationPage(props) {
     const componentRef = useRef();
     const handlePrint = useReactToPrint({
         content: () => componentRef.current,
+        documentTitle: "Evaluation-"+evalParameters['support']+"-"+evalParameters['length']
     });
 
     const toggleDisplayCorrection = (event) => {
@@ -73,7 +74,8 @@ function EvaluationPage(props) {
                     <Col sm={12} lg={10}>
                         <Evaluation id="evaluation" 
                             ref={componentRef}
-                            db={db} evaluation={evaluation} 
+                            db={db} 
+                            evaluation={evaluation} 
                             evalParameters={evalParameters}
                             displayCorrection={displayCorrection}
                             displayCategoryTitles={displayCategoryTitles}/>
