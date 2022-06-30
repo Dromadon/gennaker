@@ -2,10 +2,17 @@
     background-color: $gray-100;
 }
 
-.table table, th, tbody, tr, td {
+.question .table table, th, tbody, tr, td {
     border: thin solid $black !important;
+    font-size: 75%; //For getting the tide tables not too tall
 }
 
-.table {
+.question .table {
     border-collapse: collapse;
+}
+
+.question small {
+    // For getting the license indications a bit smaller and lighter
+    color: $gray-700;
+    font-size: x-small;
 }

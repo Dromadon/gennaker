@@ -39,7 +39,7 @@ function Question (props) {
             });
         }, [props.filePath]);
     
-       return (
+    return (
         <div className="question no-break-inside d-block rounded p-3 mb-2">
             <div class="question-content">
                 <ReactMarkdown 
@@ -60,9 +60,10 @@ function Question (props) {
                         children={correction} 
                         transformImageUri={uri =>
                             `${process.env.PUBLIC_URL}/${transformImageURI(uri, props.filePath)}`} 
-                        components={{h1: ({node, ...props}) => <h6 class="text-primary" {...props}/>}}
+                        components={{h1: ({node, ...props}) => <h6 class="text-primary" {...props}/>,
+                                    table: ({node, ...props}) => <table class="table table-sm" {...props}/>}}
                         remarkPlugins={[remarkGfm]}
-                        rehypePlugins={[rehypeRaw]}
+                        rehypePlugins={[rehypeRaw]} // This is OK as we can totally trust the Markdown
                     /> 
                 :   <div class="question-answer"><AnswerLines answerSize={props.answerSize}/></div>
             }
