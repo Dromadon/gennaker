@@ -53,6 +53,8 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^4.0.0"
+    "colors": "^1.4.0",
+    "gh-pages": "^4.0.0",
+    "node-dir": "^0.1.17"
   }
 }
