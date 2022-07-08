@@ -39,7 +39,8 @@
             "supports": ["catamaran", "deriveur"]
         },
         {
-            "fileName": "VL/PAV/waterstart.md"
+            "fileName": "VL/PAV/waterstart.md",
+            "supports": ["windsurf"]
         }
     ]
 }
