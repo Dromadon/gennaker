@@ -56,13 +56,13 @@ export const catamaran_raccourcie = {
 
 //expected resulting catamaran raccourcie eval object categories
 export const expectedCatamaranRaccourcieCategories = {
-    CAT1_NAME: new Category({displayName: CAT1_DISPLAY_NAME})
+    [CAT1_NAME]: new Category({displayName: CAT1_DISPLAY_NAME})
         .setSection({
             sectionName: SEC12_NAME, 
             section: new Section({displayName: SEC12_DISPLAY_NAME})
                 .setQuestionsNumber(CATAMARAN_RACCOURCIE_CAT1_SEC12_NUMBER)
         }),
-    CAT2_NAME: new Category({displayName: CAT2_DISPLAY_NAME})
+    [CAT2_NAME]: new Category({displayName: CAT2_DISPLAY_NAME})
         .setSection({
             sectionName: SEC21_NAME,
             section: new Section({displayName: SEC21_DISPLAY_NAME})
@@ -83,13 +83,13 @@ const deriveur_standard = {
 
 //expected resulting deriveur standard eval object categories
 export const expectedDeriveurStandardCategories = {
-    CAT1_NAME: new Category({displayName: CAT1_DISPLAY_NAME})
+    [CAT1_NAME]: new Category({displayName: CAT1_DISPLAY_NAME})
         .setSection({
             sectionName: SEC11_NAME, 
             section: new Section({displayName: SEC11_DISPLAY_NAME})
                 .setQuestionsNumber(DERIVEUR_STANDARD_CAT1_SEC11_NUMBER)
         }),
-    CAT2_NAME: new Category({displayName: CAT2_DISPLAY_NAME})
+    [CAT2_NAME]: new Category({displayName: CAT2_DISPLAY_NAME})
         .setSection({
             sectionName: SEC21_NAME,
             section: new Section({displayName: SEC21_DISPLAY_NAME})

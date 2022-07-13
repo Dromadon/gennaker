@@ -10,7 +10,7 @@ class Evaluation {
         this.categories = {};
     }
 
-    setCategory(categoryName, category) {
+    setCategory({categoryName, category}) {
         this.categories[categoryName] = category;
         return this;
     }

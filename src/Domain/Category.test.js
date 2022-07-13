@@ -29,9 +29,9 @@ describe('CategoryStructureShouldBeCorrect', () => {
 describe("CategorySectionsCanBeManipulated", () => {
     //Given
     const category = new Category({displayName: displayName})
-    category.setSection("section1", section1);
-    category.setSection("section2", section2);
-    category.setSection("section3", section3);
+    category.setSection({sectionName: "section1", section: section1});
+    category.setSection({sectionName: "section2", section: section2});
+    category.setSection({sectionName: "section3", section: section3});
 
     test('CategorySectionsCanBeSet', () => {
         //Then

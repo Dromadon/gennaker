@@ -36,9 +36,9 @@ describe('SectionShouldContainQuestions', () => {
     test('SectionCanBeAddedQuestions', () => {
         //When
         const section = new Section({displayName: sectionDisplayName, questionsNumber: questionsNumber})
-        section.addQuestion(question1);
-        section.addQuestion(question2);
-        section.addQuestion(question3);
+        section.addQuestion({question: question1});
+        section.addQuestion({question: question2});
+        section.addQuestion({question: question3});
 
         //Then
         expect(section.questions).toStrictEqual(questions);

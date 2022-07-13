@@ -7,7 +7,7 @@ class Category {
         this.sections = {}
     }
 
-    setSection(sectionName, section) {
+    setSection({sectionName, section}) {
         this.sections[sectionName] = section;
         return this;
     }

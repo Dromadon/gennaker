@@ -7,7 +7,7 @@ class Section {
         this.questions = []
     }
 
-    addQuestion(question) {
+    addQuestion({question}) {
         this.questions.push(question);
         return this;
     }

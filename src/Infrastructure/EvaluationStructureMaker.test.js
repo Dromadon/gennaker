@@ -34,24 +34,17 @@ describe('EvaluationCanBeGeneratedWithSupportAndLength', () => {
 describe('EvaluationStructureIsGeneratedBasedOnStructureFiles', () => {
     //Given
     fetchMock.enableMocks();
-    fetchMock.mockResponseOnce(JSON.stringify(TestStructure.GENERIC_STRUCTURE));
-    fetchMock.mockResponseOnce(JSON.stringify(TestStructure.catamaran_raccourcie));
 
-    //fetchMock.mockResponseOnce(JSON.stringify(TestStructure.GENERIC_STRUCTURE))
+    test('EvaluationHaveExpectedCategories', async () => {
+        //Given
+        fetchMock.mockResponseOnce(JSON.stringify(TestStructure.GENERIC_STRUCTURE));
+        fetchMock.mockResponseOnce(JSON.stringify(TestStructure.catamaran_raccourcie));
 
-    const evaluationCatamaranRaccourcie = EvaluationStructureMaker.generateStructure({support: "catamaran", length: "raccourcie"})
-    //const evaluationDeriveurStandard = EvaluationStructureMaker.generateStructure({support: "deriveur", length: "standard"})
+        //When
+        const evaluationCatamaranRaccourcie = await EvaluationStructureMaker.generateStructure({support: "catamaran", length: "raccourcie"})
 
-    test('EvaluationHaveExpectedCategories', () => {
         //Then
-        console.debug(evaluationCatamaranRaccourcie);
-        console.debug(TestStructure.expectedCatamaranRaccourcieCategories);
-
         expect(evaluationCatamaranRaccourcie.categories)
-            .toStrictEqual(TestStructure.expectedCatamaranRaccourcieCategories)
-        /*expect(evaluationDeriveurStandard.categories)
-            .toStrictEqual(TestStructure.expectedDeriveurStandardCategories)
-        */
-        
+            .toStrictEqual(TestStructure.expectedCatamaranRaccourcieCategories)        
     })
 })

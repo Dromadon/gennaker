@@ -31,9 +31,9 @@ describe('EvaluationShouldHaveCorrectStructure', () => {
 describe("EvaluationCategoriesCanBeManipulated", () => {
     const evaluation = new Evaluation({support: support, length: length});
 
-    evaluation.setCategory("categorie1", category1);
-    evaluation.setCategory("categorie2", category2);
-    evaluation.setCategory("categorie3", category3);
+    evaluation.setCategory({categoryName: "categorie1", category: category1});
+    evaluation.setCategory({categoryName: "categorie2", category: category2});
+    evaluation.setCategory({categoryName: "categorie3", category: category3});
 
     test('EvaluationCanBeAddedCategories', () => {
         //Then
