@@ -7,14 +7,19 @@ class EvaluationStructureMaker {
     async generateStructure({support, length}={}) {
         
         const categoriesData = this.fetchCategoriesData();
-        console.log(categoriesData);
+        console.debug(categoriesData);
 
         const evalStructure = this.fetchEvalStructure({support: support, length: length});
         console.debug(evalStructure);
         
-        //*
         const evaluation = new Evaluation({support: support, length: length});
+        this.populateEvaluationStructure(evaluation, evalStructure, categoriesData);
 
+        console.debug(evaluation.categories);
+        return evaluation;
+    }
+
+    populateEvaluationStructure(evaluation, evalStructure, categoriesData) {
         Object.entries(evalStructure).map(([categoryName, sectionNames]) => {
             console.debug("Adding category " + categoryName);
             const category = new Category({displayName: categoriesData[categoryName]["displayName"]});
@@ -25,34 +30,28 @@ class EvaluationStructureMaker {
             })
             evaluation.setCategory({categoryName: categoryName, category: category});
         })
-        console.debug(evaluation.categories);
-        return evaluation;
-
-        //*/
     }
 
     async fetchCategoriesData() {
         console.log("Fetching categories data");
-        const categoriesDataResult = await fetch(process.env.PUBLIC_URL + "/questions/categoriesDB.json", {
+        const categoriesData = await (await fetch(process.env.PUBLIC_URL + "/questions/categoriesDB.json", {
             headers : { 
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
                 }
-        })
-        const categoriesData = await categoriesDataResult.json();
+        })).json();
         console.log(categoriesData);
         return categoriesData;
     }
 
     async fetchEvalStructure({support, length}) {
         console.debug("Fetching eval structure for support "+support+" and length "+length);
-        const evalStructureResult = await fetch(process.env.PUBLIC_URL + "/evaluations/" + support + "_" + length + ".json", {
+        const evalStructure = await (await fetch(process.env.PUBLIC_URL + "/evaluations/" + support + "_" + length + ".json", {
             headers : { 
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
                 }
-        })
-        const evalStructure = await evalStructureResult.json();
+        })).json();
         console.debug(evalStructure);
         return evalStructure;
     }

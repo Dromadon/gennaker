@@ -35,7 +35,6 @@ describe('EvaluationStructureIsGeneratedBasedOnStructureFiles', () => {
 describe('EvaluationStructureMakerCorrectlyFetchesEvalStructureAndCategoriesFiles', () => {
     //Given
     const evaluationStructureMaker2 = new EvaluationStructureMaker();
-    //fetchMock.resetMocks();
     fetchMock.enableMocks();
 
     test('FetchCategoriesDataWorks', async () => {
