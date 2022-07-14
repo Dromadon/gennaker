@@ -1,5 +1,5 @@
-import { Category } from "../Domain/Category";
-import { Section } from "../Domain/Section";
+import { Category } from "../../Domain/Category";
+import { Section } from "../../Domain/Section";
 
 //Categories and sections names and display names
 export const CAT1_NAME="categorie1"; export const CAT1_DISPLAY_NAME="Catégorie 1";
@@ -45,7 +45,7 @@ export const GENERIC_STRUCTURE = {
 }
 
 //file with catamaran raccourcie eval structure
-export const catamaran_raccourcie = {
+export const EVAL_STRUCTURE_CATAMARAN_RACCOURCIE = {
     [CAT1_NAME]: {
         [SEC12_NAME]: CATAMARAN_RACCOURCIE_CAT1_SEC12_NUMBER
     },
@@ -71,7 +71,7 @@ export const expectedCatamaranRaccourcieCategories = {
 }
 
 //file with deriveur standard eval structure
-const deriveur_standard = {
+export const EVAL_STRUCTURE_DERIVEUR_STANDARD = {
     [CAT1_NAME]: {
         [SEC11_NAME]: DERIVEUR_STANDARD_CAT1_SEC11_NUMBER,
     },
