@@ -58,9 +58,6 @@
     "conduite": {
         "displayName": "Conduite",
         "sections": {
-            "adaptation": {
-                "displayName": "Adaptation de route"
-            },
             "trajectoire": {
                 "displayName": "Trajectoire"
             },

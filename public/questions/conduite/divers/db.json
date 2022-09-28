@@ -1,0 +1,15 @@
+[
+    {
+        "fileName": "VL/envoi_spi.md",
+        "supports": ["catamaran", "deriveur"]
+
+    },
+    {
+        "fileName": "VL/sortie_trapeze.md",
+        "supports": ["catamaran", "deriveur"]
+    },
+    {
+        "fileName": "VL/PAV/waterstart.md",
+        "supports": ["windsurf"]
+    }
+]
