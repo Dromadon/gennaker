@@ -6,10 +6,10 @@ class EvaluationStructureMaker {
 
     async generateStructure({support, length}={}) {
         
-        const categoriesData = this.fetchCategoriesData();
+        const categoriesData = await this.fetchCategoriesData();
         console.debug(categoriesData);
 
-        const evalStructure = this.fetchEvalStructure({support: support, length: length});
+        const evalStructure = await this.fetchEvalStructure({support: support, length: length});
         console.debug(evalStructure);
         
         const evaluation = new Evaluation({support: support, length: length});
