@@ -43,6 +43,23 @@ describe('SectionShouldContainQuestions', () => {
         //Then
         expect(section.questions).toStrictEqual(questions);
     })
+})
 
+describe('SectionShouldUpdateItsQuestions', () => {
+    //Given
+    const sectionDisplayName = "Section de test";
+    const questionsNumber = 2;
 
+    const question1 = new Question({fileName: "path/1"});
+    const question2 = new Question({fileName: "path/2"});
+    const question3 = new Question({fileName: "path/3"});
+    const questions = [question1, question2, question3]
+
+    test('SectionCanBeCreatedWithNameAndDisplayNameAndQuestionsNumber', () => {
+        //When
+        const section = new Section({displayName:sectionDisplayName});
+
+        //Then
+        expect(section.displayName).toBe(sectionDisplayName);
+    })
 })

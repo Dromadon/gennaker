@@ -48,8 +48,8 @@ const Section = ({categoryName, sectionName, section, displayCorrection, display
             console.debug(filePath);
             return (
                 <Question
-                    filePath={filePath}
-                    answerSize={question["answerSize"]}
+                    filePath={question.filePath}
+                    answerSize={question.answerSize}
                     displayCorrection={displayCorrection} />
             )
         })}
