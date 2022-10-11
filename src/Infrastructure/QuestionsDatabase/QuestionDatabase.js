@@ -10,7 +10,10 @@ class QuestionDatabase {
         if (section === undefined || section === null)
             throw new Error("Section is undefined or null");
 
+        console.log("Getting "+number+" questions from DB for category "+category+" and section "+section+" with support "+support)
+
         const questionsDB = await this.fetchQuestionDatabaseFile({category: category, section: section});
+        console.log("Database file fetched");
         const filteredQuestionsDB = this.filterSupport(questionsDB, support); //Mettre un if si support pas défini
         const questions = filteredQuestionsDB.map((question) => {    
             return new Question({
@@ -19,6 +22,9 @@ class QuestionDatabase {
             supports: question.supports
             })
         })
+
+        console.log("Questions returned are ");
+        console.log(questions);
 
         if(number === undefined)
             return questions

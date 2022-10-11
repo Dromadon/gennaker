@@ -43,7 +43,8 @@ const Section = ({categoryName, sectionName, section, displayCorrection, display
                 <h4 id={"section-" + categoryName + "-" + sectionName}>{section.displayName}</h4>
             </div>
         }
-        {section.questions.map((question) => {
+        {
+        section.questions.map((question) => {
             const filePath = process.env.PUBLIC_URL + "/questions/" + categoryName + "/" + sectionName + "/" + question["fileName"]
             console.debug(filePath);
             return (

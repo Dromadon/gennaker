@@ -7,13 +7,13 @@ class Section {
         this.questions = []
     }
 
-    addQuestion({question}) {
-        this.questions.push(question);
+    setQuestionsNumber(questionsNumber) {
+        this.questionsNumber=questionsNumber;
         return this;
     }
 
-    setQuestionsNumber(questionsNumber) {
-        this.questionsNumber=questionsNumber;
+    setQuestions({questions}) {
+        this.questions = questions;
         return this;
     }
 }

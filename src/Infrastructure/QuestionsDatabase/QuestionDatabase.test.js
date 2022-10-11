@@ -1,6 +1,6 @@
 import * as TestStructure from "./TestStructure";
 import fetchMock from "jest-fetch-mock";
-import {QuestionDatabase} from "./QuestionsDatabase";
+import {QuestionDatabase} from "./QuestionDatabase";
 
 
 

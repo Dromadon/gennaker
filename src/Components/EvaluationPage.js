@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { EvaluationLateralBar } from "./EvaluationLateralBar";
 
 import Container from "react-bootstrap/Container";
@@ -10,7 +10,7 @@ import { useSearchParams } from 'react-router-dom';
 import {useReactToPrint} from 'react-to-print';
 import { Evaluation } from './Evaluation';
 
-import { QuestionDatabase } from '../Infrastructure/QuestionsDatabase/QuestionsDatabase';
+import { QuestionDatabase } from '../Infrastructure/QuestionsDatabase/QuestionDatabase';
 import { EvaluationStructureMaker } from '../Infrastructure/EvaluationStructure/EvaluationStructureMaker';
 
 function EvaluationPage(props) {
@@ -46,14 +46,21 @@ function EvaluationPage(props) {
     }
 
     useEffect(() => {
-        loadQuestionDBAndEvalStructure(evalParameters["support"], evalParameters["length"]).then(([db, evalStructure]) => {
-            console.debug("DB and structure fetched");
-            setIsDataLoaded(true);
-            setDB(db);
+        const db = new QuestionDatabase();
+        const evaluationStructureMaker = new EvaluationStructureMaker();
+
+        const getEval = async () => {
+            let evalStructure = await evaluationStructureMaker
+                .generateStructure({support: evalParameters["support"], length: evalParameters["length"]});
+            await evalStructure.updateAllQuestions({questionsDB: db})
+            console.log("#####")
+            console.log(evalStructure);
             setEvaluation(evalStructure);
-            //setEvaluation(generateEval(db, evalStructure, evalParameters));
+            setIsDataLoaded(true);
             setIsQuestionsReady(true);
-        })
+        }
+        getEval();
+        setDB(db);
     }, [props, evalParameters])
 
     if (error) {
@@ -91,15 +98,15 @@ function EvaluationPage(props) {
     };
 }
 
-async function loadQuestionDBAndEvalStructure(support, length) {
+/*
+const loadQuestionDBAndEvalStructure = useCallback(async (support, length) => {
     const db = new QuestionDatabase();
-
     const evaluationStructureMaker = new EvaluationStructureMaker();
     const evalStructure = await evaluationStructureMaker.generateStructure({support: support, length: length});
-    console.log(evalStructure);
 
     return [db, evalStructure];
-}
+}, [])
+*/
 
 
 

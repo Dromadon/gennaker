@@ -8,7 +8,7 @@ function EvaluationLateralBar (props) {
                 <Nav class="nav nav-pills flex-column">
                     {props.evaluation.getCategories().map((categoryName, category) => { 
                         return(<NavHashLink class="nav-link" to={"#category-"+categoryName}>
-                                {category.DisplayName}
+                                {category.displayName}
                             </NavHashLink>)})}
                 </Nav>
             </Navbar>

@@ -25,7 +25,7 @@ class EvaluationStructureMaker {
             const category = new Category({displayName: categoriesData[categoryName]["displayName"]});
             Object.entries(sectionNames).map(([sectionName, questionsNumber]) => {
                 const section = new Section({displayName: categoriesData[categoryName]["sections"][sectionName]["displayName"]})
-                    .setQuestionsNumber(questionsNumber);
+                    .setQuestionsNumber(questionsNumber["number"]);
                 category.setSection({sectionName: sectionName, section: section});
             })
             evaluation.setCategory({categoryName: categoryName, category: category});
