@@ -47,10 +47,14 @@ export const GENERIC_STRUCTURE = {
 //file with catamaran raccourcie eval structure
 export const EVAL_STRUCTURE_CATAMARAN_RACCOURCIE = {
     [CAT1_NAME]: {
-        [SEC12_NAME]: CATAMARAN_RACCOURCIE_CAT1_SEC12_NUMBER
+        [SEC12_NAME]: {
+            "number": CATAMARAN_RACCOURCIE_CAT1_SEC12_NUMBER
+        }
     },
     [CAT2_NAME]: {
-        [SEC21_NAME]: CATAMARAN_RACCOURCIE_CAT2_SEC21_NUMBER
+        [SEC21_NAME]: {
+            "number": CATAMARAN_RACCOURCIE_CAT2_SEC21_NUMBER
+        }
     }
 }
 
