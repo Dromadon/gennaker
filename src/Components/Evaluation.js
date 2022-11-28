@@ -36,26 +36,29 @@ const Category = ({categoryName, category, displayCorrection, displayCategoryTit
     </div>
 )
 
-const Section = ({categoryName, sectionName, section, displayCorrection, displayCategoryTitles}) => (
+const Section = ({categoryName, sectionName, section, displayCorrection, displayCategoryTitles}) => {
+    console.log(section)
+
+    return(
     <div>
-        { displayCategoryTitles &&
-            <div class="sectionTitle">
-                <h4 id={"section-" + categoryName + "-" + sectionName}>{section.displayName}</h4>
-            </div>
-        }
+        { displayCategoryTitles && 
+                <div class="sectionTitle">
+                    <h4 id={"section-" + categoryName + "-" + sectionName}>{section.displayName}</h4>
+                </div> }
         {
         section.questions.map((question) => {
-            const filePath = process.env.PUBLIC_URL + "/questions/" + categoryName + "/" + sectionName + "/" + question["fileName"]
+            const filePath = process.env.PUBLIC_URL + "/questions/" + question["fileName"]
+            console.debug("Filepath of question is ")
             console.debug(filePath);
             return (
                 <Question
-                    filePath={question.filePath}
+                    filePath={filePath}
                     answerSize={question.answerSize}
                     displayCorrection={displayCorrection} />
             )
         })}
-    </div>
-)
+    </div>)
+}
 
 
 export { Evaluation }

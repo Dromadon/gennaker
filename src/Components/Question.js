@@ -19,6 +19,7 @@ function Question (props) {
     const [question, setQuestion] = useState("");
     const [correction, setCorrection] = useState("");
 
+    console.log(props.filePath)
     useEffect(() => {fetch(props.filePath, {
         // This is needed for local access sadly
         headers : { 
@@ -54,17 +55,17 @@ function Question (props) {
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeRaw]}/>
             </div>
-            { props.displayCorrection 
-                ?   <ReactMarkdown 
-                        class="question-correction"
-                        children={correction} 
-                        transformImageUri={uri =>
-                            `${process.env.PUBLIC_URL}/${transformImageURI(uri, props.filePath)}`} 
-                        components={{h1: ({node, ...props}) => <h6 class="text-primary" {...props}/>,
-                                    table: ({node, ...props}) => <table class="table table-sm" {...props}/>}}
-                        remarkPlugins={[remarkGfm]}
-                        rehypePlugins={[rehypeRaw]} // This is OK as we can totally trust the Markdown
-                    /> 
+            { props.displayCorrection ?
+                <ReactMarkdown 
+                    class="question-correction"
+                    children={correction} 
+                    transformImageUri={uri =>
+                        `${process.env.PUBLIC_URL}/${transformImageURI(uri, props.filePath)}`} 
+                    components={{h1: ({node, ...props}) => <h6 class="text-primary" {...props}/>,
+                                table: ({node, ...props}) => <table class="table table-sm" {...props}/>}}
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeRaw]} // This is OK as we can totally trust the Markdown
+                /> 
                 :   <div class="question-answer"><AnswerLines answerSize={props.answerSize}/></div>
             }
         </div>

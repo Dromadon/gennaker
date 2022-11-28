@@ -20,7 +20,6 @@ function EvaluationPage(props) {
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [isQuestionsReady, setIsQuestionsReady] = useState(false);
     const [error] = useState(false);
-    const [db, setDB] = useState({});
     const [evalParameters] = useState({
         support: searchParams.get("support"),
         length: searchParams.get("length")
@@ -49,7 +48,7 @@ function EvaluationPage(props) {
         const db = new QuestionDatabase();
         const evaluationStructureMaker = new EvaluationStructureMaker();
 
-        const getEval = async () => {
+        const getEvaluation = async () => {
             let evalStructure = await evaluationStructureMaker
                 .generateStructure({support: evalParameters["support"], length: evalParameters["length"]});
             await evalStructure.updateAllQuestions({questionsDB: db})
@@ -59,8 +58,7 @@ function EvaluationPage(props) {
             setIsDataLoaded(true);
             setIsQuestionsReady(true);
         }
-        getEval();
-        setDB(db);
+        getEvaluation();
     }, [props, evalParameters])
 
     if (error) {
