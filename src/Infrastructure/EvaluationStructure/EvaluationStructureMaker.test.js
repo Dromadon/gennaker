@@ -1,19 +1,18 @@
 
-import * as TestStructure from "./TestStructure";
+import * as TestData from "./TestData";
 import fetchMock from "jest-fetch-mock";
 import { EvaluationStructureMaker } from "./EvaluationStructureMaker";
 
 describe('EvaluationStructureIsGeneratedBasedOnStructureFiles', () => {
     //Given
     const evaluationStructureMaker = new EvaluationStructureMaker();
-    let spyData = jest.spyOn(evaluationStructureMaker, "fetchCategoriesData").mockReturnValue(TestStructure.GENERIC_STRUCTURE);
-    let spyStructure = jest.spyOn(evaluationStructureMaker, "fetchEvalStructure").mockReturnValue(TestStructure.EVAL_STRUCTURE_CATAMARAN_RACCOURCIE);
+    const support = "catamaran";
+    const length = "raccourcie";
+
+    jest.spyOn(evaluationStructureMaker, "fetchCategoriesData").mockReturnValue(TestData.CATEGORIES_DATA);
+    jest.spyOn(evaluationStructureMaker, "fetchEvalStructure").mockReturnValue(TestData.EVAL_STRUCTURE_CATAMARAN_RACCOURCIE);
 
     test('EvaluationCanBeCreatedWithSupportAndLength', async () => {
-        //And
-        const support = "catamaran";
-        const length = "raccourcie";
-
         //When
         const evaluation = await evaluationStructureMaker.generateStructure({support: support, length: length});
 
@@ -24,50 +23,45 @@ describe('EvaluationStructureIsGeneratedBasedOnStructureFiles', () => {
 
     test('EvaluationHaveExpectedCategories', async () => {
         //When
-        const evaluationCatamaranRaccourcie = await evaluationStructureMaker.generateStructure({support: "catamaran", length: "raccourcie"})
+        const evaluationCatamaranRaccourcie = await evaluationStructureMaker.generateStructure({support: support, length: length})
 
         //Then
-        expect(evaluationCatamaranRaccourcie.categories)
-            .toStrictEqual(TestStructure.expectedCatamaranRaccourcieCategories)        
+        expect(evaluationCatamaranRaccourcie)
+            .toStrictEqual(TestData.EXPECTED_CATAMARAN_RACCOURCIE_EVALUATION)        
     })
 })
 
 describe('EvaluationStructureMakerCorrectlyFetchesEvalStructureAndCategoriesFiles', () => {
     //Given
-    const evaluationStructureMaker2 = new EvaluationStructureMaker();
+    const evaluationStructureMaker = new EvaluationStructureMaker();
     fetchMock.enableMocks();
 
     test('FetchCategoriesDataWorks', async () => {
         //Given
         fetchMock.resetMocks();
-        fetchMock.mockResponseOnce(JSON.stringify(TestStructure.GENERIC_STRUCTURE));
+        fetchMock.mockResponseOnce(JSON.stringify(TestData.CATEGORIES_DATA));
 
         //When
-        const categoriesData = await evaluationStructureMaker2.fetchCategoriesData();
+        const categoriesData = await evaluationStructureMaker.fetchCategoriesData();
 
         //Then
         expect(fetch).toBeCalledWith("/questions/categoriesDB.json", {"headers": {"Accept": "application/json", "Content-Type": "application/json"}});
         expect(categoriesData)
-            .toStrictEqual(TestStructure.GENERIC_STRUCTURE)        
+            .toStrictEqual(TestData.CATEGORIES_DATA)        
     })
 
     test('FetchEvalStructureWorksForSeveralSupportAndLength', async () => {
         //Given
         fetchMock.resetMocks();
-        fetchMock.mockResponseOnce(JSON.stringify(TestStructure.EVAL_STRUCTURE_CATAMARAN_RACCOURCIE))
-            .mockResponseOnce(JSON.stringify(TestStructure.EVAL_STRUCTURE_DERIVEUR_STANDARD));
+        fetchMock.mockResponseOnce("{}")
+            .mockResponseOnce("{}");
 
         //When
-        const evalStructureCatamaranRaccourcie = await evaluationStructureMaker2.fetchEvalStructure({support: "catamaran", length: "raccourcie"});
-        const evalStructureDeriveurStandard = await evaluationStructureMaker2.fetchEvalStructure({support: "deriveur", length: "standard"});
+        await evaluationStructureMaker.fetchEvalStructure({support: "catamaran", length: "raccourcie"});
+        await evaluationStructureMaker.fetchEvalStructure({support: "deriveur", length: "standard"});
 
         //Then
         expect(fetch.mock.calls[0][0]).toEqual("/evaluations/catamaran_raccourcie.json");
         expect(fetch.mock.calls[1][0]).toEqual("/evaluations/deriveur_standard.json");
-
-        expect(evalStructureCatamaranRaccourcie)
-            .toStrictEqual(TestStructure.EVAL_STRUCTURE_CATAMARAN_RACCOURCIE);      
-        expect(evalStructureDeriveurStandard)
-            .toStrictEqual(TestStructure.EVAL_STRUCTURE_DERIVEUR_STANDARD);  
     })
 })
