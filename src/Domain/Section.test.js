@@ -1,9 +1,9 @@
 import { Question } from './Question';
 import {Section} from './Section';
+import {QuestionDatabase} from "../Infrastructure/QuestionsDatabase/QuestionDatabase"
 
 describe('SectionShouldContainQuestions', () => {
     //Given
-    const sectionName = "sectionTest";
     const sectionDisplayName = "Section de test";
     const questionsNumber = 2;
 
@@ -14,33 +14,33 @@ describe('SectionShouldContainQuestions', () => {
 
     test('SectionCanBeCreatedWithNameAndDisplayNameAndQuestionsNumber', () => {
         //When
-        const section = new Section({name: sectionName, displayName:sectionDisplayName, questionsNumber: questionsNumber});
+        const section = new Section({displayName:sectionDisplayName});
 
         //Then
-        expect(section.name).toBe(sectionName);
         expect(section.displayName).toBe(sectionDisplayName);
     })
     
-    test('SectionMustBeCreatedWithNameAndSectionDisplayNameAndQuestionsNumber', () => {
+    test('SectionMustBeCreatedWithDisplayName', () => {
         //Then
         expect(() => {new Section()}).toThrowError();
-        expect(() => {new Section({name: sectionName})}).toThrowError();
-        expect(() => {new Section({displayName: sectionDisplayName})}).toThrowError();
-        expect(() => {new Section({questionsNumber: questionsNumber})}).toThrowError();
-
-        expect(() => {new Section({name: sectionName, displayName: sectionDisplayName})}).toThrowError();
     })
 
-    test('SectionCanBeAddedQuestions', () => {
+    test('SectionCanBeSetQuestionNumber', () => {
         //When
-        const section = new Section({name: sectionName, displayName: sectionDisplayName, questionsNumber: questionsNumber})
-        section.addQuestion(question1);
-        section.addQuestion(question2);
-        section.addQuestion(question3);
-
+        const section = new Section({displayName:sectionDisplayName});
+        section.setQuestionsNumber(2);
+        
         //Then
-        section.questions = questions;
+        expect(section.questionsNumber).toBe(2);
     })
 
-
+    test('SectionCanBeSetQuestions', () => {
+        //When
+        const section = new Section({displayName:sectionDisplayName});
+        section.setQuestionsNumber(3);
+        section.setQuestions({questions: questions});
+        
+        //Then
+        expect(section.questions).toBe(questions);
+    })
 })

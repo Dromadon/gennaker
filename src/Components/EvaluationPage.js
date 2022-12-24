@@ -1,15 +1,17 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { EvaluationLateralBar } from "./EvaluationLateralBar";
-import { generateEval } from '../Logic/EvaluationGenerator'
 
-import Container from "react-bootstrap/Container"
-import Col from "react-bootstrap/Col"
-import Row from "react-bootstrap/Row"
+import Container from "react-bootstrap/Container";
+import Col from "react-bootstrap/Col";
+import Row from "react-bootstrap/Row";
 
 import { useSearchParams } from 'react-router-dom';
 
 import {useReactToPrint} from 'react-to-print';
 import { Evaluation } from './Evaluation';
+
+import { QuestionDatabase } from '../Infrastructure/QuestionsDatabase/QuestionDatabase';
+import { EvaluationStructureMaker } from '../Infrastructure/EvaluationStructure/EvaluationStructureMaker';
 
 function EvaluationPage(props) {
     const [searchParams] = useSearchParams();
@@ -18,8 +20,6 @@ function EvaluationPage(props) {
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [isQuestionsReady, setIsQuestionsReady] = useState(false);
     const [error] = useState(false);
-    const [db, setDB] = useState({});
-    const [evalStructure, setEvalStructure] = useState({});
     const [evalParameters] = useState({
         support: searchParams.get("support"),
         length: searchParams.get("length")
@@ -45,25 +45,32 @@ function EvaluationPage(props) {
     }
 
     useEffect(() => {
-        loadQuestionDBAndEvalStructure(evalParameters["support"], evalParameters["length"]).then(([db, evalStructure]) => {
-            console.debug("DB and structure fetched");
+        const db = new QuestionDatabase();
+        const evaluationStructureMaker = new EvaluationStructureMaker();
+
+        const getEvaluation = async () => {
+            let evalStructure = await evaluationStructureMaker
+                .generateStructure({support: evalParameters["support"], length: evalParameters["length"]});
+            await evalStructure.updateAllQuestions({questionsDB: db})
+            console.log("#####")
+            console.log(evalStructure);
+            setEvaluation(evalStructure);
             setIsDataLoaded(true);
-            setDB(db);
-            setEvalStructure(evalStructure);
-            setEvaluation(generateEval(db, evalStructure, evalParameters));
             setIsQuestionsReady(true);
-        })
+        }
+        getEvaluation();
     }, [props, evalParameters])
 
     if (error) {
         return(<div>Error happened while loading content</div>);
     } else if (isQuestionsReady){
+        console.log("In EvaluationPage.js, evaluation is ")
+        console.log(evaluation);
         return(
             <Container fluid id="evaluationPage">
                 <Row>
                     <Col xs={12} lg={2} className="lateralColumn">
                         <EvaluationLateralBar
-                            db={db} 
                             evaluation={evaluation} 
                             displayCorrection={displayCorrection} 
                             displayCategoryTitles={displayCategoryTitles}
@@ -74,7 +81,6 @@ function EvaluationPage(props) {
                     <Col sm={12} lg={10}>
                         <Evaluation id="evaluation" 
                             ref={componentRef}
-                            db={db} 
                             evaluation={evaluation} 
                             evalParameters={evalParameters}
                             displayCorrection={displayCorrection}
@@ -90,47 +96,15 @@ function EvaluationPage(props) {
     };
 }
 
-async function loadQuestionDBAndEvalStructure(support, length) {
-    const evalStructureResponse = await fetch(process.env.PUBLIC_URL + "/evaluations/"+support+"_"+length+".json", {
-            headers : { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-                }
-        })
-    const evalStructure = await evalStructureResponse.json();
-
-    const categoriesDB = await Promise.all(Object.keys(evalStructure).map(
-        //We put every category DB in an object with a single key
-        //being the category name
-        /* Each object is like:
-            {
-                meteo: {
-                    DB content fetched from db.json
-                }
-            }
-        //*/
-         async (category) => ({[category]: await (await fetch(process.env.PUBLIC_URL +"/questions/"+category+"/db.json", {
-                headers : { 
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-            })).json()}))
-    );
-    
-    //Then we merge all these category db objects in order to get
-    //a single object with each top key being a category
-    /*
-            {
-                meteo: {…},
-                conduite: {…},
-                navigation: {…},
-                …
-            }
-    //*/
-    const db = categoriesDB.reduce((item1, item2) => ({...item1, ...item2}));
+/*
+const loadQuestionDBAndEvalStructure = useCallback(async (support, length) => {
+    const db = new QuestionDatabase();
+    const evaluationStructureMaker = new EvaluationStructureMaker();
+    const evalStructure = await evaluationStructureMaker.generateStructure({support: support, length: length});
 
     return [db, evalStructure];
-}
+}, [])
+*/
 
 
 

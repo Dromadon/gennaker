@@ -1,17 +1,19 @@
 class Category {
-    constructor({name, displayName}={}) {
-        if(name === undefined)
-            throw new Error('Section name not defined');
+    constructor({displayName}={}) {
         if(displayName === undefined)
-            throw new Error('Section dispaly name not defined');
+            throw new Error('Section display name not defined');
 
-        this.name = name;
         this.displayName = displayName;
-        this.sections = []
+        this.sections = {}
     }
 
-    addSection(section) {
-        this.sections.push(section);
+    setSection({sectionName, section}) {
+        this.sections[sectionName] = section;
+        return this;
+    }
+
+    getSections() {
+        return Object.entries(this.sections);
     }
 }
 

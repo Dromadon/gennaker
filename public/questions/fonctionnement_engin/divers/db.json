@@ -1,0 +1,13 @@
+[
+    {
+        "fileName": "penons_1.md"
+    },
+    {
+        "fileName": "cintre_mat.md",
+        "supports": ["catamaran","deriveur","croisiere"]
+    },
+    {
+        "fileName": "VL/PAV/tension_amure.md",
+        "supports": ["windsurf"]
+    }
+]

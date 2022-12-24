@@ -6,9 +6,10 @@ function EvaluationLateralBar (props) {
         <div className="lateralNavBar sticky-lg-top my-3">
             <Navbar id="navbar-categories" color="light" className="flex-column align-items-start">
                 <Nav class="nav nav-pills flex-column">
-                    {Object.keys(props.evaluation).map((category) => { 
-                        const categoryDisplayName = props.db[category]["meta"]["categoryDisplayName"]
-                        return(<NavHashLink class="nav-link" to={"#category-"+category}>{categoryDisplayName}</NavHashLink>)})}
+                    {props.evaluation.getCategories().map((categoryName, category) => { 
+                        return(<NavHashLink class="nav-link" to={"#category-"+categoryName}>
+                                {category.displayName}
+                            </NavHashLink>)})}
                 </Nav>
             </Navbar>
             <hr/>
