@@ -13,8 +13,9 @@ class QuestionDatabase {
         console.log("Getting "+number+" questions from DB for category "+category+" and section "+section+" with support "+support)
 
         const questionsDB = await this.fetchQuestionDatabaseFile({category: category, section: section});
-        console.log("Database file fetched");
-        const filteredQuestionsDB = this.filterSupport(questionsDB, support); //Mettre un if si support pas défini
+        const filteredQuestionsDB = this.filterSupport(questionsDB, support); 
+
+        //Optimisation de perf : instancier les objets après le choix aléatoire
         const questions = filteredQuestionsDB.map((question) => {    
             return new Question({
             fileName: category+"/"+section+"/"+question.fileName,
@@ -23,8 +24,8 @@ class QuestionDatabase {
             })
         })
 
-        console.log("Questions returned are ");
-        console.log(questions);
+        console.debug("Questions returned from DB are ");
+        console.debug(questions);
 
         if(number === undefined)
             return questions

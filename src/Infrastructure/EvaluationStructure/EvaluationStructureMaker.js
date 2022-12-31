@@ -7,10 +7,8 @@ class EvaluationStructureMaker {
     async generateStructure({support, length}={}) {
         
         const categoriesData = await this.fetchCategoriesData();
-        console.debug(categoriesData);
 
         const evalStructure = await this.fetchEvalStructure({support: support, length: length});
-        console.debug(evalStructure);
         
         const evaluation = new Evaluation({support: support, length: length});
         this.populateEvaluationStructure(evaluation, evalStructure, categoriesData);
@@ -24,6 +22,7 @@ class EvaluationStructureMaker {
             console.debug("Adding category " + categoryName);
             const category = new Category({displayName: categoriesData[categoryName]["displayName"]});
             Object.entries(sectionNames).map(([sectionName, questionsNumber]) => {
+                console.debug("In category "+categoryName+" adding section "+sectionName+" with questionsNumber "+questionsNumber)
                 const section = new Section({displayName: categoriesData[categoryName]["sections"][sectionName]["displayName"]})
                     .setQuestionsNumber(questionsNumber["number"]);
                 category.setSection({sectionName: sectionName, section: section});
@@ -33,14 +32,14 @@ class EvaluationStructureMaker {
     }
 
     async fetchCategoriesData() {
-        console.log("Fetching categories data");
+        console.debug("Fetching categories data");
         const categoriesData = await (await fetch(process.env.PUBLIC_URL + "/questions/categoriesDB.json", {
             headers : { 
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
                 }
         })).json();
-        console.log(categoriesData);
+        console.debug(categoriesData);
         return categoriesData;
     }
 
