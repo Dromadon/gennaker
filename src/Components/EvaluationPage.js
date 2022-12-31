@@ -14,10 +14,8 @@ import { QuestionDatabase } from '../Infrastructure/QuestionsDatabase/QuestionDa
 import { EvaluationStructureMaker } from '../Infrastructure/EvaluationStructure/EvaluationStructureMaker';
 
 function EvaluationPage(props) {
-    const [searchParams] = useSearchParams();
-    console.log(searchParams.get("support"))
 
-    const [isDataLoaded, setIsDataLoaded] = useState(false);
+    const [searchParams] = useSearchParams();
     const [isQuestionsReady, setIsQuestionsReady] = useState(false);
     const [error] = useState(false);
     const [evalParameters] = useState({
@@ -45,27 +43,32 @@ function EvaluationPage(props) {
     }
 
     useEffect(() => {
+        console.log("Creating evaluation object with questions")
         const db = new QuestionDatabase();
         const evaluationStructureMaker = new EvaluationStructureMaker();
 
         const getEvaluation = async () => {
+            console.debug("Creating new evaluation from evaluationStructureMaker");
             let evalStructure = await evaluationStructureMaker
                 .generateStructure({support: evalParameters["support"], length: evalParameters["length"]});
-            await evalStructure.updateAllQuestions({questionsDB: db})
-            console.log("#####")
-            console.log(evalStructure);
-            setEvaluation(evalStructure);
-            setIsDataLoaded(true);
+            console.debug("Population evaluation questions with QuestionsDatabase")
+            const evaluationWithQuestions = await evalStructure.updateAllQuestions({questionsDB: db})
+
+            console.debug("Resulting evaluation with questions is")
+            console.debug(evaluationWithQuestions);
+
+            setEvaluation(evaluationWithQuestions);
             setIsQuestionsReady(true);
         }
         getEvaluation();
     }, [props, evalParameters])
 
+    console.log("EvaluationPage with parameters")
+    console.log(evalParameters)
+
     if (error) {
         return(<div>Error happened while loading content</div>);
     } else if (isQuestionsReady){
-        console.log("In EvaluationPage.js, evaluation is ")
-        console.log(evaluation);
         return(
             <Container fluid id="evaluationPage">
                 <Row>
@@ -89,8 +92,6 @@ function EvaluationPage(props) {
                 </Row>
             </Container>
         )
-    } else if (isDataLoaded) {
-        return(<div>Creating questions…</div>)
     } else {
         return(<div>Loading questions database…</div>)
     };

@@ -19,8 +19,9 @@ function Question (props) {
     const [question, setQuestion] = useState("");
     const [correction, setCorrection] = useState("");
 
-    console.log(props.filePath)
-    useEffect(() => {fetch(props.filePath, {
+    useEffect(() => {
+        console.debug("Fetching question content for filePath: "+props.filePath)
+        fetch(props.filePath, {
         // This is needed for local access sadly
         headers : { 
           'Content-Type': 'text',
@@ -87,10 +88,8 @@ function AnswerLines(props) {
 }
 
 export function transformImageURI(uri, filePath) {
-    console.debug(uri);
-    console.debug(filePath);
+    console.debug("Transforming URI: "+uri+" for filePath: "+filePath)
     let strippedPath = filePath.substr(0, filePath.lastIndexOf("/")+1);
-    console.debug(strippedPath);
     return strippedPath + uri;
 }
 

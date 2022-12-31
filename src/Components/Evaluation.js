@@ -18,7 +18,10 @@ const Evaluation = React.forwardRef(({evaluation, evalParameters, displayCorrect
     </div>
 ))
 
-const Category = ({categoryName, category, displayCorrection, displayCategoryTitles}) => (
+const Category = ({categoryName, category, displayCorrection, displayCategoryTitles}) => {
+    console.log("Displaying category "+categoryName)
+
+    return(
     <div className="mt-5">
         { displayCategoryTitles &&
             <div class="categoryTitle">
@@ -33,11 +36,11 @@ const Category = ({categoryName, category, displayCorrection, displayCategoryTit
                 displayCorrection={displayCorrection}
                 displayCategoryTitles={displayCategoryTitles} />
         ))}
-    </div>
-)
+    </div>)
+}
 
 const Section = ({categoryName, sectionName, section, displayCorrection, displayCategoryTitles}) => {
-    console.log(section)
+    console.log("Displaying section "+sectionName+" in category "+categoryName)
 
     return(
     <div>
@@ -48,8 +51,6 @@ const Section = ({categoryName, sectionName, section, displayCorrection, display
         {
         section.questions.map((question) => {
             const filePath = process.env.PUBLIC_URL + "/questions/" + question["fileName"]
-            console.debug("Filepath of question is ")
-            console.debug(filePath);
             return (
                 <Question
                     filePath={filePath}

@@ -20,21 +20,21 @@ class Evaluation {
     }
 
     async updateSectionQuestions({questionsDB, categoryName, sectionName}) {
-        console.log("Updating questions for category "+categoryName+" and section "+sectionName);
+        console.debug("Updating questions for category "+categoryName+" and section "+sectionName);
         const number = this.categories[categoryName].sections[sectionName].questionsNumber;
-        console.log(number);
         const questions = await questionsDB.getQuestions({category: categoryName, section: sectionName, number: number, support: this.support})
-        console.log("Questions received from DB are");
-        console.log(questions);
+        console.debug("Questions received from DB for category "+categoryName+" and section "+sectionName+" are ");
+        console.debug(questions);
         this.categories[categoryName].sections[sectionName].setQuestions({questions: questions});
         return this;
     }
 
     async updateAllQuestions({questionsDB}) {
+        console.debug("Updating all questions in Evaluation")
         await Promise.all(Object.keys(this.categories).map(async (categoryName) => {
-            Object.keys(this.categories[categoryName].sections).map(async (sectionName) => {
+            return Promise.all(Object.keys(this.categories[categoryName].sections).map(async (sectionName) => {
                 await this.updateSectionQuestions({ questionsDB: questionsDB, categoryName: categoryName, sectionName: sectionName });
-            });
+            }));
         }))
         return this;
     }
