@@ -24,7 +24,7 @@ class QuestionDatabase {
             })
         })
 
-        console.debug("Questions returned from DB are ");
+        console.debug("All questions fetched from remote DB are ");
         console.debug(questions);
 
         if(number === undefined)
