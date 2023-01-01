@@ -25,7 +25,7 @@ function EvaluationPage(props) {
         support: searchParams.get("support"),
         length: searchParams.get("length")
     });
-    const [questionsDB, setQuestionsDB] = useState(new QuestionDatabase())
+    const [questionsDB] = useState(new QuestionDatabase())
     const [evaluation, setEvaluation] = useImmer({});
     const [displayCorrection, setDisplayCorrection] = useState(false);
     const [displayCategoryTitles, setDisplayCategoryTitle] = useState(true);
@@ -46,13 +46,33 @@ function EvaluationPage(props) {
         setDisplayCategoryTitle(!displayCategoryTitles);
     }
 
+    //*
     const changeSectionQuestions = async (categoryName, sectionName) => {
         console.debug("Changing questions for category "+categoryName+" and section "+sectionName)
+        const questions = await questionsDB.getQuestions({category: categoryName, section: sectionName, support: evaluation.support, number: 1})    
+
         setEvaluation(
-            async (draft) => {
-            await draft.updateSectionQuestions({questionsDB: questionsDB, categoryName: categoryName, sectionName: sectionName})
-        })
+            (draft) => {
+                draft.categories[categoryName].sections[sectionName].questions=questions
+                console.debug(draft);
+            })
+        console.debug(evaluation)
     }
+    //*/
+
+
+    /*const changeSectionQuestions = async (categoryName, sectionName) => {
+        console.debug("Changing questions for category "+categoryName+" and section "+sectionName)
+        const newSection = await evaluation.updateSectionQuestions({questionsDB: questionsDB, categoryName: categoryName, sectionName: sectionName})
+        console.log(newSection)
+        setEvaluation(
+            (draft) => {
+                draft.categories[categoryName].sections[sectionName] = newSection
+                console.debug(draft);
+            })
+        console.debug(evaluation)
+    }
+    //*/
 
     useEffect(() => {
         console.log("Creating evaluation object with questions")
