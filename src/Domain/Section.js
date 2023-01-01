@@ -1,4 +1,9 @@
+import {immerable} from "immer"
+
+
 class Section {
+    [immerable] = true
+
     constructor({displayName}={}) {
         if(displayName === undefined)
             throw new Error('Section display name not defined');
@@ -15,6 +20,10 @@ class Section {
     setQuestions({questions}) {
         this.questions = questions;
         return this;
+    }
+
+    async updateQuestions({questionsDB}) {
+        //this.questions = await questionsDB.getQuestions()
     }
 }
 

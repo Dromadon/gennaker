@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import rehypeRaw from 'rehype-raw'
 import remarkGfm from 'remark-gfm'
 
+import {Button} from "react-bootstrap";
+
+
 
 const CORRECTION_MARKER="# Correction"
 const ANSWER_LINES_BY_SIZE={
@@ -42,21 +45,22 @@ function Question (props) {
         }, [props.filePath]);
     
     return (
-        <div className="question no-break-inside d-block rounded p-3 mb-2">
-            <div class="question-content">
-                <ReactMarkdown 
-                children={question} 
-                transformImageUri={uri =>
-                    `${transformImageURI(uri, props.filePath)}`} 
-                components={{
-                    h1: ({node, ...props}) => <h6 {...props}/>,
-                    img: ({node, ...props}) => <img class="img-fluid" {...props}/>,
-                    table: ({node, ...props}) => <table class="table table-sm table-borderless table-responsive" {...props}/>
-                }}
-                remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeRaw]}/>
-            </div>
-            { props.displayCorrection ?
+        <div className="question no-break-inside d-block rounded mb-3">
+            <div class="p-2">
+                <div class="question-content">
+                    <ReactMarkdown 
+                    children={question} 
+                    transformImageUri={uri =>
+                        `${transformImageURI(uri, props.filePath)}`} 
+                    components={{
+                        h1: ({node, ...props}) => <h6 {...props}/>,
+                        img: ({node, ...props}) => <img class="img-fluid" {...props}/>,
+                        table: ({node, ...props}) => <table class="table table-sm table-borderless table-responsive" {...props}/>
+                    }}
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeRaw]}/>
+                </div>
+                { props.displayCorrection ?
                 <ReactMarkdown 
                     class="question-correction"
                     children={correction} 
@@ -68,7 +72,8 @@ function Question (props) {
                     rehypePlugins={[rehypeRaw]} // This is OK as we can totally trust the Markdown
                 /> 
                 :   <div class="question-answer"><AnswerLines answerSize={props.answerSize}/></div>
-            }
+                }
+            </div>
         </div>
     )
 }

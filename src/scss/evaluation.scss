@@ -1,13 +1,17 @@
 //*
 @media print {
 
-    //*
+   
     .categoryTitle {
         break-after: avoid;
     }
 
     .categoryTitle + div {
         break-before: avoid;
+    }
+
+    /*.sectionTitle {
+        break-after: avoid;
     }
     //*/
 
@@ -16,28 +20,15 @@
     }
 
     //*
+    .changeQuestionButton {
+        display: none;
+    }
+    
     .question {
         display: block;
         break-inside: avoid;
         background-color: white;
     }
-    //*/
-
-    /*
-    .question-content {
-        display: block;
-        break-inside: avoid;
-        background-color: $green-100;
-    }
-    //*/
-
-    /*/
-    .question-answer {
-        display: block;
-        break-inside: avoid;
-        background-color: $blue-100;
-    }
-    //*/
     
     @page {
         margin-top: 10mm; 
