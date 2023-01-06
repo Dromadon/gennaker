@@ -4,76 +4,76 @@ import { useEffect, useState } from 'react';
 import rehypeRaw from 'rehype-raw'
 import remarkGfm from 'remark-gfm'
 
-import {Button} from "react-bootstrap";
+import { Button } from "react-bootstrap";
 
 
 
-const CORRECTION_MARKER="# Correction"
-const ANSWER_LINES_BY_SIZE={
+const CORRECTION_MARKER = "# Correction"
+const ANSWER_LINES_BY_SIZE = {
     "xs": 2,
     "sm": 5,
     "md": 8,
     "lg": 11,
     "xl": 14
 }
-const DEFAULT_ANSWER_SIZE="md"
+const DEFAULT_ANSWER_SIZE = "md"
 
-function Question (props) {
+function Question(props) {
     const [question, setQuestion] = useState("");
     const [correction, setCorrection] = useState("");
 
     useEffect(() => {
-        console.debug("Fetching question content for filePath: "+props.filePath)
+        console.debug("Fetching question content for filePath: " + props.filePath)
         fetch(props.filePath, {
-        // This is needed for local access sadly
-        headers : { 
-          'Content-Type': 'text',
-          'Accept': 'text'
-        }
+            // This is needed for local access sadly
+            headers: {
+                'Content-Type': 'text',
+                'Accept': 'text'
+            }
         })
-        .then((res) => res.text())
-        .then((text) => {
+            .then((res) => res.text())
+            .then((text) => {
                 const [question, correction] = text.split(CORRECTION_MARKER)
-                
+
                 setQuestion(question)
-                if(text.indexOf(CORRECTION_MARKER)>=0) {
-                    setCorrection(CORRECTION_MARKER+correction)
+                if (text.indexOf(CORRECTION_MARKER) >= 0) {
+                    setCorrection(CORRECTION_MARKER + correction)
                 } else {
                     setCorrection('');
                 }
             });
-        }, [props.filePath]);
-    
+    }, [props.filePath]);
+
     return (
-        <div className="question no-break-inside d-block rounded mb-3">
-            <div class="p-2">
-                <div class="question-content">
-                    <ReactMarkdown 
-                    children={question} 
+        <div className="question no-break-inside d-block rounded mb-3 p-2">
+            <div class="question-content">
+                <ReactMarkdown
+                    children={question}
                     transformImageUri={uri =>
-                        `${transformImageURI(uri, props.filePath)}`} 
+                        `${transformImageURI(uri, props.filePath)}`}
                     components={{
-                        h1: ({node, ...props}) => <h6 {...props}/>,
-                        img: ({node, ...props}) => <img class="img-fluid" {...props}/>,
-                        table: ({node, ...props}) => <table class="table table-sm table-borderless table-responsive" {...props}/>
+                        h1: ({ node, ...props }) => <h6 {...props} />,
+                        img: ({ node, ...props }) => <img class="img-fluid" {...props} />,
+                        table: ({ node, ...props }) => <table class="table table-sm table-borderless table-responsive" {...props} />
                     }}
                     remarkPlugins={[remarkGfm]}
-                    rehypePlugins={[rehypeRaw]}/>
-                </div>
-                { props.displayCorrection ?
-                <ReactMarkdown 
+                    rehypePlugins={[rehypeRaw]} />
+            </div>
+            { props.displayCorrection ?
+                <ReactMarkdown
                     class="question-correction"
-                    children={correction} 
+                    children={correction}
                     transformImageUri={uri =>
-                        `${process.env.PUBLIC_URL}/${transformImageURI(uri, props.filePath)}`} 
-                    components={{h1: ({node, ...props}) => <h6 class="text-primary" {...props}/>,
-                                table: ({node, ...props}) => <table class="table table-sm" {...props}/>}}
+                        `${process.env.PUBLIC_URL}/${transformImageURI(uri, props.filePath)}`}
+                    components={{
+                        h1: ({ node, ...props }) => <h6 class="text-primary" {...props} />,
+                        table: ({ node, ...props }) => <table class="table table-sm" {...props} />
+                    }}
                     remarkPlugins={[remarkGfm]}
                     rehypePlugins={[rehypeRaw]} // This is OK as we can totally trust the Markdown
-                /> 
-                :   <div class="question-answer"><AnswerLines answerSize={props.answerSize}/></div>
-                }
-            </div>
+                />
+                : <div class="question-answer"><AnswerLines answerSize={props.answerSize} /></div>
+            }
         </div>
     )
 }
@@ -83,19 +83,19 @@ function AnswerLines(props) {
 
     if (props.answerSize !== undefined && props.answerSize in ANSWER_LINES_BY_SIZE) {
         answerLines = ANSWER_LINES_BY_SIZE[props.answerSize];
-    } 
+    }
 
-    return(
+    return (
         <div>
-            {[...Array(answerLines)].map(() => <br/>)}
+            {[...Array(answerLines)].map(() => <br />)}
         </div>
     )
 }
 
 export function transformImageURI(uri, filePath) {
-    console.debug("Transforming URI: "+uri+" for filePath: "+filePath)
-    let strippedPath = filePath.substr(0, filePath.lastIndexOf("/")+1);
+    console.debug("Transforming URI: " + uri + " for filePath: " + filePath)
+    let strippedPath = filePath.substr(0, filePath.lastIndexOf("/") + 1);
     return strippedPath + uri;
 }
 
-export {Question}
+export { Question }
