@@ -2,7 +2,11 @@
     background-color: $gray-100;
 }
 
-.question .table table, th, tbody, tr, td {
+.question .table table,
+th,
+tbody,
+tr,
+td {
     border: thin solid $black !important;
     font-size: 75%; //For getting the tide tables not too tall
     padding: 0;

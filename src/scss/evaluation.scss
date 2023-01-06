@@ -1,7 +1,4 @@
-//*
 @media print {
-
-   
     .categoryTitle {
         break-after: avoid;
     }
@@ -10,35 +7,33 @@
         break-before: avoid;
     }
 
-    /*.sectionTitle {
-        break-after: avoid;
-    }
-    //*/
-
     .sectionTitle {
         break-after: avoid;
     }
 
-    //*
     .changeQuestionButton {
         display: none;
     }
-    
+
     .question {
         display: block;
         break-inside: avoid;
         background-color: white;
     }
-    
+
     @page {
-        margin-top: 10mm; 
-        margin-bottom: 10mm; 
-        margin-left: 10mm; 
-        margin-right: 10mm
+        margin-top: 10mm;
+        margin-bottom: 10mm;
+        margin-left: 10mm;
+        margin-right: 10mm;
     }
-    
 }
-//*/
-#evaluation h1, h2, h3, h4, h5, h6 {
+
+#evaluation h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     color: black;
 }
