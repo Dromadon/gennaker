@@ -43,7 +43,7 @@ const Section = ({categoryName, sectionName, section, displayCorrection, display
     console.log("Displaying section "+sectionName+" in category "+categoryName)
 
     return(
-    <div>
+    <div className="mt-3">
         { displayCategoryTitles && 
                 <div class="sectionTitle">
                     <h4 id={"section-" + categoryName + "-" + sectionName}>{section.displayName}</h4>
