@@ -28,16 +28,18 @@ class Evaluation {
     async updateSectionQuestions({questionsDB, categoryName, sectionName}) {
         console.debug("Updating questions for category "+categoryName+" and section "+sectionName);
 
-        const questions = await questionsDB.getQuestions({category: categoryName, section: sectionName, number: 1, support: this.support})
+        const questions = await questionsDB.getQuestions({
+            category: categoryName, 
+            section: sectionName, 
+            number: this.categories[categoryName].sections[sectionName].questionsNumber, 
+            support: this.support,
+            excludedQuestions: this.categories[categoryName].sections[sectionName].questions
+        })
         console.debug("Questions received from DB for category "+categoryName+" and section "+sectionName+" are ");
         console.debug(questions);
         
         this.categories[categoryName].sections[sectionName].setQuestions({questions: questions});
-        /*
-        return new Section({displayName: this.categories[categoryName].sections[sectionName].displayName})
-            .setQuestionsNumber(1)
-            .setQuestions({questions: questions})
-        //*/
+        return this
     }
 
     async updateAllQuestions({questionsDB}) {

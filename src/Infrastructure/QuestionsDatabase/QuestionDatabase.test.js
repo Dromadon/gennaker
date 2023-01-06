@@ -52,6 +52,16 @@ describe('QuestionDatabaseShouldReturnCorrectQuestions', () => {
         expect(questions.sort())
             .toStrictEqual([TestData.QUESTION_3, TestData.QUESTION_4]);
     })
+
+    test('GetQuestionsShouldExcludeQuestionsBasedOnGivenList', async () => {
+        //When
+        const questions = await questionDatabase.getQuestions({category: category, section: section, 
+            excludedQuestions: [TestData.QUESTION_3]})
+
+        //Then
+        expect(questions.sort())
+            .toStrictEqual([TestData.QUESTION_4, TestData.QUESTION_5].sort());
+    })
 })
 
 

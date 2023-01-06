@@ -4,7 +4,7 @@ const _ = require('lodash')
 
 class QuestionDatabase {
 
-    async getQuestions({category, section, number, support}={}){   
+    async getQuestions({category, section, number, support, excludedQuestions}={}){   
         if (category === undefined || category === null)
             throw new Error("Category is undefined or null");
         if (section === undefined || section === null)
@@ -12,35 +12,51 @@ class QuestionDatabase {
 
         console.log("Getting "+number+" questions from DB for category "+category+" and section "+section+" with support "+support)
 
-        const questionsDB = await this.fetchQuestionDatabaseFile({category: category, section: section});
-        const filteredQuestionsDB = this.filterSupport(questionsDB, support); 
-
-        //Optimisation de perf : instancier les objets après le choix aléatoire
-        const questions = filteredQuestionsDB.map((question) => {    
+        const questionsData = await this.fetchQuestionDatabaseFile({category: category, section: section});
+        
+        const filteredQuestionsData = questionsData
+            .filter(questionData => this.filterSupport(questionData, support))
+            .filter(questionData => this.filterExcludedQuestions(questionData, excludedQuestions))
+        
+        const questions = this.getRandomQuestions(filteredQuestionsData, number).map((question) => {    
             return new Question({
             fileName: category+"/"+section+"/"+question.fileName,
             answerSize: question.answerSize,
             supports: question.supports
             })
         })
-
+        
         console.debug("All questions fetched from remote DB are ");
         console.debug(questions);
-
-        if(number === undefined)
-            return questions
-        else
-            return _.sampleSize(questions, number);
+        return questions
+        
+        
     }
 
-    filterSupport(questionsDB, support) {
+    filterSupport(questionData, support) {
         if(support === undefined)
-            return questionsDB
+            return true
         else {
-            return questionsDB.filter((question) => {
-                return(!question.hasOwnProperty("supports") || question["supports"].includes(support))
-            })
+            return !questionData.hasOwnProperty("supports") || questionData["supports"].includes(support)
         }
+    }
+
+    filterExcludedQuestions(questionData, excludedQuestions) {
+        if(excludedQuestions === undefined)
+            return true
+        else {
+            if (excludedQuestions.some(excludedQuestion => excludedQuestion.fileName.split('/').pop() === questionData.fileName))
+                return false
+            else
+                return true
+        }
+    }
+
+    getRandomQuestions(questionsData, number) {
+        if(number === undefined)
+            return questionsData
+        else
+            return _.sampleSize(questionsData, number);
     }
 
     async fetchQuestionDatabaseFile({category, section}={}) {

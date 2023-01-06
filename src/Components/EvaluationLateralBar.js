@@ -6,7 +6,8 @@ function EvaluationLateralBar (props) {
         <div className="lateralNavBar sticky-lg-top my-3">
             <Navbar id="navbar-categories" color="light" className="flex-column align-items-start">
                 <Nav class="nav nav-pills flex-column">
-                    {props.evaluation.getCategories().map((categoryName, category) => { 
+                    {props.evaluation.getCategories().map(([categoryName, category]) => { 
+                        console.log(category)
                         return(<NavHashLink class="nav-link" to={"#category-"+categoryName}>
                                 {category.displayName}
                             </NavHashLink>)})}
@@ -32,7 +33,7 @@ function EvaluationLateralBar (props) {
                     <hr/>
                 </Form>
                 <Button onClick={props.handlePrint} size="md" variant="primary"><div className="hstack"><i class="bi bi-printer-fill"></i><span class="mx-auto">Imprimer</span></div></Button>
-                <Button onClick={() => window.location.reload()} variant="success" size="md"><div className="hstack"><i class="bi bi-arrow-clockwise"></i><span class="mx-auto">Générer une nouvelle évaluation</span></div></Button>
+                <Button onClick={props.changeAllQuestions} variant="success" size="md"><div className="hstack"><i class="bi bi-arrow-clockwise"></i><span class="mx-auto">Générer une nouvelle évaluation</span></div></Button>
             </div>
         </div>
     )

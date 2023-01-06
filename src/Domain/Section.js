@@ -21,10 +21,6 @@ class Section {
         this.questions = questions;
         return this;
     }
-
-    async updateQuestions({questionsDB}) {
-        //this.questions = await questionsDB.getQuestions()
-    }
 }
 
 export {Section}

@@ -26,7 +26,7 @@ function EvaluationPage(props) {
         length: searchParams.get("length")
     });
     const [questionsDB] = useState(new QuestionDatabase())
-    const [evaluation, setEvaluation] = useImmer({});
+    const [evaluation, setEvaluation] = useState({});
     const [displayCorrection, setDisplayCorrection] = useState(false);
     const [displayCategoryTitles, setDisplayCategoryTitle] = useState(true);
 
@@ -46,33 +46,23 @@ function EvaluationPage(props) {
         setDisplayCategoryTitle(!displayCategoryTitles);
     }
 
-    //*
     const changeSectionQuestions = async (categoryName, sectionName) => {
         console.debug("Changing questions for category "+categoryName+" and section "+sectionName)
-        const questions = await questionsDB.getQuestions({category: categoryName, section: sectionName, support: evaluation.support, number: 1})    
-
-        setEvaluation(
-            (draft) => {
-                draft.categories[categoryName].sections[sectionName].questions=questions
-                console.debug(draft);
-            })
-        console.debug(evaluation)
+        //See the Immer doc https://immerjs.github.io/immer/async
+        const newEvaluation = await produce(evaluation, async (draft) => {
+            await draft.updateSectionQuestions({questionsDB: questionsDB, categoryName: categoryName, sectionName: sectionName})
+        })
+        setEvaluation(newEvaluation)
     }
-    //*/
 
-
-    /*const changeSectionQuestions = async (categoryName, sectionName) => {
-        console.debug("Changing questions for category "+categoryName+" and section "+sectionName)
-        const newSection = await evaluation.updateSectionQuestions({questionsDB: questionsDB, categoryName: categoryName, sectionName: sectionName})
-        console.log(newSection)
-        setEvaluation(
-            (draft) => {
-                draft.categories[categoryName].sections[sectionName] = newSection
-                console.debug(draft);
-            })
-        console.debug(evaluation)
+    const changeAllQuestions = async () => {
+        console.debug("Changing all questions")
+        //See the Immer doc https://immerjs.github.io/immer/async
+        const newEvaluation = await produce(evaluation, async (draft) => {
+            await draft.updateAllQuestions({questionsDB: questionsDB})
+        })
+        setEvaluation(newEvaluation)
     }
-    //*/
 
     useEffect(() => {
         console.log("Creating evaluation object with questions")
@@ -111,7 +101,8 @@ function EvaluationPage(props) {
                             displayCategoryTitles={displayCategoryTitles}
                             toggleDisplayCorrection={toggleDisplayCorrection}
                             toggleDisplayCategoryTitles={toggleDisplayCategoryTitles}
-                            handlePrint={handlePrint}/>
+                            handlePrint={handlePrint}
+                            changeAllQuestions={changeAllQuestions}/>
                     </Col>
                     <Col sm={12} lg={10}>
                         <Evaluation id="evaluation" 
