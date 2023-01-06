@@ -1,4 +1,10 @@
+import {Section} from './Section';
+import {immerable} from "immer"
+
+
 class Evaluation {
+    [immerable] = true
+
     constructor({support, length}={}) {
         if (support === undefined)
             throw new Error("Support not defined for Evaluation");
@@ -21,12 +27,19 @@ class Evaluation {
 
     async updateSectionQuestions({questionsDB, categoryName, sectionName}) {
         console.debug("Updating questions for category "+categoryName+" and section "+sectionName);
-        const number = this.categories[categoryName].sections[sectionName].questionsNumber;
-        const questions = await questionsDB.getQuestions({category: categoryName, section: sectionName, number: number, support: this.support})
+
+        const questions = await questionsDB.getQuestions({
+            category: categoryName, 
+            section: sectionName, 
+            number: this.categories[categoryName].sections[sectionName].questionsNumber, 
+            support: this.support,
+            excludedQuestions: this.categories[categoryName].sections[sectionName].questions
+        })
         console.debug("Questions received from DB for category "+categoryName+" and section "+sectionName+" are ");
         console.debug(questions);
+        
         this.categories[categoryName].sections[sectionName].setQuestions({questions: questions});
-        return this;
+        return this
     }
 
     async updateAllQuestions({questionsDB}) {

@@ -88,6 +88,18 @@ describe('EvaluationShouldUpdateQuestions', () => {
         expect(evaluation.categories["categorie1"].sections["section11"].questions).toBe(section11Questions);
     })
 
+    test('QuestionsAreUpdatedAndActualQuestionsAreExcluded', async () => {
+        //And
+        evaluation.categories["categorie1"].sections["section11"].setQuestions({questions: section11Questions})
+        const getQuestionsMock = jest.spyOn(questionsDB, "getQuestions").mockReturnValueOnce(section11Questions)
+
+        //When
+        await evaluation.updateSectionQuestions({questionsDB: questionsDB, categoryName: "categorie1", sectionName: "section11"})
+
+        //Then
+        expect(getQuestionsMock).toHaveBeenCalledWith({category: "categorie1", section: "section11", number: 2, support: support, excludedQuestions: section11Questions});
+    })
+
     test('QuestionsCanBeUpdatedForTheWholeEvaluation', async () => {
         //And
         jest.spyOn(questionsDB, "getQuestions")

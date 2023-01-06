@@ -1,4 +1,9 @@
+import {immerable} from "immer"
+
+
 class Section {
+    [immerable] = true
+
     constructor({displayName}={}) {
         if(displayName === undefined)
             throw new Error('Section display name not defined');

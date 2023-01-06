@@ -1,4 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { useImmer } from "use-immer";
+import {produce} from "immer";
+
 import { EvaluationLateralBar } from "./EvaluationLateralBar";
 
 import Container from "react-bootstrap/Container";
@@ -22,6 +25,7 @@ function EvaluationPage(props) {
         support: searchParams.get("support"),
         length: searchParams.get("length")
     });
+    const [questionsDB] = useState(new QuestionDatabase())
     const [evaluation, setEvaluation] = useState({});
     const [displayCorrection, setDisplayCorrection] = useState(false);
     const [displayCategoryTitles, setDisplayCategoryTitle] = useState(true);
@@ -42,17 +46,34 @@ function EvaluationPage(props) {
         setDisplayCategoryTitle(!displayCategoryTitles);
     }
 
+    const changeSectionQuestions = async (categoryName, sectionName) => {
+        console.debug("Changing questions for category "+categoryName+" and section "+sectionName)
+        //See the Immer doc https://immerjs.github.io/immer/async
+        const newEvaluation = await produce(evaluation, async (draft) => {
+            await draft.updateSectionQuestions({questionsDB: questionsDB, categoryName: categoryName, sectionName: sectionName})
+        })
+        setEvaluation(newEvaluation)
+    }
+
+    const changeAllQuestions = async () => {
+        console.debug("Changing all questions")
+        //See the Immer doc https://immerjs.github.io/immer/async
+        const newEvaluation = await produce(evaluation, async (draft) => {
+            await draft.updateAllQuestions({questionsDB: questionsDB})
+        })
+        setEvaluation(newEvaluation)
+    }
+
     useEffect(() => {
         console.log("Creating evaluation object with questions")
-        const db = new QuestionDatabase();
         const evaluationStructureMaker = new EvaluationStructureMaker();
 
         const getEvaluation = async () => {
             console.debug("Creating new evaluation from evaluationStructureMaker");
             let evalStructure = await evaluationStructureMaker
                 .generateStructure({support: evalParameters["support"], length: evalParameters["length"]});
-            console.debug("Population evaluation questions with QuestionsDatabase")
-            const evaluationWithQuestions = await evalStructure.updateAllQuestions({questionsDB: db})
+            console.debug("Populating evaluation questions with QuestionsDatabase")
+            const evaluationWithQuestions = await evalStructure.updateAllQuestions({questionsDB: questionsDB})
 
             console.debug("Resulting evaluation with questions is")
             console.debug(evaluationWithQuestions);
@@ -69,6 +90,7 @@ function EvaluationPage(props) {
     if (error) {
         return(<div>Error happened while loading content</div>);
     } else if (isQuestionsReady){
+        console.log("Rerendering!!")
         return(
             <Container fluid id="evaluationPage">
                 <Row>
@@ -79,7 +101,8 @@ function EvaluationPage(props) {
                             displayCategoryTitles={displayCategoryTitles}
                             toggleDisplayCorrection={toggleDisplayCorrection}
                             toggleDisplayCategoryTitles={toggleDisplayCategoryTitles}
-                            handlePrint={handlePrint}/>
+                            handlePrint={handlePrint}
+                            changeAllQuestions={changeAllQuestions}/>
                     </Col>
                     <Col sm={12} lg={10}>
                         <Evaluation id="evaluation" 
@@ -87,7 +110,8 @@ function EvaluationPage(props) {
                             evaluation={evaluation} 
                             evalParameters={evalParameters}
                             displayCorrection={displayCorrection}
-                            displayCategoryTitles={displayCategoryTitles}/>
+                            displayCategoryTitles={displayCategoryTitles}
+                            changeSectionQuestions={changeSectionQuestions}/>
                     </Col>
                 </Row>
             </Container>
@@ -96,20 +120,5 @@ function EvaluationPage(props) {
         return(<div>Loading questions database…</div>)
     };
 }
-
-/*
-const loadQuestionDBAndEvalStructure = useCallback(async (support, length) => {
-    const db = new QuestionDatabase();
-    const evaluationStructureMaker = new EvaluationStructureMaker();
-    const evalStructure = await evaluationStructureMaker.generateStructure({support: support, length: length});
-
-    return [db, evalStructure];
-}, [])
-*/
-
-
-
-
-
 
 export {EvaluationPage}
