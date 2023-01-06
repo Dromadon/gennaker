@@ -86,9 +86,14 @@ function AnswerLines(props) {
     }
 
     return (
-        <div>
-            {[...Array(answerLines)].map(() => <br />)}
-        </div>
+        <>
+            <div class="print-only">
+                {[...Array(answerLines)].map(() => <br />)}
+            </div>
+            <div class="no-print">
+                <br/>
+            </div>
+        </>
     )
 }
 

@@ -29,7 +29,7 @@ const Category = ({categoryName, category, displayCorrection, displayCategoryTit
     <div>
         { displayCategoryTitles &&
             <div class="categoryTitle mt-5 px-2">
-                <h3 id={"category-" + categoryName}>{category.displayName}</h3>
+                <h4 id={"category-" + categoryName}>{category.displayName}</h4>
             </div>
         }
         {category.getSections().map(([sectionName, section]) => (
