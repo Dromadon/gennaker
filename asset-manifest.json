@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/gennaker/static/css/main.66b37781.css",
-    "main.js": "/gennaker/static/js/main.0ef9fa12.js",
+    "main.js": "/gennaker/static/js/main.71ef41fb.js",
     "index.html": "/gennaker/index.html",
     "main.66b37781.css.map": "/gennaker/static/css/main.66b37781.css.map",
-    "main.0ef9fa12.js.map": "/gennaker/static/js/main.0ef9fa12.js.map"
+    "main.71ef41fb.js.map": "/gennaker/static/js/main.71ef41fb.js.map"
   },
   "entrypoints": [
     "static/css/main.66b37781.css",
-    "static/js/main.0ef9fa12.js"
+    "static/js/main.71ef41fb.js"
   ]
 }
