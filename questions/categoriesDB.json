@@ -1,0 +1,96 @@
+{
+    "meteo": {
+        "displayName": "Météo",
+        "sections": {
+            "perturbation": {
+                "displayName": "Passage perturbation"
+            },
+            "brise_thermique": {
+                "displayName": "Brise thermique"
+            },
+            "phenomene_local": {
+                "displayName": "Phénomène local"
+            },
+            "divers": {
+                "displayName": "Divers"
+            }
+        }
+    },
+    "oceanographie": {
+        "displayName": "Océanographie",
+        "sections": {
+            "calcul_maree": {
+                "displayName": "Calcul de marée"
+            }
+        }
+    },
+    "navigation": {
+        "displayName": "Navigation",
+        "sections": {
+            "alignement": {
+                "displayName": "Alignement"
+            },
+            "balisage": {
+                "displayName": "Balisage"
+            },
+            "divers": {
+                "displayName": "Divers"
+            }
+        }
+    },
+    "fonctionnement_engin": {
+        "displayName": "Fonctionnement de l’engin",
+        "sections": {
+            "vent_apparent": {
+                "displayName": "Vent apparent"
+            },
+            "reglage": {
+                "displayName": "Réglage"
+            },
+            "equilibre_forces": {
+                "displayName": "Équilibre des forces"
+            },
+            "divers": {
+                "displayName": "Divers"
+            }
+        }
+    },
+    "conduite": {
+        "displayName": "Conduite",
+        "sections": {
+            "trajectoire": {
+                "displayName": "Trajectoire"
+            },
+            "chronologie": {
+                "displayName": "Chronologie"
+            },
+            "divers": {
+                "displayName": "Divers"
+            }
+        }
+    },
+    "securite": {
+        "displayName": "Sécurité",
+        "sections": {
+            "divers": {
+                "displayName": "Divers"
+            }
+        }
+    },
+    "technologie": {
+        "displayName": "Technologie",
+        "sections": {
+            "divers": {
+                "displayName": "Divers"
+            }
+        }
+    },
+    "environnement": {
+        "displayName": "Environnement",
+        "sections": {
+            "divers": {
+                "displayName": "Divers"
+            }
+        }
+    }
+}
