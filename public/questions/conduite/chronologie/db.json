@@ -1,18 +1,26 @@
 [
     {
         "fileName": "VL/chronologie_virement_catamaran.md",
-        "supports": ["catamaran"]
+        "supports": [
+            "catamaran"
+        ]
     },
     {
         "fileName": "VL/chronologie_empannage_catamaran.md",
-        "supports": ["catamaran"]
+        "supports": [
+            "catamaran"
+        ]
     },
     {
         "fileName": "VL/chronologie_virement_deriveur.md",
-        "supports": ["deriveur"]
+        "supports": [
+            "deriveur"
+        ]
     },
     {
         "fileName": "VL/chronologie_empannage_deriveur.md",
-        "supports": ["deriveur"]
+        "supports": [
+            "deriveur"
+        ]
     }
 ]

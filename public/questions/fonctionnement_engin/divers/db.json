@@ -4,10 +4,16 @@
     },
     {
         "fileName": "cintre_mat.md",
-        "supports": ["catamaran","deriveur","croisiere"]
+        "supports": [
+            "catamaran",
+            "deriveur",
+            "croisiere"
+        ]
     },
     {
-        "fileName": "VL/PAV/tension_amure.md",
-        "supports": ["windsurf"]
+        "fileName": "VL/windsurf/tension_amure.md",
+        "supports": [
+            "windsurf"
+        ]
     }
 ]

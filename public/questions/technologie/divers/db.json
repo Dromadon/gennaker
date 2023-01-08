@@ -4,6 +4,8 @@
     },
     {
         "fileName": "VL/catamaran/parallelisme.md",
-        "supports": ["catamaran"]
+        "supports": [
+            "catamaran"
+        ]
     }
 ]

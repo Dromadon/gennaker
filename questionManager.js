@@ -2,41 +2,42 @@ var dir = require('node-dir');
 const fs = require('fs');
 require('colors');
 const readline = require('readline');
-const prompt = require('prompt-sync')({sigint: true});
+const prompt = require('prompt-sync')({ sigint: true });
 
-
-//loop over categories
-//loop over sections
-//get questions files
-//load db json
-//check if each file is in db
-
-//for later: backup db, update it
 const BASE_PATH = "public/questions";
 
 console.log("Listing categories".bold.underline.yellow);
 
+missingQuestionsInDB = {}
+missingQuestionsInFiles = {}
+
 dir.files(BASE_PATH, 'dir', null, { sync: true, recursive: false, shortName: true })
     .map(
         (category) => {
-            checkCategory(category)
+            checkCategory(category, missingQuestionsInDB)
         }
     )
 
+displayMissingQuestions(missingQuestionsInDB, missingQuestionsInFiles)
+
 function checkCategory(category) {
-    console.log("\n\nEntering category ".bold.underline + category.bold.underline.red);
+    console.log("\n\nEntering category ".bold.underline + category.bold.underline.green);
+    missingQuestionsInDB[category] = {}
+    missingQuestionsInFiles[category] = {}
 
     dir.files(BASE_PATH + '/' + category, 'dir', null, { sync: true, recursive: false, shortName: true })
         .map(
             (section) => {
-                checkSection(category, section)
+                [missingQuestionsInDBForSection, missingQuestionsInFilesForSection] = checkSection(category, section)
+                missingQuestionsInDB[category][section] = missingQuestionsInDBForSection
+                missingQuestionsInFiles[category][section] = missingQuestionsInFilesForSection
             }
         )
 }
 
 
 function checkSection(category, section) {
-    console.log("\nEntering section ".bold + section.bold.red);
+    console.log("\nEntering section ".bold + section.bold.green);
     const SECTION_PATH = BASE_PATH + '/' + category + '/' + section;
 
     backupDB(SECTION_PATH)
@@ -48,16 +49,16 @@ function checkSection(category, section) {
 
     console.log("DB & file questions loaded".italic)
     const missingQuestionsInDB = checkQuestionsExistInDB(fileQuestions, dbQuestions);
+    const missingQuestionsInFiles = checkQuestionsExistOnFileSystem(fileQuestions, dbQuestions);
+
     writeDB(SECTION_PATH, dbQuestions)
 
-    checkQuestionsExistOnFileSystem(fileQuestions, dbQuestions);
-
-    return missingQuestionsInDB
+    return [missingQuestionsInDB, missingQuestionsInFiles]
 }
 
 function checkQuestionsExistInDB(fileQuestions, dbQuestions) {
     console.log("\nChecking if file questions exist in db".italic)
-    var missinQuestionsInDB = []
+    var missingQuestionsInDB = []
 
     fileQuestions.map((fileQuestion) => {
         if (dbQuestions.some(dbQuestion => dbQuestion.fileName === fileQuestion)) {
@@ -68,30 +69,38 @@ function checkQuestionsExistInDB(fileQuestions, dbQuestions) {
             const questionAddedToDB = addQuestionToDB(dbQuestions, fileQuestion)
 
             if (!questionAddedToDB)
-                missinQuestionsInDB.push(fileQuestion)
+                missingQuestionsInDB.push(fileQuestion)
         }
     })
 
-    return missinQuestionsInDB
+    return missingQuestionsInDB
 }
 
 function checkQuestionsExistOnFileSystem(fileQuestions, dbQuestions) {
     console.log("\nChecking if questions in db exist on filesystem".italic)
+    var missingQuestionsInFiles = []
+
     dbQuestions.map((dbQuestion) => {
         if (fileQuestions.some(fileQuestion => fileQuestion === dbQuestion.fileName)) {
             console.log("Found question on filesystem: ".green + dbQuestion.fileName);
         }
         else {
-            console.log("Missing question on filesystem: ".bold.red + dbQuestion.fileName);
+            console.log("Missing question on filesystem: ".bold.red + JSON.stringify(dbQuestion));
+            const questionRemovedFromDB = removeQuestionFromDB(dbQuestions, dbQuestion)
+
+            if(!questionRemovedFromDB)
+                missingQuestionsInFiles.push(dbQuestion)
         }
     })
+
+    return missingQuestionsInFiles
 }
 
 function addQuestionToDB(dbQuestions, fileQuestion) {
     const decision = prompt("Do you want to add the question to the DB? y/n : ")
 
-    if (decision === "y"){
-        newQuestion = {"filename": fileQuestion}
+    if (decision === "y") {
+        newQuestion = { "fileName": fileQuestion }
 
         console.log("Which answer size?")
         const answerSize = prompt("xs/sm/md/lg/xl or leave empty: ")
@@ -106,9 +115,36 @@ function addQuestionToDB(dbQuestions, fileQuestion) {
         console.log("Adding question to the DB")
         dbQuestions.push(newQuestion)
         return true
-    } 
+    }
 
     return false
+}
+
+function removeQuestionFromDB(dbQuestions, dbQuestion) {
+    const decision = prompt("Do you want to remove the question to the DB? y/n : ")
+
+    if (decision === "y") {
+        dbQuestions.splice(dbQuestions.indexOf(dbQuestion), 1)
+        return true
+    }
+
+    return false
+}
+
+function displayMissingQuestions(missingQuestionsInDB, missingQuestionsInFiles) {
+    console.log("\n\nQuestions still missing in database :".bold.underline.red)
+    Object.entries(missingQuestionsInDB).map(([categoryName, category]) => {
+        Object.entries(category).map(([sectionName, section]) => {
+            section.map(question => console.log(categoryName.bold+" "+sectionName.bold+" : "+question))
+        })
+    })
+
+    console.log("\n\nQuestions still missing in files :".bold.underline.red)
+    Object.entries(missingQuestionsInFiles).map(([categoryName, category]) => {
+        Object.entries(category).map(([sectionName, section]) => {
+            section.map(question => console.log(categoryName.bold+" "+sectionName.bold+" : "+JSON.stringify(question)))
+        })
+    })
 }
 
 function loadDB(sectionPath) {
@@ -116,12 +152,9 @@ function loadDB(sectionPath) {
 }
 
 function backupDB(sectionPath) {
-    fs.copyFile(sectionPath+'/db.json', sectionPath+'/db.json.backup', (err) => {
-        if (err) throw err;
-        console.log('source.txt was copied to destination.txt');
-      });
+    fs.copyFileSync(sectionPath + '/db.json', sectionPath + '/db.json.backup')
 }
 
 function writeDB(sectionPath, dbQuestions) {
-    fs.writeFileSync(sectionPath+'/db.json', JSON.stringify(dbQuestions, null, 4), 'utf8');
+    fs.writeFileSync(sectionPath + '/db.json', JSON.stringify(dbQuestions, null, 4), 'utf8');
 }

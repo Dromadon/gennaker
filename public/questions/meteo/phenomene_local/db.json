@@ -1,5 +1,17 @@
 [
     {
         "fileName": "evolution_vent_sous_grain.md"
+    },
+    {
+        "fileName": "coussin.md",
+        "answerSize": "sm"
+    },
+    {
+        "fileName": "vent_parallèle_côte_droite.md",
+        "answerSize": "sm"
+    },
+    {
+        "fileName": "vent_parallèle_côte_gauche.md",
+        "answerSize": "sm"
     }
 ]
