@@ -11,6 +11,9 @@
 # production
 /build
 
+# DB management
+/public/questions/**/*.backup
+
 # misc
 .DS_Store
 .env.local

@@ -1,15 +1,23 @@
 [
     {
         "fileName": "VL/envoi_spi.md",
-        "supports": ["catamaran", "deriveur"]
-
+        "supports": [
+            "catamaran",
+            "deriveur"
+        ]
     },
     {
         "fileName": "VL/sortie_trapeze.md",
-        "supports": ["catamaran", "deriveur"]
+        "supports": [
+            "catamaran",
+            "deriveur"
+        ]
     },
     {
-        "fileName": "VL/PAV/waterstart.md",
-        "supports": ["windsurf"]
+        "fileName": "VL/windsurf/waterstart.md",
+        "answerSize": "md",
+        "supports": [
+            "windsurf"
+        ]
     }
 ]

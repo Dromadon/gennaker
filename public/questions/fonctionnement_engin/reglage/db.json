@@ -1,22 +1,32 @@
 [
     {
         "fileName": "VL/catamaran_vent_faible.md",
-        "supports": ["catamaran"]
+        "supports": [
+            "catamaran"
+        ]
     },
     {
         "fileName": "VL/catamaran_vent_fort.md",
-        "supports": ["catamaran"]
+        "supports": [
+            "catamaran"
+        ]
     },
     {
         "fileName": "VL/deriveur_vent_faible.md",
-        "supports": ["deriveur"]
+        "supports": [
+            "deriveur"
+        ]
     },
     {
         "fileName": "VL/deriveur_vent_fort.md",
-        "supports": ["deriveur"]
+        "supports": [
+            "deriveur"
+        ]
     },
     {
         "fileName": "VL/deriveur_solo_portant.md",
-        "supports": ["deriveur"]
+        "supports": [
+            "deriveur"
+        ]
     }
 ]
