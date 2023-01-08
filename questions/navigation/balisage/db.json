@@ -1,17 +1,22 @@
 [
     {
-        "fileName": "cardinale_est.md"
+        "fileName": "cardinale_est.md",
+        "answerSize": "xs"
     },
     {
-        "fileName": "cardinale_sud.md"
+        "fileName": "cardinale_sud.md",
+        "answerSize": "xs"
     },
     {
-        "fileName": "cardinale_nord.md"
+        "fileName": "cardinale_nord.md",
+        "answerSize": "xs"
     },
     {
-        "fileName": "cardinale_ouest.md"
+        "fileName": "cardinale_ouest.md",
+        "answerSize": "xs"
     },
     {
-        "fileName": "danger_isole_reverse.md"
+        "fileName": "danger_isole_reverse.md",
+        "answerSize": "xs"
     }
 ]

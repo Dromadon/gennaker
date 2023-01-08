@@ -1,6 +1,7 @@
 [
     {
-        "fileName": "composite.md"
+        "fileName": "composite.md",
+        "answerSize": "sm"
     },
     {
         "fileName": "VL/catamaran/parallelisme.md",
