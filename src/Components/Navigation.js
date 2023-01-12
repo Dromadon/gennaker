@@ -13,8 +13,11 @@ function Navigation (props) {
               <LinkContainer to="/settings">
                 <Nav.Link href="#">Générer une évaluation</Nav.Link>
               </LinkContainer>
-              <LinkContainer to="/howitworks">
-                <Nav.Link href="#">Fonctionnement des évaluations</Nav.Link>
+              <LinkContainer to="/evaluationstructure">
+                <Nav.Link href="#">Structure des évaluations</Nav.Link>
+              </LinkContainer>
+              <LinkContainer to="/questionsdatabasedisplay">
+                <Nav.Link href="#">Banque de questions</Nav.Link>
               </LinkContainer>
             </Nav>
             <Nav>
