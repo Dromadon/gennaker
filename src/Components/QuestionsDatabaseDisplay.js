@@ -1,19 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Col, Row, Nav, Navbar, Accordion } from 'react-bootstrap';
+import { Form, Container, Col, Row, Nav, Navbar, Accordion } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { NavHashLink } from 'react-router-hash-link';
 
 import { QuestionDatabase } from '../Infrastructure/QuestionsDatabase/QuestionDatabase';
 import { EvaluationStructureMaker } from '../Infrastructure/EvaluationStructure/EvaluationStructureMaker';
 
+import { Question } from '../Components/Question'
+
 function QuestionsDatabaseDisplay(props) {
 
     const [support, setSupport] = useState("catamaran")
-    const [length, setLength] = useState("standard")
+    const [length] = useState("standard")
     const [categoryName, setCategoryName] = useState("")
     const [sectionName, setSectionName] = useState("")
 
     const [evaluationStructure, setEvaluationStructure] = useState({})
+    const [questions, setQuestions] = useState([])
+
+    const [displayCorrection, setDisplayCorrection] = useState(false)
 
     const handleSupportChange = (event) => {
         setSupport(event.target.value)
@@ -21,10 +26,15 @@ function QuestionsDatabaseDisplay(props) {
 
     const handleCategoryNameChange = (event) => {
         setCategoryName(event.target.value)
+        setSectionName(Object.keys(evaluationStructure.categories[event.target.value].sections)[0])
     }
 
     const handleSectionNameChange = (event) => {
         setSectionName(event.target.value)
+    }
+
+    const toggleDisplayCorrection = (event) => {
+        setDisplayCorrection(!displayCorrection)
     }
 
     useEffect(() => {
@@ -36,36 +46,39 @@ function QuestionsDatabaseDisplay(props) {
                 .generateStructure({ support: support, length: length });
 
             setEvaluationStructure(evalStructure)
+            //On met la première catégorie comme sélectionnée
+            setCategoryName(Object.keys(evalStructure.categories)[0])
+            //On met la première section de cette catégorie comme sélectionnée
+            setSectionName(Object.keys(Object.values(evalStructure.categories)[0].sections)[0])
         }
         getEvaluationStructure();
     }, [props, support])
 
+    useEffect(() => {
+        const getQuestions = async () => {
+            console.debug("Fetching all questions")
+            const questionsDB = new QuestionDatabase();
+            setQuestions(await questionsDB.getQuestions({category: categoryName, section: sectionName, support: support}))
+        }
+
+        getQuestions()
+    }, [props, support, categoryName, sectionName])
+
     return (
         <Container fluid>
-            <Row>
-                <Col xs={12} lg={2} className="lateralColumn">
-                    <div className="lateralNavBar sticky-lg-top vstack">
-                        <Navbar id="navbar-questions" color="light" className="flex-column align-items-start">
-                            <Nav className="nav nav-pills flex-column mt-3">
-                                <NavHashLink to="#contenu">Structure d'une évaluation</NavHashLink>
-                            </Nav>
-                        </Navbar>
-                    </div>
-                </Col>
-                <Col xs={12} lg={10} className="mt-3">
-                    <Row className="mb-3">
-
+                <Col lg={10} className="mx-auto mt-3">
+                    <Row className="mx-2 align-items-center">
                         <Col md={3}>
-                            <h4>Choisissez le support :</h4>
+                            <h5>Choisissez le support :</h5>
                             <select className="form-select mb-3" aria-label=".form-select support" onChange={handleSupportChange} value={support}>
                                 <option value="catamaran">Catamaran</option>
                                 <option value="deriveur">Dériveur</option>
-                                <option value="windsurf">Windsurf</option>
-                                <option value="croisiere">Croisière</option>
+                                <option value="windsurf" disabled>Windsurf</option>
+                                <option value="croisiere" disabled>Croisière</option>
                             </select>
                         </Col>
                         <Col md={3}>
-                            <h4>Choisissez la catégorie :</h4>
+                            <h5>Choisissez la catégorie :</h5>
                             <select className="form-select mb-3" aria-label=".form-select support" onChange={handleCategoryNameChange} value={categoryName}>
                                 {Object.entries(evaluationStructure).length !== 0 &&
                                     Object.entries(evaluationStructure.categories).map(([categoryName, category]) => {
@@ -75,21 +88,41 @@ function QuestionsDatabaseDisplay(props) {
                             </select>
                         </Col>
                         <Col md={3}>
-                            <h4>Choisissez la section :</h4>
+                            <h5>Choisissez la section :</h5>
                             <select className="form-select mb-3" aria-label=".form-select support" onChange={handleSectionNameChange} value={sectionName}>
                                 {categoryName !== "" &&
                                     Object.entries(evaluationStructure.categories[categoryName].sections).map(([sectionName, section]) => (<option value={sectionName}>{section.displayName}</option>))
                                 }
                             </select>
                         </Col>
+                        <Col md={3}>
+                            <Form>
+                                <Form.Switch
+                                onChange={toggleDisplayCorrection}
+                                id="toggleCorrection"
+                                label="Afficher la correction"
+                                checked={displayCorrection}
+                                className="btn-md"
+                                />
+                            </Form>
+                        </Col>
+                        <hr/>
                     </Row>
-                    <Row className="mb-3">
-                        <h4 id="contenu">Structure d'une évaluation :</h4>
-
-
+                    <Row className="mx-2">
+                        <Col className=''>
+                        <h5 id="contenu">Liste des questions</h5>
+                        {
+                           questions.map(question => (
+                                <Question
+                                    filePath={process.env.PUBLIC_URL + "/questions/" + question.fileName}
+                                    answerSize={question.answerSize}
+                                    displayCorrection={displayCorrection}
+                                />
+                           ))
+                        }
+                        </Col>
                     </Row>
                 </Col>
-            </Row>
         </Container>
     )
 }
