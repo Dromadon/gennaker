@@ -1,7 +1,7 @@
 {
   "name": "gennaker",
   "version": "0.1.0",
-  "homepage": "https://dromadon.github.io/gennaker",
+  "homepage": "https://gennaker.bzh",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
