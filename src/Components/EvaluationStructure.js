@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Col, Row, Nav, Navbar, Accordion } from 'react-bootstrap';
-import { NavHashLink } from 'react-router-hash-link';
 
 import { EvaluationStructureMaker } from '../Infrastructure/EvaluationStructure/EvaluationStructureMaker';
 
