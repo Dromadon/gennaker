@@ -66,8 +66,8 @@ function QuestionsDatabaseDisplay(props) {
 
     return (
         <Container fluid>
-                <Col lg={10} className="mx-auto mt-3">
-                    <Row className="mx-2 align-items-center">
+                <Col xl={10} className="mx-auto mt-3">
+                    <Row className="align-items-center">
                         <Col md={3}>
                             <h5>Choisissez le support :</h5>
                             <select className="form-select mb-3" aria-label=".form-select support" onChange={handleSupportChange} value={support}>
@@ -108,7 +108,7 @@ function QuestionsDatabaseDisplay(props) {
                         </Col>
                         <hr/>
                     </Row>
-                    <Row className="mx-2">
+                    <Row className="">
                         <Col className=''>
                         <h5 id="contenu">Liste des questions</h5>
                         {

@@ -37,15 +37,15 @@ function EvaluationStructure(props) {
     return (
         <Container fluid>
             <Row>
-                <Col lg={10} className="mt-3 mx-auto">
-                    <Row className="mb-3 mx-2">
+                <Col xl={10} className="mt-3 mx-auto">
+                    <Row className="mb-3">
                         <Col md={3}>
                             <h5>Choisissez le support :</h5>
                             <select className="form-select mb-3" aria-label=".form-select support" onChange={handleSupportChange} value={support}>
                                 <option value="catamaran">Catamaran</option>
                                 <option value="deriveur">Dériveur</option>
-                                <option value="windsurf">Windsurf</option>
-                                <option value="croisiere">Croisière</option>
+                                <option value="windsurf" disabled>Windsurf</option>
+                                <option value="croisiere" disabled>Croisière</option>
                             </select>
                         </Col>
                         <Col md={3}>
@@ -58,10 +58,9 @@ function EvaluationStructure(props) {
                         </Col>
                         <hr/>
                     </Row>
-                    <Row className="mx-2">
+                    <Row className="">
                         <Col>
                             <h4 id="contenu">Structure d'une évaluation :</h4>
-
                             {Object.keys(evaluationStructure).length != 0 &&
                                 Object.entries(evaluationStructure.categories).map(([categoryName, category]) => {
                                     return (
