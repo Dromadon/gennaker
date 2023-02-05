@@ -110,7 +110,7 @@ function addQuestionToDB(dbQuestions, fileQuestion) {
         console.log("Which supports?")
         const supports = prompt("deriveur/catamaran/windsurf/croisiere, separated by ',' or leave empty: ")
         if (supports != "")
-            newQuestion["supports"] = supports.split(' ')
+            newQuestion["supports"] = supports.split(',')
 
         console.log("Adding question to the DB")
         dbQuestions.push(newQuestion)

@@ -27,14 +27,16 @@
         "fileName": "VL/chronologie_abattee_vent_fort.md",
         "answerSize": "lg",
         "supports": [
-            "deriveur,catamaran"
+            "deriveur",
+            "catamaran"
         ]
     },
     {
         "fileName": "VL/chronologie_empannage_vent_fort.md",
         "answerSize": "lg",
         "supports": [
-            "deriveur,catamaran"
+            "deriveur",
+            "catamaran"
         ]
     },
     {
