@@ -22,7 +22,8 @@
         "fileName": "liaison_indirecte_abattee.md",
         "answerSize": "sm",
         "supports": [
-            "deriveur,catamaran"
+            "deriveur",
+            "catamaran"
         ]
     }
 ]

@@ -15,7 +15,8 @@
         "fileName": "VL/ecoute_lache.md",
         "answerSize": "md",
         "supports": [
-            "deriveur,catamaran"
+            "deriveur",
+            "catamaran"
         ]
     }
 ]

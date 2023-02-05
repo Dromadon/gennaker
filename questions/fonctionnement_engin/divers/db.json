@@ -20,7 +20,8 @@
         "fileName": "VL/cunningham.md",
         "answerSize": "sm",
         "supports": [
-            "deriveur,catamaran"
+            "deriveur",
+            "catamaran"
         ]
     },
     {
@@ -34,7 +35,8 @@
         "fileName": "vrillage.md",
         "answerSize": "sm",
         "supports": [
-            "deriveur,catamaran"
+            "deriveur",
+            "catamaran"
         ]
     }
 ]
