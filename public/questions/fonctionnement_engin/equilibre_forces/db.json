@@ -10,5 +10,19 @@
     },
     {
         "fileName": "equilibre_general.md"
+    },
+    {
+        "fileName": "couple_dessalage_catamaran.md",
+        "answerSize": "lg",
+        "supports": [
+            "catamaran"
+        ]
+    },
+    {
+        "fileName": "liaison_indirecte_abattee.md",
+        "answerSize": "sm",
+        "supports": [
+            "deriveur,catamaran"
+        ]
     }
 ]

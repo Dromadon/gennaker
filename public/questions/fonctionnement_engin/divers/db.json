@@ -15,5 +15,26 @@
         "supports": [
             "windsurf"
         ]
+    },
+    {
+        "fileName": "VL/cunningham.md",
+        "answerSize": "sm",
+        "supports": [
+            "deriveur,catamaran"
+        ]
+    },
+    {
+        "fileName": "VL/hale-bas.md",
+        "answerSize": "sm",
+        "supports": [
+            "deriveur"
+        ]
+    },
+    {
+        "fileName": "vrillage.md",
+        "answerSize": "sm",
+        "supports": [
+            "deriveur,catamaran"
+        ]
     }
 ]

@@ -4,5 +4,12 @@
     },
     {
         "fileName": "vent_apparent_risee.md"
+    },
+    {
+        "fileName": "vent_apparent_surf.md",
+        "answerSize": "md",
+        "supports": [
+            "deriveur"
+        ]
     }
 ]
