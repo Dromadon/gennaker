@@ -1,0 +1,12 @@
+[
+    {
+        "fileName": "composite.md",
+        "answerSize": "sm"
+    },
+    {
+        "fileName": "VL/catamaran/parallelisme.md",
+        "supports": [
+            "catamaran"
+        ]
+    }
+]
