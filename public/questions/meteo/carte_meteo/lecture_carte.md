@@ -1,4 +1,4 @@
-# Identifiez les élements météorologiques remarquable sur la carte ci-dessous
+﻿# Identifiez les élements météorologiques remarquables sur la carte ci-dessous
 
 Identifiez:
 1.	Anticyclone.
@@ -13,4 +13,8 @@ Identifiez:
 10.	Thalweg.
 11.	Dorsale.
 
+![image_correction](./images/carte_vierge.png)
+
 # Correction
+
+![image_correction](./images/carte_marine.png)
