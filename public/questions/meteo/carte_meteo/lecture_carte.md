@@ -13,7 +13,7 @@ Identifiez:
 10.	Thalweg.
 11.	Dorsale.
 
-![image_correction](./images/carte_vierge.png)
+![image_correction](./images/carte_meteo_vierge.png)
 
 # Correction
 
