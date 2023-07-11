@@ -1,7 +1,7 @@
 # Determiner la vitesse du vent à l'emplacement de l'étoile sur la carte météo ci-dessous
 Detaillez votre méthode
 
-![image_question](./images/carte_vierge_calcul.png)
+![image_question](./images/carte_vierge_calcul_vitesse.png)
 
 # Answer
 
