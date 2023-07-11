@@ -1,7 +1,7 @@
 ﻿# Determiner la direction du vent à l'empalcement de l'étoile sur la carte ci-dessous
 Pour indiquer la direction, une flèche sur la carte suffit, mais expliquez votre raisonnement.
 
-![image_question](./images/carte_vierge_calcul.png)
+![image_question](./images/carte_vierge_calcul_vitesse.png)
 
 # Correction
 
