@@ -19,5 +19,26 @@
         "supports": [
             "windsurf"
         ]
+    },
+    {
+        "fileName": "VL/windsurf/spin-out.md",
+        "answerSize": "md",
+        "supports": [
+            "windsurf"
+        ]
+    },
+    {
+        "fileName": "VL/windsurf/explication_depart_planning.md",
+        "answerSize": "md",
+        "supports": [
+            "windsurf"
+        ]
+    },
+    {
+        "fileName": "VL/windsurf/declancheurs_depart_planning.md",
+        "answerSize": "md",
+        "supports": [
+            "windsurf"
+        ]
     }
 ]

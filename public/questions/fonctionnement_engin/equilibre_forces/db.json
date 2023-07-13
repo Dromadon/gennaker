@@ -1,4 +1,19 @@
 [
+    
+    {
+        "fileName": "abatee_pav.md",
+        "answerSize": "lg",
+        "supports": [
+            "windsurf"
+        ]
+    },
+    {
+        "fileName": "aulofee_pav.md",
+        "answerSize": "lg",
+        "supports": [
+            "windsurf"
+        ]
+    },
     {
         "fileName": "couple_auloffee.md"
     },

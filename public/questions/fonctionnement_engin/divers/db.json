@@ -36,7 +36,24 @@
         "answerSize": "sm",
         "supports": [
             "deriveur",
-            "catamaran"
+            "catamaran",
+            "windsurf"
         ]
+    },
+    {
+        "fileName": "aero/ecoulements.md",
+        "answerSize": "lg"
+    },
+    {
+        "fileName": "aero/portance.md",
+        "answerSize": "lg"
+    },
+    {
+        "fileName": "aero/profile_voile.md",
+        "answerSize": "md"
+    },
+    {
+        "fileName": "aero/trainee.md",
+        "answerSize": "lg"
     }
 ]
