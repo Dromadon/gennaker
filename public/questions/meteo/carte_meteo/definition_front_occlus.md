@@ -11,4 +11,5 @@ Front froid: Si la masse d’air chaud est suivie d’une masse d’air froid, o
 Front Occlus: Lorsque le front froid rattrape le front chaud, il y a une occlusion.  L’air chaud est “coincé” entre les deux fronts et est soulevé en altitude. La perturbation meurt progressivement.
 
 ![image_correction](./images/front_occlus_schema.png)
+
 <sup><sub>Source : [*Cours théorique planche à voile*, Les Glénans CEB, 2023](https://encadrementbenevole.glenans.asso.fr/wp-content/uploads/2023/07/Cours-theorique-PAV-Version-1.pdf) </sub></sup>

@@ -7,6 +7,7 @@ Un schema complet peut suffire.
 
 
 ![image_correction](./images/passage_depression.png)
+
 <sup><sub>Source : [*Cours théorique planche à voile*, Les Glénans CEB, 2023](https://encadrementbenevole.glenans.asso.fr/wp-content/uploads/2023/07/Cours-theorique-PAV-Version-1.pdf) </sub></sup>
 
 - Phase 1: Nous sommes bien avant l’arrivée du front chaud. L’observateur voit différents types de nuages se succéder. Petit à petit le plafond nuageux s’abaisse. Les cirrus (fibres de glace en haute altitude) apparaissent en premier, puis le ciel se couvre de cirrostratus. Le ciel est voilé mais lumineux. La pression atmosphérique diminue lentement.
