@@ -3,7 +3,7 @@
 # Correction
 
 ![image_correction](./images/perturbation.png)
-<sup><sub>Source "Cours théorique planche à voile", Les Glénans CEB </sub></sup>
+<sup><sub>Source : *Cours théorique planche à voile*, Les Glénans CEB, 2023 </sub></sup>
 
 La correction est plus complete que ce qui est réellement attendu
 

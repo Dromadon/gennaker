@@ -3,4 +3,4 @@ Faites apparaitre les fronts, les secteurs froids et chauds. Indiquez la directi
 
 # Correction
 ![image_correction](./images/nuage_depression.png)
-<sup><sub>Source "Cours théorique planche à voile", Les Glénans CEB </sub></sup>
+<sup><sub>Source : *Cours théorique planche à voile*, Les Glénans CEB, 2023 </sub></sup>

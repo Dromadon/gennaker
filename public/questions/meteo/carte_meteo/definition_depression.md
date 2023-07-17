@@ -8,4 +8,4 @@ Dépression: Symbolisée L (Low) ou D (Dépression) c’est une zone où la pres
 Le vent tourne dans le sens antihoraire. L’air monte, il subit une ascendance. 
 
 ![image_correction](./images/depression_haut.png)
-<sup><sub>Source "Cours théorique planche à voile", Les Glénans CEB </sub></sup>
+<sup><sub>Source : *Cours théorique planche à voile*, Les Glénans CEB, 2023 </sub></sup>

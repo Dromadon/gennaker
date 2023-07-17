@@ -8,4 +8,4 @@ Dans une perturbation en mouvement, l’air chaud est soulevé à l’avant par 
 Alors que le front chaud est stable et crée des nuages plutôt startiform, le front froid est instable, puisque l'air chaud se retrouve souvent coincé sous la masse froide. Il se crée alors des nuages à formation verticale (cumulonimbus, cumulus...)
 
 ![image_correction](./images/soulevement_frontal.png)
-<sup><sub>Source "Cours théorique planche à voile", Les Glénans CEB </sub></sup>
+<sup><sub>Source : *Cours théorique planche à voile*, Les Glénans CEB, 2023 </sub></sup>

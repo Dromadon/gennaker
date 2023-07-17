@@ -7,7 +7,7 @@ Un schema complet peut suffire.
 
 
 ![image_correction](./images/passage_depression.png)
-<sup><sub>Source "Cours théorique planche à voile", Les Glénans CEB </sub></sup>
+<sup><sub>Source : *Cours théorique planche à voile*, Les Glénans CEB, 2023 </sub></sup>
 
 - Phase 1: Nous sommes bien avant l’arrivée du front chaud. L’observateur voit différents types de nuages se succéder. Petit à petit le plafond nuageux s’abaisse. Les cirrus (fibres de glace en haute altitude) apparaissent en premier, puis le ciel se couvre de cirrostratus. Le ciel est voilé mais lumineux. La pression atmosphérique diminue lentement.
 - Phase 2: Le front chaud se rapproche. Le ciel se couvre d’altostratus, grisâtre et assez uniforme. Ces nuages peuvent apporter les premières pluies. Le vent se renforce et la pression atmosphérique continue de chuter.
