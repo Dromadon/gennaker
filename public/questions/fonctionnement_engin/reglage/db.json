@@ -30,31 +30,31 @@
         ]
     },
     {
-        "fileName": "VL/reglage_windsurf/creux_voile.md",
+        "fileName": "VL/windsurf/creux_voile.md",
         "supports": [
             "windsurf"
         ]
     },
     {
-        "fileName": "VL/reglage_windsurf/creux_voile_minimum.md",
+        "fileName": "VL/windsurf/creux_voile_minimum.md",
         "supports": [
             "windsurf"
         ]
     },
     {
-        "fileName": "VL/reglage_windsurf/reglage_pied_de_mat.md",
+        "fileName": "VL/windsurf/reglage_pied_de_mat.md",
         "supports": [
             "windsurf"
         ]
     },
     {
-        "fileName": "VL/reglage_windsurf/reglage_point_amure.md",
+        "fileName": "VL/windsurf/reglage_point_amure.md",
         "supports": [
             "windsurf"
         ]
     },
     {
-        "fileName": "VL/reglage_windsurf/reglage_wishbone.md",
+        "fileName": "VL/windsurf/reglage_wishbone.md",
         "supports": [
             "windsurf"
         ]
