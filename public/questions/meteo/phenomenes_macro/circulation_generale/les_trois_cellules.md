@@ -1,15 +1,16 @@
-# Expliquez ce qu'on appelle la circulation générale. Décrire par un schéma les trois cellules qui permettent de la comprendre.
+# Expliquez ce qu'on appelle la circulation gï¿½nï¿½rale. Dï¿½crire par un schï¿½ma les trois cellules qui permettent de la comprendre.
 
 
 # Correction
 
 
-La circulation générale décrit les grands mouvements de flux d’air dans l’atmosphère à l’échelle de la Terre. Elle permet de comprendre des phénomènes tels que les alizés, le régime dépressionnaire de l’Atlantique nord… 
-C’est la différence de température entre les masses d’air à l’échelle planétaire qui explique leur déplacement relatif. Cette différence de température est liée à une répartition non homogène de l’énergie solaire à la surface de la Terre.  A cause de la forme sphérique de la Terre, les pôles reçoivent moins d’énergie solaire (par unité de surface) que la zone équatoriale. Il existe donc de fortes différences de température mais aussi de densité, d’humidité des masses d’air entre ces régions. La circulation générale se met en place pour rétablir l’équilibre. 
+La circulation gï¿½nï¿½rale dï¿½crit les grands mouvements de flux dï¿½air dans lï¿½atmosphï¿½re ï¿½ lï¿½ï¿½chelle de la Terre. Elle permet de comprendre des phï¿½nomï¿½nes tels que les alizï¿½s, le rï¿½gime dï¿½pressionnaire de lï¿½Atlantique nordï¿½ 
+Cï¿½est la diffï¿½rence de tempï¿½rature entre les masses dï¿½air ï¿½ lï¿½ï¿½chelle planï¿½taire qui explique leur dï¿½placement relatif. Cette diffï¿½rence de tempï¿½rature est liï¿½e ï¿½ une rï¿½partition non homogï¿½ne de lï¿½ï¿½nergie solaire ï¿½ la surface de la Terre.  A cause de la forme sphï¿½rique de la Terre, les pï¿½les reï¿½oivent moins dï¿½ï¿½nergie solaire (par unitï¿½ de surface) que la zone ï¿½quatoriale. Il existe donc de fortes diffï¿½rences de tempï¿½rature mais aussi de densitï¿½, dï¿½humiditï¿½ des masses dï¿½air entre ces rï¿½gions. La circulation gï¿½nï¿½rale se met en place pour rï¿½tablir lï¿½ï¿½quilibre. 
 
-- De 0 à 30° de latitude : la cellule de Hadley
-- De 30 à 60° de latitude : la cellule de Ferrel 
-- De 60 à 90° (pôle) de latitude : la cellule Polaire
+- De 0 ï¿½ 30ï¿½ de latitude : la cellule de Hadley
+- De 30 ï¿½ 60ï¿½ de latitude : la cellule de Ferrel 
+- De 60 ï¿½ 90ï¿½ (pï¿½le) de latitude : la cellule Polaire
 
 
 ![image_correction](./images/circulation_generale.png)
+<small>Source "Cours thÃ©orique planche Ã  voile", Les GlÃ©nans CEB </small>

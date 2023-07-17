@@ -9,3 +9,4 @@ Front chaud: Si la masse d’air froid est suivie d’une masse d’air chaud, o
 
 
 ![image_correction](./images/front_chaud_schema.png)
+<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>

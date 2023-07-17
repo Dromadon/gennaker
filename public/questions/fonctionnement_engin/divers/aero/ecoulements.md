@@ -12,3 +12,4 @@ L’écoulement est dit turbulent lorsque les filets d’air n’arrivent pas à
 
 ![image_correction](./images/ecoulements_laminaires.png)
 ![image_correction](./images/ecoulements_turbulants.png)
+<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>

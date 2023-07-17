@@ -4,6 +4,7 @@ Comment peut-on éviter l'enfournement ?
 # Correction
 
 ![image_correction](./images/couple_enfournement.png)
+<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>
 
 Pour éviter l'enfournement:
 - On se recule sur son support

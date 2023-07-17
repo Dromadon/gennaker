@@ -3,6 +3,7 @@
 # Correction
 
 ![image_correction](./images/perturbation.png)
+<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>
 
 La correction est plus complete que ce qui est réellement attendu
 

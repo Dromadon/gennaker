@@ -17,3 +17,4 @@ Le vent va des anticyclones (zone de haute pression) vers les dépressions. Plus
 
 
 ![image_correction](./images/ferrel.png)
+<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>

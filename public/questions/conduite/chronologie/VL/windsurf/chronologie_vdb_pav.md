@@ -4,6 +4,7 @@ Un schema est attendu
 # Correction
 
 ![image_correction](./images/virement.png)
+<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>
 
 Auloffée :
 

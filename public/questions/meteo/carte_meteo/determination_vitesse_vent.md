@@ -1,16 +1,18 @@
-# Determiner la vitesse du vent à l'emplacement de l'étoile sur la carte météo ci-dessous
-Detaillez votre méthode
+# Determiner la vitesse du vent ï¿½ l'emplacement de l'ï¿½toile sur la carte mï¿½tï¿½o ci-dessous
+Detaillez votre mï¿½thode
 
 ![image_question](./images/carte_vierge_calcul_vitesse.png)
+<small>Source "Cours thÃ©orique planche Ã  voile", Les GlÃ©nans CEB </small>
 
 # Answer
 
-1.	Choisir une zone pour laquelle vous souhaitez estimer le vent. Dans l’exemple au large de l’Irlande (Etoile).
-2.	Relever le degré de latitude de la zone concernée. Il est indiqué sur les parallèles. A 50°N dans l’exemple. 
-3.	Mesurer l’écart entre 2 isobares de votre zone. Vous obtenez le gradient de pression. 
-4.	Reporter cet écart dans l’abaque (en haut à gauche) au niveau du bon degré de latitude (50°N).
-5.	Lire sur la droite de l’écart, la force du vent en suivant la courbe. Les données sont en kt = nœud. Nous avons donc environ 25 nœuds.
+1.	Choisir une zone pour laquelle vous souhaitez estimer le vent. Dans lï¿½exemple au large de lï¿½Irlande (Etoile).
+2.	Relever le degrï¿½ de latitude de la zone concernï¿½e. Il est indiquï¿½ sur les parallï¿½les. A 50ï¿½N dans lï¿½exemple. 
+3.	Mesurer lï¿½ï¿½cart entre 2 isobares de votre zone. Vous obtenez le gradient de pression. 
+4.	Reporter cet ï¿½cart dans lï¿½abaque (en haut ï¿½ gauche) au niveau du bon degrï¿½ de latitude (50ï¿½N).
+5.	Lire sur la droite de lï¿½ï¿½cart, la force du vent en suivant la courbe. Les donnï¿½es sont en kt = nï¿½ud. Nous avons donc environ 25 nï¿½uds.
 
-La réponse est donc approximativement 25nds.
+La rï¿½ponse est donc approximativement 25nds.
 
 ![image_correction](./images/calcul_force_vent_carte.png)
+<small>Source "Cours thÃ©orique planche Ã  voile", Les GlÃ©nans CEB </small>

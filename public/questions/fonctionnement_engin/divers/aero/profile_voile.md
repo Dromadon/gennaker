@@ -3,3 +3,4 @@ Indiquer sur le schéma le vocabulaire décrivant ce profil (au moins 5 élement
 
 ## Correction
 ![image_correction](./images/profile_voile.png)
+<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>

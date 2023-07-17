@@ -13,3 +13,4 @@ Eléments favorables à l’établissement de la brise thermique :
 - Un système météo instable. Des conditions d’instabilité permettent à l’air chaud de monter en altitude. Au contraire, dans le cas d’un fort anticyclone, les courants d’air ascendants peuvent être bloqués.
 
 ![image_correction](./images/schema_brise_thermique.png)
+<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>

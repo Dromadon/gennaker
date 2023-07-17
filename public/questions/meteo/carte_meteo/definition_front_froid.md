@@ -10,3 +10,4 @@ Front froid: Si la masse d’air chaud est suivie d’une masse d’air froid, o
 
 
 ![image_correction](./images/front_froid_schema.png)
+<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>
