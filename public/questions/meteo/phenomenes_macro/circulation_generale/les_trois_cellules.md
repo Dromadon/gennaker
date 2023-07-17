@@ -13,4 +13,4 @@ C�est la diff�rence de temp�rature entre les masses d�air � l��che
 
 
 ![image_correction](./images/circulation_generale.png)
-<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>
+<sup><sub>Source "Cours théorique planche à voile", Les Glénans CEB </sub></sup>

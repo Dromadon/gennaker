@@ -2,7 +2,7 @@
 Detaillez votre m�thode
 
 ![image_question](./images/carte_vierge_calcul_vitesse.png)
-<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>
+<sup><sub>Source "Cours théorique planche à voile", Les Glénans CEB </sub></sup>
 
 # Answer
 
@@ -15,4 +15,4 @@ Detaillez votre m�thode
 La r�ponse est donc approximativement 25nds.
 
 ![image_correction](./images/calcul_force_vent_carte.png)
-<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>
+<sup><sub>Source "Cours théorique planche à voile", Les Glénans CEB </sub></sup>

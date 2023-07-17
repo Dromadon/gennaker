@@ -4,7 +4,7 @@ Un schéma est attendu
 # Correction
 
 ![image_correction](./images/empannage.png)
-<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>
+<sup><sub>Source "Cours théorique planche à voile", Les Glénans CEB </sub></sup>
 Abatée :
 
 - Dérive relevée.

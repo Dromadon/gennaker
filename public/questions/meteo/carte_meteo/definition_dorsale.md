@@ -8,4 +8,4 @@ Temps: Au centre de la dorsale, le vent est nul et en bordure le vent est souten
 
 ![image_correction](./images/dorsale.png)
 
-<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>
+<sup><sub>Source "Cours théorique planche à voile", Les Glénans CEB </sub></sup>

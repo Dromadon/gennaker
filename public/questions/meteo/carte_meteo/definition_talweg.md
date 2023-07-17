@@ -7,4 +7,4 @@ Zone prolongeant une dépression et s’étirant entre 2 anticyclones.
 Temps : Mauvais, Vent violent et irrégulier. 
 
 ![image_correction](./images/talweg.png)
-<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>
+<sup><sub>Source "Cours théorique planche à voile", Les Glénans CEB </sub></sup>

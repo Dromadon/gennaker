@@ -3,7 +3,7 @@
 # Correction
 
 ![image_correction](./images/condensation.png)
-<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>
+<sup><sub>Source "Cours théorique planche à voile", Les Glénans CEB </sub></sup>
 
 Un volume d’air à 25 degré peut contenir un certain volume d’eau sous forme gazeuse. Un volume d’air à 18 degré peut quant à lui contenir un volume d’eau plus faible sous forme gazeuse. 
 Lorsque la température diminue et que la pression reste constante, le volume d’air peut se retrouver saturé. L’eau présente dans l’air sous forme de gaz condense. L’eau devient liquide. On parle de seuil de saturation.

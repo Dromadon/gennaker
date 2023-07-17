@@ -14,9 +14,9 @@ Identifiez:
 11.	Dorsale.
 
 ![image_correction](./images/carte_meteo_vierge.png)
-<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>
+<sup><sub>Source "Cours théorique planche à voile", Les Glénans CEB </sub></sup>
 
 # Correction
 
 ![image_correction](./images/carte_marine.png)
-<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>
+<sup><sub>Source "Cours théorique planche à voile", Les Glénans CEB </sub></sup>

@@ -3,4 +3,4 @@
 # Correction 
 
 ![image_correction](./images/couple_chavirage.png)
-<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>
+<sup><sub>Source "Cours théorique planche à voile", Les Glénans CEB </sub></sup>

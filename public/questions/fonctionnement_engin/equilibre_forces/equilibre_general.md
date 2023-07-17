@@ -3,5 +3,5 @@
 # Correction
 
 ![image_correction](./images/bilan_aero_hydro.png)
-<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>
+<sup><sub>Source "Cours théorique planche à voile", Les Glénans CEB </sub></sup>
 

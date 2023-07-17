@@ -7,4 +7,4 @@ Anticyclone: Symbolisé H (Hight) ou A (Anticyclone), c’est une zone où la pr
 Le vent tourne dans le sens horaire. L’air descend, on dit qu’il subit une subsidence. En « s’écrasant » il subit une divergence, c'est-à-dire qu’il « s’écarte » sur les côtés.
 
 ![image_correction](./images/anticyclone_haut.png)
-<small>Source "Cours théorique planche à voile", Les Glénans CEB </small>
+<sup><sub>Source "Cours théorique planche à voile", Les Glénans CEB </sub></sup>
