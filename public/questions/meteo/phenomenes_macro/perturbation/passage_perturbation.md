@@ -1,7 +1,7 @@
 ﻿# Décrivez un passage de perturbation type sur la côte ouest de la France
 
 *Température, direction et force du vent, précipitations, pressions, nuages…*
-Un schema complet peu suffire.
+Un schema complet peut suffire.
 
 # Correction
 

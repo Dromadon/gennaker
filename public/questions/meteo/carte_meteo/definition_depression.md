@@ -4,7 +4,7 @@
 
 # Correction
 
-Dépression: Symbolisée L (Low) ou D (Dépression) c’est une zone où la pression est inférieure à inférieure à 1013 hpa. La masse d’air est en général chaude, humide, légère. Sous une dépression le temps est mauvais, avec du vent fort et des précipitations. Voir le chapitre dédié pour plus de précision.
+Dépression: Symbolisée L (Low) ou D (Dépression) c’est une zone où la pression est inférieure à inférieure à 1013 hpa. La masse d’air est en général chaude, humide, légère. Sous une dépression le temps est mauvais, avec du vent fort et des précipitations. 
 Le vent tourne dans le sens antihoraire. L’air monte, il subit une ascendance. 
 
 ![image_correction](./images/depression_haut.png)
