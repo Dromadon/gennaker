@@ -8,12 +8,12 @@ Detaillez votre méthode
 # Correction
 
 1.	Choisir une zone pour laquelle vous souhaitez estimer le vent. Dans l'exemple au large de l'Irlande (Etoile).
-2.	Relever le degré de latitude de la zone concernée. Il est indiqu� sur les parall�les. A 50�N dans l�exemple. 
+2.	Relever le degré de latitude de la zone concernée. Il est indiqué sur les parallèles. A 50°N dans l'exemple. 
 3.	Mesurer l'écart entre 2 isobares de votre zone. Vous obtenez le gradient de pression. 
-4.	Reporter cet écart dans l�abaque (en haut à gauche) au niveau du bon degr� de latitude (50�N).
-5.	Lire sur la droite de l'écart, la force du vent en suivant la courbe. Les donn�es sont en kt = n�ud. Nous avons donc environ 25 n�uds.
+4.	Reporter cet écart dans l'abaque (en haut à gauche) au niveau du bon degré de latitude (50°N).
+5.	Lire sur la droite de l'écart, la force du vent en suivant la courbe. Les données sont en kt = noeud. Nous avons donc environ 25 noeuds.
 
-La r�ponse est donc approximativement 25nds.
+La réponse est donc approximativement 25nds.
 
 ![image_correction](./images/calcul_force_vent_carte.png)
 

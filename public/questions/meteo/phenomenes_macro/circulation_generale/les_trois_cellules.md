@@ -1,15 +1,15 @@
-# Expliquez ce qu'on appelle la circulation g�n�rale. D�crire par un sch�ma les trois cellules qui permettent de la comprendre.
+﻿# Expliquez ce qu'on appelle la circulation générale. Décrire par un schéma les trois cellules qui permettent de la comprendre.
 
 
 # Correction
 
 
-La circulation g�n�rale d�crit les grands mouvements de flux d�air dans l�atmosph�re � l��chelle de la Terre. Elle permet de comprendre des ph�nom�nes tels que les aliz�s, le r�gime d�pressionnaire de l�Atlantique nord� 
-C�est la diff�rence de temp�rature entre les masses d�air � l��chelle plan�taire qui explique leur d�placement relatif. Cette diff�rence de temp�rature est li�e � une r�partition non homog�ne de l��nergie solaire � la surface de la Terre.  A cause de la forme sph�rique de la Terre, les p�les re�oivent moins d��nergie solaire (par unit� de surface) que la zone �quatoriale. Il existe donc de fortes diff�rences de temp�rature mais aussi de densit�, d�humidit� des masses d�air entre ces r�gions. La circulation g�n�rale se met en place pour r�tablir l��quilibre. 
+La circulation générale décrit les grands mouvements de flux d'air dans l'atmosphère à l'échelle de la Terre. Elle permet de comprendre des phénomènes tels que les alizés, le régime dépressionnaire de l'Atlantique nord. 
+C'est la différence de température entre les masses d'air à l'échelle planétaire qui explique leur déplacement relatif. Cette différence de température est liée à une répartition non homogène de l'énergie solaire à la surface de la Terre.  A cause de la forme sphérique de la Terre, les pôles reçoivent moins d'énergie solaire (par unité de surface) que la zone équatoriale. Il existe donc de fortes différences de température mais aussi de densité, d'humidité des masses d'air entre ces régions. La circulation générale se met en place pour rétablir l'équilibre. 
 
-- De 0 � 30� de latitude : la cellule de Hadley
-- De 30 � 60� de latitude : la cellule de Ferrel 
-- De 60 � 90� (p�le) de latitude : la cellule Polaire
+- De 0 à 30° de latitude : la cellule de Hadley
+- De 30 à 60° de latitude : la cellule de Ferrel 
+- De 60 à 90° (pôle) de latitude : la cellule Polaire
 
 
 ![image_correction](./images/circulation_generale.png)
