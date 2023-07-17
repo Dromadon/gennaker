@@ -1,27 +1,42 @@
 [
     
     {
-        "fileName": "abatee_pav.md",
+        "fileName": "VL/windsurf/abatee_pav.md",
         "answerSize": "lg",
         "supports": [
             "windsurf"
         ]
     },
     {
-        "fileName": "aulofee_pav.md",
+        "fileName": "VL/windsurf/aulofee_pav.md",
         "answerSize": "lg",
         "supports": [
             "windsurf"
         ]
     },
     {
-        "fileName": "couple_auloffee.md"
+        "fileName": "couple_auloffee.md",
+        "supports": [
+            "catamaran",
+            "deriveur",
+            "croisiere"
+        ]
     },
     {
-        "fileName": "couple_dessalage.md"
+        "fileName": "couple_dessalage.md",
+        "supports": [
+            "catamaran",
+            "deriveur",
+            "croisiere"
+        ]
     },
     {
-        "fileName": "couple_enfournement.md"
+        "fileName": "couple_enfournement.md",
+        "supports": [
+            "catamaran",
+            "deriveur",
+            "croisiere"
+        ]
     },
     {
         "fileName": "equilibre_general.md"
