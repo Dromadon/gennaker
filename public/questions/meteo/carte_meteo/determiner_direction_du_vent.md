@@ -7,7 +7,7 @@ Pour indiquer la direction, une flèche sur la carte suffit, mais expliquez votr
 
 
 <small>Data supplied by the Met Office
-© British Crown copyright 2023, the Met Office </small>
+© British Crown copyright [followed by year], the Met Office </small>
 
 # Correction
 
