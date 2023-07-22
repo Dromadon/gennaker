@@ -5,6 +5,10 @@ Pour indiquer la direction, une flèche sur la carte suffit, mais expliquez votr
 
 <small>Source : [*Cours théorique planche à voile*, Les Glénans CEB, 2023](https://encadrementbenevole.glenans.asso.fr/wp-content/uploads/2023/07/Cours-theorique-PAV-Version-1.pdf) </small>
 
+
+<small>Data supplied by the Met Office
+© British Crown copyright 2023, the Met Office </small>
+
 # Correction
 
 1.	Choisir une zone pour laquelle vous souhaitez estimer le vent. Dans l’exemple au large de l’Irlande (Etoile).
@@ -18,3 +22,6 @@ La réponse est donc approximativement 25nds.
 ![image_correction](./images/direction_du_vent.png)
 
 <small>Source : [*Cours théorique planche à voile*, Les Glénans CEB, 2023](https://encadrementbenevole.glenans.asso.fr/wp-content/uploads/2023/07/Cours-theorique-PAV-Version-1.pdf) </small>
+
+<small>Data supplied by the Met Office
+© British Crown copyright 2023, the Met Office </small>
