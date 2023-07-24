@@ -1,4 +1,4 @@
-﻿[
+[
     {
         "fileName": "definition_anticyclone.md",
         "answerSize": "lg"
@@ -11,7 +11,6 @@
         "fileName": "definition_depression.md",
         "answerSize": "lg"
     },
-
     {
         "fileName": "definition_dorsale.md",
         "answerSize": "sm"
@@ -23,11 +22,11 @@
     {
         "fileName": "definition_front_froid.md",
         "answerSize": "sm"
-    },    
+    },
     {
         "fileName": "definition_front_occlus.md",
         "answerSize": "sm"
-    },        
+    },
     {
         "fileName": "definition_talweg.md",
         "answerSize": "sm"
@@ -36,15 +35,14 @@
         "fileName": "determination_vitesse_vent.md",
         "answerSize": "sm"
     },
-
     {
         "fileName": "determiner_direction_du_vent.md",
         "answerSize": "xs"
-    },    
+    },
     {
         "fileName": "lecture_carte.md",
         "answerSize": "xs"
-    },       
+    },
     {
         "fileName": "marais_barometrique.md",
         "answerSize": "xs"

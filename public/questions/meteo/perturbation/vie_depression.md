@@ -1,4 +1,6 @@
 ﻿# Décrivez les différentes phase de vie d'une dépression
+Comment une dépression se crée-t-elle, évolue-t-elle, meurt-elle?
+Aidez vous d'un schéma. Faites apparaitre les fronts.
 
 # Correction
 

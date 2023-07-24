@@ -14,5 +14,17 @@
     {
         "fileName": "vives_eaux.md",
         "answerSize": "sm"
+    },
+    {
+        "fileName": "sonde_negative.md",
+        "answerSize": "xs"
+    },
+    {
+        "fileName": "sonde_positive.md",
+        "answerSize": "xs"
+    },
+    {
+        "fileName": "zero_hydrographique.md",
+        "answerSize": "xs"
     }
 ]

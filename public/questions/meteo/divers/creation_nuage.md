@@ -1,4 +1,4 @@
-﻿# Comment se crée un nuage? 
+﻿# Comment se crée un nuage? Citez un mécanisme menant à la création de nuage.
 
 # Correction
 

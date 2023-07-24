@@ -1,4 +1,4 @@
-﻿[
+[
     {
         "fileName": "brise_thermique/facteurs_brise_thermique.md",
         "answerSize": "lg"
@@ -11,50 +11,47 @@
         "fileName": "brise_thermique/signes_brise_thermique.md",
         "answerSize": "lg"
     },
-
-    {
-        "fileName": "effet_de_site/convergence_divergence.md",
-        "answerSize": "sm"
-    },
-    {
-        "fileName": "effet_de_site/coussin.md",
-        "answerSize": "sm"
-    },
-    {
-        "fileName": "effet_de_site/effet_pointe.md",
-        "answerSize": "sm"
-    },    
-    {
-        "fileName": "effet_de_site/effet_venturi.md",
-        "answerSize": "sm"
-    },        
-    {
-        "fileName": "effet_de_site/vent_parallele_cote_droite.md",
-        "answerSize": "sm"
-    },
-    {
-        "fileName": "effet_de_site/vent_parallele_cote_gauche.md",
-        "answerSize": "sm"
-    },
-
     {
         "fileName": "grains/anticiper_grain.md",
         "answerSize": "xs"
-    },    
+    },
     {
         "fileName": "grains/evolution_vent_sous_grain.md",
         "answerSize": "xs"
-    },       
+    },
     {
         "fileName": "grains/reaction_grain_violent.md",
         "answerSize": "xs"
-    },       
+    },
     {
         "fileName": "grains/signes_grain_violent.md",
         "answerSize": "xs"
-    },       
+    },
     {
         "fileName": "grains/vent_grain.md",
         "answerSize": "sm"
+    },
+    {
+        "fileName": "effets_de_site/convergence_divergence.md",
+        "answerSize": "md"
+    },
+    {
+        "fileName": "effets_de_site/coussin.md"
+    },
+    {
+        "fileName": "effets_de_site/effet_venturi.md",
+        "answerSize": "md"
+    },
+    {
+        "fileName": "effets_de_site/vent_parallele_cote_droite.md",
+        "answerSize": "sm"
+    },
+    {
+        "fileName": "effets_de_site/vent_parallele_cote_gauche.md",
+        "answerSize": "sm"
+    },
+    {
+        "fileName": "effets_de_site/effet_pointe.md",
+        "answerSize": "md"
     }
 ]
