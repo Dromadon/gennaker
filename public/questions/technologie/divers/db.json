@@ -8,5 +8,42 @@
         "supports": [
             "catamaran"
         ]
+    },
+    {
+        "fileName": "VL/windsurf/choix_aileron.md",
+        "supports": [
+            "windsurf"
+        ]
+    },
+    {
+        "fileName": "VL/windsurf/choix_materiel.md",
+        "supports": [
+            "windsurf"
+        ]
+    },    
+    {
+        "fileName": "VL/windsurf/greer_voile.md",
+        "answerSize": "sm",
+        "supports": [
+            "windsurf"
+        ]
+    },
+    {
+        "fileName": "VL/windsurf/longueur_aileron.md",
+        "supports": [
+            "windsurf"
+        ]
+    },
+    {
+        "fileName": "VL/windsurf/type_aileron.md",
+        "supports": [
+            "windsurf"
+        ]
+    },
+    {
+        "fileName": "VL/windsurf/type_harnais.md",
+        "supports": [
+            "windsurf"
+        ]
     }
 ]

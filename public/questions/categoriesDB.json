@@ -1,18 +1,19 @@
-{
+﻿{
     "meteo": {
         "displayName": "Météo",
         "sections": {
-            "perturbation": {
-                "displayName": "Passage perturbation"
-            },
-            "brise_thermique": {
-                "displayName": "Brise thermique"
-            },
-            "phenomene_local": {
-                "displayName": "Phénomène local"
+
+            "carte_meteo": {
+                "displayName": "Carte météo"
             },
             "divers": {
                 "displayName": "Divers"
+            },
+            "phenomenes_macro": {
+                "displayName": "Circulation générale - Passage perturbation"
+            },
+            "phenomenes_locaux": {
+                "displayName": "Phénomène locaux (Grains, Effets de site, Brises ...) "
             }
         }
     },
@@ -21,6 +22,9 @@
         "sections": {
             "calcul_maree": {
                 "displayName": "Calcul de marée"
+            },
+            "maree": {
+                "displayName": "Marées"
             }
         }
     },
