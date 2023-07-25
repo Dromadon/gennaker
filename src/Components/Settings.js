@@ -43,13 +43,13 @@ function Settings(props) {
                         <Form.Group onChange={handleSupportChange} controlId="support">
                             <Form.Check defaultChecked  name="support" type="radio" label="Catamaran" value="catamaran" />
                             <Form.Check name="support" type="radio" label="Dériveur" value="deriveur" />
-                            <Form.Check disabled name="support" type="radio" label="Windsurf" value="windsurf" />
+                            <Form.Check name="support" type="radio" label="Windsurf" value="windsurf" />
                             <Form.Check disabled name="support" type="radio" label="Croisière" value="croisiere" />
                         </Form.Group>
                     </Col>
                     <Col md={3} className="mb-5">
                         <h4>2. Je choisis mes réglages</h4>
-                        <h6>Longueur de l’évaluation <i className="bi bi-question-circle"></i></h6>
+                        <h6>Longueur de l’évaluation <i className="bi bi-question-circle" title="Évaluation standard = tous les thèmes, raccourcie ≃ thèmes essentiels, positionnement = questions clés"></i></h6>
                         <Form.Group onChange={handleLengthChange} controlId="length">
                             <Form.Check defaultChecked name="length" type="radio" label="Évaluation standard" value="standard"/>
                             <Form.Check name="length" type="radio" label="Évaluation raccourcie" value="raccourcie"/>
