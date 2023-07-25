@@ -3,7 +3,10 @@
         "carte_meteo": {
             "number": 1
         },
-        "phenomenes_macro": {
+        "circulation_generale": {
+            "number": 1
+        },
+        "perturbation": {
             "number": 1
         },
         "phenomenes_locaux": {
@@ -17,7 +20,6 @@
         "calcul_maree" : {
             "number": 1
         },
-        {
         "maree" : {
             "number": 1
         }

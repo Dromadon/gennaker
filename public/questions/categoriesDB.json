@@ -9,11 +9,14 @@
             "divers": {
                 "displayName": "Divers"
             },
-            "phenomenes_macro": {
-                "displayName": "Circulation générale - Passage perturbation"
+            "circulation_generale": {
+                "displayName": "Circulation générale"
+            },
+            "perturbation": {
+                "displayName": "Passage de perturbation"
             },
             "phenomenes_locaux": {
-                "displayName": "Phénomène locaux (Grains, Effets de site, Brises ...) "
+                "displayName": "Phénomène locaux"
             }
         }
     },
