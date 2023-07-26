@@ -9,6 +9,6 @@ Les masses d'air n’ont pas toutes les mêmes propriétés : on peut distinguer
 Front froid: Si la masse d’air chaud est suivie d’une masse d’air froid, on a un front froid. L’air froid est sec, lourd : il descend. En rencontrant la masse d’air chaud, il pousse l’air chaud par la base.  La situation est instable avec des nuages de type cumuliforme. 
 
 
-![image_correction](./images/front_froid_schema.png)
+![image_correction](images/front_froid_schema.png)
 
 <small>Source : [*Cours théorique planche à voile*, Les Glénans CEB, 2023](https://encadrementbenevole.glenans.asso.fr/wp-content/uploads/2023/07/Cours-theorique-PAV-Version-1.pdf) </small>

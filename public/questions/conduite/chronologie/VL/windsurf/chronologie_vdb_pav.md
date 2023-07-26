@@ -1,9 +1,9 @@
 ﻿# Décrivez la chronologie d'un virement de bord en planche à voile
-Un schema est attendu
+Un schéma est attendu
 
 # Correction
 
-![image_correction](./images/virement.png)
+![image_correction](images/virement.png)
 
 <small>Source : [*Cours théorique planche à voile*, Les Glénans CEB, 2023](https://encadrementbenevole.glenans.asso.fr/wp-content/uploads/2023/07/Cours-theorique-PAV-Version-1.pdf) </small>
 

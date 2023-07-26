@@ -8,6 +8,6 @@ Les masses d'air n’ont pas toutes les mêmes propriétés : on peut distinguer
 Front chaud: Si la masse d’air froid est suivie d’une masse d’air chaud, on a un front chaud. L’air chaud est humide, léger : il passe au-dessus de l'air froid. Plus il monte, plus il se refroidit et l’humidité se condense et se transforme en nuages. A saturation il pleut. Les nuages sont de type stratiforme et la situation est stable. 
 
 
-![image_correction](./images/front_chaud_schema.png)
+![image_correction](images/front_chaud_schema.png)
 
 <small>Source : [*Cours théorique planche à voile*, Les Glénans CEB, 2023](https://encadrementbenevole.glenans.asso.fr/wp-content/uploads/2023/07/Cours-theorique-PAV-Version-1.pdf) </small>

@@ -9,6 +9,6 @@ Si la côte est à droite du vent (dans le sens du vent) : Le frottement à la c
 
 Inversement si la cote est à gauche du vent il y a divergence du flux à la côte. 
 
-![image_correction](./images/effet_side_droit.png)
+![image_correction](images/effet_side_droit.png)
 
 <small>Source : [*Cours théorique planche à voile*, Les Glénans CEB, 2023](https://encadrementbenevole.glenans.asso.fr/wp-content/uploads/2023/07/Cours-theorique-PAV-Version-1.pdf) </small>

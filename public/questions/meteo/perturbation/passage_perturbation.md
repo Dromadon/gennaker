@@ -1,12 +1,12 @@
 ﻿# Décrivez un passage de perturbation type sur la côte ouest de la France
 
 *Température, direction et force du vent, précipitations, pressions, nuages…*
-Un schema complet peut suffire.
+Un schéma complet peut suffire.
 
 # Correction
 
 
-![image_correction](./images/passage_depression.png)
+![image_correction](images/passage_depression.png)
 
 <small>Source : [*Cours théorique planche à voile*, Les Glénans CEB, 2023](https://encadrementbenevole.glenans.asso.fr/wp-content/uploads/2023/07/Cours-theorique-PAV-Version-1.pdf) </small>
 

@@ -10,6 +10,6 @@ Entre la région A et la B, les marques d'entrée de port sont inversées.
 France métropolitaine: région A
 Antilles: région B
 
-![image_correction](./images/marque_port.png)
+![image_correction](images/marque_port.png)
 
 <small>Source : [*Cours théorique planche à voile*, Les Glénans CEB, 2023](https://encadrementbenevole.glenans.asso.fr/wp-content/uploads/2023/07/Cours-theorique-PAV-Version-1.pdf) </small>
