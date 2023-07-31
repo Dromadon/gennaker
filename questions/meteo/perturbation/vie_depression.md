@@ -8,7 +8,7 @@ Aidez vous d'un schéma. Faites apparaitre les fronts.
 
 <small>Source : [*Cours théorique planche à voile*, Les Glénans CEB, 2023](https://encadrementbenevole.glenans.asso.fr/wp-content/uploads/2023/07/Cours-theorique-PAV-Version-1.pdf) </small>
 
-La correction est plus complete que ce qui est réellement attendu
+La correction est plus complète que ce qui est réellement attendu.
 
 Une dépression se crée en plusieurs étapes : 
 Des turbulences vont tout d’abord permettre aux masses d’air chaud et froid de se déplacer l’une par rapport à l’autre. L'air froid va pouvoir s'écouler vers le Sud et l’air chaud vers le Nord.
