@@ -28,5 +28,35 @@
         "supports": [
             "deriveur"
         ]
+    },
+    {
+        "fileName": "VL/windsurf/creux_voile.md",
+        "supports": [
+            "windsurf"
+        ]
+    },
+    {
+        "fileName": "VL/windsurf/creux_voile_minimum.md",
+        "supports": [
+            "windsurf"
+        ]
+    },
+    {
+        "fileName": "VL/windsurf/reglage_pied_de_mat.md",
+        "supports": [
+            "windsurf"
+        ]
+    },
+    {
+        "fileName": "VL/windsurf/reglage_point_amure.md",
+        "supports": [
+            "windsurf"
+        ]
+    },
+    {
+        "fileName": "VL/windsurf/reglage_wishbone.md",
+        "supports": [
+            "windsurf"
+        ]
     }
 ]

@@ -64,7 +64,7 @@ function Question(props) {
                     class="question-correction"
                     children={correction}
                     transformImageUri={uri =>
-                        `${process.env.PUBLIC_URL}/${transformImageURI(uri, props.filePath)}`}
+                        `${transformImageURI(uri, props.filePath)}`}
                     components={{
                         h1: ({ node, ...props }) => <h6 class="text-primary" {...props} />,
                         table: ({ node, ...props }) => <table class="table table-sm" {...props} />

@@ -11,5 +11,16 @@
         "supports": [
             "deriveur"
         ]
+    },
+    {
+        "fileName": "conduite_molle_planing.md",
+        "answerSize": "sm",
+        "supports": [
+            "windsurf"
+        ]
+    },
+    {
+        "fileName": "conduite_risee.md",
+        "answerSize": "sm"
     }
 ]

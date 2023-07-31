@@ -1,12 +1,12 @@
 {
     "meteo": {
-        "brise_thermique": {
+        "carte_meteo": {
             "number": 1
         },
-        "perturbation": {
+        "circulation_generale": {
             "number": 1
         },
-        "phenomene_local": {
+        "phenomenes_locaux": {
             "number": 1
         }
     },

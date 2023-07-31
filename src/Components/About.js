@@ -98,6 +98,7 @@ class About extends React.Component {
                             <Row className="mb-3">
                                 <h2 id="contribution">Comment contribuer</h2>
                                 <h3>Contributeurs</h3>
+                                Augustin Grimprel, Louis Valéry
                             </Row>
                         </Container>
                     </Col>

@@ -18,5 +18,29 @@
     {
         "fileName": "beaufort_5.md",
         "answerSize": "lg"
+    },
+    {
+        "fileName": "convection.md",
+        "answerSize": "md"
+    },
+    {
+        "fileName": "creation_nuage.md",
+        "answerSize": "md"
+    },
+    {
+        "fileName": "masse_air_instable.md",
+        "answerSize": "md"
+    },
+    {
+        "fileName": "masse_air_stable.md",
+        "answerSize": "md"
+    },
+    {
+        "fileName": "nuage_front.md",
+        "answerSize": "md"
+    },
+    {
+        "fileName": "saturation_masse_air.md",
+        "answerSize": "sm"
     }
 ]

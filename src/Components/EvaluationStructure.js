@@ -43,7 +43,7 @@ function EvaluationStructure(props) {
                             <select className="form-select mb-3" aria-label=".form-select support" onChange={handleSupportChange} value={support}>
                                 <option value="catamaran">Catamaran</option>
                                 <option value="deriveur">Dériveur</option>
-                                <option value="windsurf" disabled>Windsurf</option>
+                                <option value="windsurf">Windsurf</option>
                                 <option value="croisiere" disabled>Croisière</option>
                             </select>
                         </Col>
