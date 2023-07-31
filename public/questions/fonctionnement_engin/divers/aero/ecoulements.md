@@ -11,7 +11,6 @@ Lorsque l’angle d’incidence est faible (angle entre le vent et la voile), l�
 L’écoulement est dit turbulent lorsque les filets d’air n’arrivent pas à suivre le profil sur l’extrados. Ils finissent donc par tourbillonner. Il en résulte une perte de puissance dans la voile. On dit que la voile décroche. Situation à éviter. Les écoulements sont turbulents essentiellement au vent arrière et au grand largue.
 
 ![image_correction](images/ecoulements_laminaires.png)
-
 ![image_correction](images/ecoulements_turbulants.png)
 
 <small>Source : [*Cours théorique planche à voile*, Les Glénans CEB, 2023](https://encadrementbenevole.glenans.asso.fr/wp-content/uploads/2023/07/Cours-theorique-PAV-Version-1.pdf) </small>
