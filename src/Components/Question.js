@@ -60,18 +60,20 @@ function Question(props) {
                     rehypePlugins={[rehypeRaw]} />
             </div>
             { props.displayCorrection ?
-                <ReactMarkdown
-                    class="question-correction"
-                    children={correction}
-                    transformImageUri={uri =>
-                        `${transformImageURI(uri, props.filePath)}`}
-                    components={{
-                        h1: ({ node, ...props }) => <h6 class="text-primary" {...props} />,
-                        table: ({ node, ...props }) => <table class="table table-sm" {...props} />
-                    }}
-                    remarkPlugins={[remarkGfm]}
-                    rehypePlugins={[rehypeRaw]} // This is OK as we can totally trust the Markdown
-                />
+                <div class="question-correction">
+                    <ReactMarkdown
+                        children={correction}
+                        transformImageUri={uri =>
+                            `${transformImageURI(uri, props.filePath)}`}
+                        components={{
+                            h1: ({ node, ...props }) => <h6 class="text-primary" {...props} />,
+                            img: ({ node, ...props }) => <img class="img-fluid" {...props} />,
+                            table: ({ node, ...props }) => <table class="table table-sm" {...props} />
+                        }}
+                        remarkPlugins={[remarkGfm]}
+                        rehypePlugins={[rehypeRaw]} // This is OK as we can totally trust the Markdown
+                    />
+                </div>
                 : <div class="question-answer"><AnswerLines answerSize={props.answerSize} /></div>
             }
         </div>
