@@ -15,5 +15,45 @@
         "supports": [
             "windsurf"
         ]
+    },
+    {
+        "fileName": "VL/cunningham.md",
+        "answerSize": "sm",
+        "supports": [
+            "deriveur",
+            "catamaran"
+        ]
+    },
+    {
+        "fileName": "VL/hale-bas.md",
+        "answerSize": "sm",
+        "supports": [
+            "deriveur"
+        ]
+    },
+    {
+        "fileName": "vrillage.md",
+        "answerSize": "sm",
+        "supports": [
+            "deriveur",
+            "catamaran",
+            "windsurf"
+        ]
+    },
+    {
+        "fileName": "aero/ecoulements.md",
+        "answerSize": "lg"
+    },
+    {
+        "fileName": "aero/portance.md",
+        "answerSize": "lg"
+    },
+    {
+        "fileName": "aero/profile_voile.md",
+        "answerSize": "md"
+    },
+    {
+        "fileName": "aero/trainee.md",
+        "answerSize": "lg"
     }
 ]

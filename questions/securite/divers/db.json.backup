@@ -3,12 +3,28 @@
         "fileName": "VL/eau_froide.md"
     },
     {
-        "fileName": "VL/noyade.md"
+        "fileName": "VL/noyade.md",
+        "supports": [
+            "deriveur",
+            "catamaran"
+        ]
     },
     {
         "fileName": "VL/procedures_alerte.md"
     },
     {
-        "fileName": "VL/trajectoire_HLM_VL.md"
+        "fileName": "VL/trajectoire_HLM_VL.md",
+        "supports": [
+            "deriveur",
+            "catamaran"
+        ]
+    },
+    {
+        "fileName": "VL/ecoute_lache.md",
+        "answerSize": "md",
+        "supports": [
+            "deriveur",
+            "catamaran"
+        ]
     }
 ]

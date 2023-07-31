@@ -18,5 +18,13 @@
     {
         "fileName": "danger_isole_reverse.md",
         "answerSize": "xs"
+    },
+    {
+        "fileName": "chenal.md",
+        "answerSize": "md"
+    },
+    {
+        "fileName": "region_a_b.md",
+        "answerSize": "sm"
     }
 ]

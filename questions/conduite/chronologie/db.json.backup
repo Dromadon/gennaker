@@ -22,5 +22,50 @@
         "supports": [
             "deriveur"
         ]
+    },
+    {
+        "fileName": "VL/chronologie_abattee_vent_fort.md",
+        "answerSize": "lg",
+        "supports": [
+            "deriveur",
+            "catamaran"
+        ]
+    },
+    {
+        "fileName": "VL/chronologie_empannage_vent_fort.md",
+        "answerSize": "lg",
+        "supports": [
+            "deriveur",
+            "catamaran"
+        ]
+    },
+    {
+        "fileName": "VL/manque_a_virer.md",
+        "answerSize": "md",
+        "supports": [
+            "deriveur",
+            "catamaran"
+        ]
+    },
+    {
+        "fileName": "VL/windsurf/chronologie_vdb_pav.md",
+        "answerSize": "lg",
+        "supports": [
+            "windsurf"
+        ]
+    },
+    {
+        "fileName": "VL/windsurf/chronologie_remorquage_pav.md",
+        "answerSize": "lg",
+        "supports": [
+            "windsurf"
+        ]
+    },
+    {
+        "fileName": "VL/windsurf/chronologie_empannage_pav.md",
+        "answerSize": "lg",
+        "supports": [
+            "windsurf"
+        ]
     }
 ]
