@@ -1,6 +1,10 @@
 [
     {
-        "fileName": "gain_sous_vent.md"
+        "fileName": "gain_sous_vent.md",
+        "supports" : [
+            "catamaran",
+            "deriveur"
+        ]
     },
     {
         "fileName": "vent_apparent_risee.md"
