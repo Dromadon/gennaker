@@ -16,10 +16,6 @@
         "answerSize": "sm"
     },
     {
-        "fileName": "sonde_positive.md",
-        "answerSize": "xs"
-    },
-    {
         "fileName": "zero_hydrographique.md",
         "answerSize": "xs"
     }
