@@ -26,5 +26,29 @@
             "deriveur",
             "catamaran"
         ]
+    },
+    {
+        "fileName": "VL/deriveur/cape.md",
+        "supports": [
+            "deriveur"
+        ]
+    },
+    {
+        "fileName": "VL/deriveur/dematage.md",
+        "supports": [
+            "deriveur"
+        ]
+    },
+    {
+        "fileName": "VL/deriveur/points_fragilite.md",
+        "supports": [
+            "deriveur"
+        ]
+    },
+    {
+        "fileName": "VL/deriveur/trou_puit_derive.md",
+        "supports": [
+            "deriveur"
+        ]
     }
 ]

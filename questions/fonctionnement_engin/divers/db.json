@@ -55,5 +55,11 @@
     {
         "fileName": "aero/trainee.md",
         "answerSize": "lg"
+    },
+    {
+        "fileName": "VL/deriveur/surpuissance_pres.md",
+        "supports": [
+            "deriveur"
+        ]
     }
 ]

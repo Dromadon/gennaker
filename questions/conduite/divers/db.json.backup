@@ -40,5 +40,37 @@
         "supports": [
             "windsurf"
         ]
+    },
+    {
+        "fileName": "VL/cadre_deforme.md",
+        "supports": [
+            "deriveur",
+            "catamaran",
+            "windsurf"
+        ]
+    },
+    {
+        "fileName": "VL/deriveur/4bf_surf.md",
+        "supports": [
+            "deriveur"
+        ]
+    },
+    {
+        "fileName": "VL/deriveur/depart_lof_spi.md",
+        "supports": [
+            "deriveur"
+        ]
+    },
+    {
+        "fileName": "VL/deriveur/manque_a_virer.md",
+        "supports": [
+            "deriveur"
+        ]
+    },
+    {
+        "fileName": "VL/deriveur/safran_decroche_spi.md",
+        "supports": [
+            "deriveur"
+        ]
     }
 ]
