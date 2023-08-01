@@ -9,3 +9,38 @@
         display: none;
     }
 }
+
+@media print {
+    .categoryTitle {
+        break-after: avoid;
+    }
+
+    .categoryTitle + div {
+        break-before: avoid;
+    }
+
+    .sectionTitle {
+        break-after: avoid;
+    }
+
+    .changeQuestionButton {
+        display: none;
+    }
+
+    .question {
+        display: block;
+        break-inside: avoid;
+        background-color: white;
+    }
+
+    .question .img {
+        max-height: 100%;
+    }
+
+    @page {
+        margin-top: 10mm;
+        margin-bottom: 10mm;
+        margin-left: 10mm;
+        margin-right: 10mm;
+    }
+}
