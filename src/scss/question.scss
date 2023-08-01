@@ -21,3 +21,9 @@ td {
     color: $gray-700;
     font-size: x-small;
 }
+
+@media screen{
+    .question img {
+        max-height: 50vh;
+    }
+}

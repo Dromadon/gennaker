@@ -1,7 +1,7 @@
 [
     {
         "fileName": "gain_sous_vent.md",
-        "supports" : [
+        "supports": [
             "catamaran",
             "deriveur"
         ]
@@ -26,5 +26,11 @@
     {
         "fileName": "conduite_risee.md",
         "answerSize": "sm"
+    },
+    {
+        "fileName": "VL/deriveur/planing.md",
+        "supports": [
+            "deriveur"
+        ]
     }
 ]
