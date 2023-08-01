@@ -12,24 +12,6 @@
         ]
     },
     {
-        "fileName": "VL/deriveur_vent_faible.md",
-        "supports": [
-            "deriveur"
-        ]
-    },
-    {
-        "fileName": "VL/deriveur_vent_fort.md",
-        "supports": [
-            "deriveur"
-        ]
-    },
-    {
-        "fileName": "VL/deriveur_solo_portant.md",
-        "supports": [
-            "deriveur"
-        ]
-    },
-    {
         "fileName": "VL/windsurf/creux_voile.md",
         "supports": [
             "windsurf"
@@ -57,6 +39,36 @@
         "fileName": "VL/windsurf/reglage_wishbone.md",
         "supports": [
             "windsurf"
+        ]
+    },
+    {
+        "fileName": "VL/deriveur/3bf_clapot_pres.md",
+        "supports": [
+            "deriveur"
+        ]
+    },
+    {
+        "fileName": "VL/deriveur/4bf_spi.md",
+        "supports": [
+            "deriveur"
+        ]
+    },
+    {
+        "fileName": "VL/deriveur/bordure_hale-bas_sangle.md",
+        "supports": [
+            "deriveur"
+        ]
+    },
+    {
+        "fileName": "VL/deriveur/deriveur_solo_portant.md",
+        "supports": [
+            "deriveur"
+        ]
+    },
+    {
+        "fileName": "VL/deriveur/deriveur_vent_fort.md",
+        "supports": [
+            "deriveur"
         ]
     }
 ]

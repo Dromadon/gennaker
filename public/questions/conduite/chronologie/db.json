@@ -12,18 +12,6 @@
         ]
     },
     {
-        "fileName": "VL/chronologie_virement_deriveur.md",
-        "supports": [
-            "deriveur"
-        ]
-    },
-    {
-        "fileName": "VL/chronologie_empannage_deriveur.md",
-        "supports": [
-            "deriveur"
-        ]
-    },
-    {
         "fileName": "VL/chronologie_abattee_vent_fort.md",
         "answerSize": "lg",
         "supports": [
@@ -66,6 +54,24 @@
         "answerSize": "lg",
         "supports": [
             "windsurf"
+        ]
+    },
+    {
+        "fileName": "VL/deriveur/chronologie_empannage_laser_solo_12kts.md",
+        "supports": [
+            "deriveur"
+        ]
+    },
+    {
+        "fileName": "VL/deriveur/chronologie_virement_laser_solo_15kts.md",
+        "supports": [
+            "deriveur"
+        ]
+    },
+    {
+        "fileName": "VL/deriveur/depart_pres_arrivee_portant.md",
+        "supports": [
+            "deriveur"
         ]
     }
 ]
