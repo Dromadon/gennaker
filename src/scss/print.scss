@@ -14,19 +14,7 @@
     .categoryTitle {
         break-after: avoid;
     }
-
-    .categoryTitle + div {
-        break-before: avoid;
-    }
-
-    .sectionTitle {
-        break-after: avoid;
-    }
-
-    .changeQuestionButton {
-        display: none;
-    }
-
+    
     .question {
         display: block;
         break-inside: avoid;

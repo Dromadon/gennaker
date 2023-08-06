@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { useImmer } from "use-immer";
 import {produce} from "immer";
 
 import { EvaluationLateralBar } from "./EvaluationLateralBar";
@@ -29,6 +28,11 @@ function EvaluationPage(props) {
     const [evaluation, setEvaluation] = useState({});
     const [displayCorrection, setDisplayCorrection] = useState(false);
     const [displayCategoryTitles, setDisplayCategoryTitle] = useState(true);
+    const [displaySettings, setDisplaySettings] = useState({
+        displayCorrection: false,
+        displayCategoryTitles: true,
+        displayAnswerSpace: false
+    });
 
     const componentRef = useRef();
     const handlePrint = useReactToPrint({
@@ -36,14 +40,19 @@ function EvaluationPage(props) {
         documentTitle: "Evaluation-"+evalParameters['support']+"-"+evalParameters['length']
     });
 
-    const toggleDisplayCorrection = (event) => {
-        console.info("Switching correction display");
-        setDisplayCorrection(!displayCorrection);
+    const toggleDisplayAnswerSpace = (event) => {
+        console.info("Switching answer space display in printing");
+        setDisplaySettings({...displaySettings, displayAnswerSpace: !displaySettings.displayAnswerSpace});
     }
 
     const toggleDisplayCategoryTitles = (event) => {
         console.info("Switching category titles display");
-        setDisplayCategoryTitle(!displayCategoryTitles);
+        setDisplaySettings({...displaySettings, displayCategoryTitles: !displaySettings.displayCategoryTitles});
+    }
+
+    const toggleDisplayCorrection = (event) => {
+        console.info("Switching correction display");
+        setDisplaySettings({...displaySettings, displayCorrection: !displaySettings.displayCorrection});
     }
 
     const changeSectionQuestions = async (categoryName, sectionName) => {
@@ -97,10 +106,10 @@ function EvaluationPage(props) {
                     <Col xs={12} lg={2} className="lateralColumn">
                         <EvaluationLateralBar
                             evaluation={evaluation} 
-                            displayCorrection={displayCorrection} 
-                            displayCategoryTitles={displayCategoryTitles}
+                            displaySettings={displaySettings}
                             toggleDisplayCorrection={toggleDisplayCorrection}
                             toggleDisplayCategoryTitles={toggleDisplayCategoryTitles}
+                            toggleDisplayAnswerSpace={toggleDisplayAnswerSpace}
                             handlePrint={handlePrint}
                             changeAllQuestions={changeAllQuestions}/>
                     </Col>
@@ -109,8 +118,7 @@ function EvaluationPage(props) {
                             ref={componentRef}
                             evaluation={evaluation} 
                             evalParameters={evalParameters}
-                            displayCorrection={displayCorrection}
-                            displayCategoryTitles={displayCategoryTitles}
+                            displaySettings={displaySettings}
                             changeSectionQuestions={changeSectionQuestions}/>
                     </Col>
                 </Row>
