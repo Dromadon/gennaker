@@ -1,6 +1,7 @@
 # Au prés, les penons de mon foc sont disposés comme suit : 
 - Intrados accroché en haut et en bas
 - Extrados décroché en haut et accroché en bas
+
 Comment bien régler mon foc sans action de barre ?
 
 # Correction 
