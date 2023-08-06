@@ -18,13 +18,13 @@ const ANSWER_LINES_BY_SIZE = {
 }
 const DEFAULT_ANSWER_SIZE = "md"
 
-function Question(props) {
+const Question = ({filePath, answerSize, displaySettings}) => {
     const [question, setQuestion] = useState("");
     const [correction, setCorrection] = useState("");
 
     useEffect(() => {
-        console.debug("Fetching question content for filePath: " + props.filePath)
-        fetch(props.filePath, {
+        console.debug("Fetching question content for filePath: " + filePath)
+        fetch(filePath, {
             // This is needed for local access sadly
             headers: {
                 'Content-Type': 'text',
@@ -42,58 +42,62 @@ function Question(props) {
                     setCorrection('');
                 }
             });
-    }, [props.filePath]);
+    }, [filePath]);
 
     return (
         <div className="question no-break-inside d-block rounded mb-3 p-2">
             <div class="question-content">
-                <ReactMarkdown
-                    children={question}
-                    transformImageUri={uri =>
-                        `${transformImageURI(uri, props.filePath)}`}
-                    components={{
-                        h1: ({ node, ...props }) => <h6 {...props} />,
-                        img: ({ node, ...props }) => <img class="img-fluid" {...props} />,
-                        table: ({ node, ...props }) => <table class="table table-sm table-borderless table-responsive" {...props} />
-                    }}
-                    remarkPlugins={[remarkGfm]}
-                    rehypePlugins={[rehypeRaw]} />
+                <Markdown content={question} filePath={filePath} />
             </div>
-            { props.displayCorrection ?
-                <div class="question-correction">
-                    <ReactMarkdown
-                        children={correction}
-                        transformImageUri={uri =>
-                            `${transformImageURI(uri, props.filePath)}`}
-                        components={{
-                            h1: ({ node, ...props }) => <h6 class="text-primary" {...props} />,
-                            img: ({ node, ...props }) => <img class="img-fluid" {...props} />,
-                            table: ({ node, ...props }) => <table class="table table-sm" {...props} />
-                        }}
-                        remarkPlugins={[remarkGfm]}
-                        rehypePlugins={[rehypeRaw]} // This is OK as we can totally trust the Markdown
-                    />
-                </div>
-                : <div class="question-answer"><AnswerLines answerSize={props.answerSize} /></div>
-            }
+            <Answer correction={correction} filePath={filePath} answerSize={answerSize} displaySettings={displaySettings} />
         </div>
     )
 }
 
-function AnswerLines(props) {
-    var answerLines = ANSWER_LINES_BY_SIZE[DEFAULT_ANSWER_SIZE];
 
-    if (props.answerSize !== undefined && props.answerSize in ANSWER_LINES_BY_SIZE) {
-        answerLines = ANSWER_LINES_BY_SIZE[props.answerSize];
+const Answer = ({correction, filePath, answerSize, displaySettings}) => {
+    if (displaySettings.displayCorrection) {
+        return(
+            <div class="question-correction">
+                <Markdown content={correction} filePath={filePath} />
+            </div>
+        )
     }
+    else if (displaySettings.displayAnswerSpace) {
+        return (
+            <div class="question-answer">
+                <AnswerLines answerSize={answerSize} />
+            </div>
+        )
+    }
+}
+
+
+const Markdown = ({content, filePath}) => (
+    <ReactMarkdown
+        children={content}
+        transformImageUri={uri =>
+            `${transformImageURI(uri, filePath)}`}
+        components={{
+            h1: ({ node, ...props }) => <h6 {...props} />,
+            img: ({ node, ...props }) => <img class="img-fluid" {...props} />,
+            table: ({ node, ...props }) => <table class="table table-sm table-borderless table-responsive" {...props} />
+        }}
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeRaw]} // This is OK as we can totally trust the Markdown 
+    />
+)
+
+const AnswerLines = ({answerSize}) => {
+    if (answerSize !== undefined && answerSize in ANSWER_LINES_BY_SIZE)
+        var answerLines = ANSWER_LINES_BY_SIZE[answerSize];
+    else
+        var answerLines = ANSWER_LINES_BY_SIZE[DEFAULT_ANSWER_SIZE]
 
     return (
         <>
             <div class="print-only">
                 {[...Array(answerLines)].map(() => <br />)}
-            </div>
-            <div class="no-print">
-                <br/>
             </div>
         </>
     )

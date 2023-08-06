@@ -16,7 +16,9 @@ function QuestionsDatabaseDisplay(props) {
     const [evaluationStructure, setEvaluationStructure] = useState({})
     const [questions, setQuestions] = useState([])
 
-    const [displayCorrection, setDisplayCorrection] = useState(false)
+    const [displaySettings, setDisplaySettings] = useState({
+        displayCorrection: false
+    })
 
     const handleSupportChange = (event) => {
         setSupport(event.target.value)
@@ -32,16 +34,18 @@ function QuestionsDatabaseDisplay(props) {
     }
 
     const toggleDisplayCorrection = (event) => {
-        setDisplayCorrection(!displayCorrection)
+        console.info("Switching correction display");
+        setDisplaySettings({...displaySettings, displayCorrection: !displaySettings.displayCorrection});
     }
 
     useEffect(() => {
         const evaluationStructureMaker = new EvaluationStructureMaker();
 
         const getEvaluationStructure = async () => {
+            //On génère une évaluation complète par défaut avec toutes les catégories
             console.debug("Creating new evaluation from evaluationStructureMaker");
             let evalStructure = await evaluationStructureMaker
-                .generateStructure({ support: support, length: length });
+                .generateStructure({ support: support, length: length }); 
 
             setEvaluationStructure(evalStructure)
             //On met la première catégorie comme sélectionnée
@@ -99,7 +103,7 @@ function QuestionsDatabaseDisplay(props) {
                                 onChange={toggleDisplayCorrection}
                                 id="toggleCorrection"
                                 label="Afficher la correction"
-                                checked={displayCorrection}
+                                checked={displaySettings.displayCorrection}
                                 className="btn-md"
                                 />
                             </Form>
@@ -114,7 +118,7 @@ function QuestionsDatabaseDisplay(props) {
                                 <Question
                                     filePath={process.env.PUBLIC_URL + "/questions/" + question.fileName}
                                     answerSize={question.answerSize}
-                                    displayCorrection={displayCorrection}
+                                    displaySettings={displaySettings}
                                 />
                            ))
                         }
