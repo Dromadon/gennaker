@@ -102,9 +102,40 @@ npx wrangler secret put ADMIN_PASSWORD_HASH
 npx wrangler secret put ADMIN_SESSION_SECRET
 ```
 
+### Connecter le repo GitHub à Cloudflare Pages
+
+Dans le dashboard Cloudflare → Workers & Pages → Create → connecter le repo GitHub `Dromadon/gennaker`.
+
+Paramètres de build :
+
+| Champ | Valeur |
+|-------|--------|
+| Build command | `npm run build` |
+| Deploy command | `npx wrangler pages deploy .svelte-kit/cloudflare --project-name gennaker` |
+| Node.js version | `22` |
+
+**Créer un token API pour le deploy**
+
+Le deploy command (`wrangler pages deploy`) tourne dans le pipeline de build et a besoin d'un token Cloudflare avec les bonnes permissions.
+
+1. Dashboard → Profile → API Tokens → Create Token → Custom token
+2. Permissions à cocher :
+   - `Cloudflare Pages` → **Edit**
+   - `Workers Scripts` → **Edit**
+   - `Account Settings` → **Read**
+3. Copier le token généré
+
+**Injecter le token dans le projet**
+
+Dans le projet Gennaker → Settings → Environment variables → ajouter :
+
+- Nom : `CLOUDFLARE_API_TOKEN`
+- Valeur : le token créé ci-dessus
+- Environnement : **Build** (pas Runtime — le token est utilisé pendant le deploy command, pas à l'exécution)
+
 ### Déploiement continu
 
-Automatique via Cloudflare Pages Git integration à chaque push sur `main`.
+Automatique à chaque push sur `main` via la Git integration.
 
 Pour appliquer de nouvelles migrations de schéma :
 
