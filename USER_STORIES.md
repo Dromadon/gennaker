@@ -122,8 +122,6 @@ Ces tâches ne sont pas des user stories mais sont des prérequis bloquants.
 - Les questions tirées respectent les supports applicables
 - Si la banque ne contient qu'une seule question dans la section, un message l'indique et aucun re-tirage n'est effectué
 
-**Hors périmètre**
-- Exclusion des questions déjà présentes dans d'autres slots
 
 ---
 
