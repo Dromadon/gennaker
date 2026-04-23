@@ -11,12 +11,10 @@
  *   npx tsx scripts/migrate-images.ts --local
  *   npx tsx scripts/migrate-images.ts --remote
  *
- * Après --local, régénérer le seed avec les URLs absolues :
- *   IMAGES_BASE_URL=/questions-images npx tsx scripts/migrate-content.ts
- *   npx wrangler d1 execute gennaker --local --file scripts/seed.sql
+ * Après --local, régénérer le seed : npm run db:seed:local
  */
 
-import { copyFileSync, mkdirSync, existsSync, readdirSync } from 'fs'
+import { copyFileSync, mkdirSync, readdirSync } from 'fs'
 import { dirname, join, relative, resolve } from 'path'
 import { execSync } from 'child_process'
 
@@ -64,9 +62,7 @@ if (mode === '--local') {
 	}
 	console.log(`✓ ${copied} images copiées dans static/questions-images/`)
 	console.log()
-	console.log('Régénérer le seed avec les URLs locales :')
-	console.log('  IMAGES_BASE_URL=/questions-images npx tsx scripts/migrate-content.ts')
-	console.log('  npx wrangler d1 execute gennaker --local --file scripts/seed.sql')
+	console.log('Régénérer le seed : npm run db:seed:local')
 }
 
 if (mode === '--remote') {
@@ -75,7 +71,7 @@ if (mode === '--remote') {
 	for (const imgPath of allImages) {
 		const r2Key = relative(ARCHIVE_QUESTIONS, imgPath)
 		try {
-			execSync(`npx wrangler r2 object put "${R2_BUCKET}/${r2Key}" --file "${imgPath}"`, {
+			execSync(`npx wrangler r2 object put "${R2_BUCKET}/${r2Key}" --file "${imgPath}" --remote`, {
 				stdio: 'pipe'
 			})
 			uploaded++
@@ -88,6 +84,5 @@ if (mode === '--remote') {
 	console.log(`\n✓ ${uploaded} images uploadées vers R2 (${failed} échecs)`)
 	console.log()
 	console.log('Régénérer le seed avec les URLs R2 :')
-	console.log('  IMAGES_BASE_URL=<votre_r2_public_url> npx tsx scripts/migrate-content.ts')
-	console.log('  npx wrangler d1 execute gennaker --remote --file scripts/seed.sql')
+	console.log('  npm run db:seed:remote')
 }
