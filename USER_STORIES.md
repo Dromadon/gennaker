@@ -10,18 +10,18 @@ Le MVP couvre le flux principal : générer une évaluation, la consulter, la mo
 
 Ces tâches ne sont pas des user stories mais sont des prérequis bloquants.
 
-| # | Tâche |
-|---|-------|
-| T1 | Initialiser le projet SvelteKit avec `@sveltejs/adapter-cloudflare`, Tailwind CSS, TypeScript |
-| T2 | Configurer Cloudflare D1, écrire le schéma Drizzle (SQLite dialect), générer les migrations |
-| T3 | Écrire et exécuter `scripts/migrate-content.ts` : importer les 146 questions et 9 templates depuis `archive/` vers D1 |
-| T4 | Configurer Cloudflare R2 et migrer les images existantes |
+| # | Tâche | |
+|---|-------|---|
+| T1 | Initialiser le projet SvelteKit avec `@sveltejs/adapter-cloudflare`, Tailwind CSS, TypeScript | ✅ |
+| T2 | Configurer Cloudflare D1, écrire le schéma Drizzle (SQLite dialect), générer les migrations | ✅ |
+| T3 | Écrire et exécuter `scripts/migrate-content.ts` : importer les 146 questions et 9 templates depuis `archive/` vers D1 | ✅ |
+| T4 | Configurer Cloudflare R2 et migrer les images existantes | ✅ |
 
 ---
 
 ## Epic 1 — Génération d'une évaluation
 
-### US-01 — Choisir un support et un format
+### US-01 ✅ — Choisir un support et un format
 
 **En tant que** stagiaire ou formateur,  
 **je veux** choisir un support (dériveur, catamaran, windsurf) et un format (standard, raccourcie, positionnement),  
@@ -39,7 +39,7 @@ Ces tâches ne sont pas des user stories mais sont des prérequis bloquants.
 
 ---
 
-### US-02 — Afficher l'évaluation générée
+### US-02 ✅ — Afficher l'évaluation générée
 
 **En tant que** stagiaire ou formateur,  
 **je veux** voir les questions tirées aléatoirement, organisées par catégorie et section,  
@@ -60,7 +60,7 @@ Ces tâches ne sont pas des user stories mais sont des prérequis bloquants.
 
 ---
 
-### US-03 — Afficher et masquer la correction
+### US-03 ✅ — Afficher et masquer la correction
 
 **En tant que** stagiaire ou formateur,  
 **je veux** afficher ou masquer la correction de toutes les questions en un clic,  
@@ -74,7 +74,7 @@ Ces tâches ne sont pas des user stories mais sont des prérequis bloquants.
 
 ---
 
-### US-04 — Masquer les titres de catégories et/ou de sections à l'impression
+### US-04 ✅ — Masquer les titres de catégories et/ou de sections à l'impression
 
 **En tant que** formateur,  
 **je veux** choisir de masquer les titres de catégories, les titres de sections, ou les deux lors de l'impression,  
@@ -146,7 +146,7 @@ Ces tâches ne sont pas des user stories mais sont des prérequis bloquants.
 
 ## Epic 3 — Impression
 
-### US-08 — Imprimer l'évaluation
+### US-08 ✅ — Imprimer l'évaluation
 
 **En tant que** formateur,  
 **je veux** imprimer l'évaluation dans un format propre, sans coupure au milieu d'une question,  
