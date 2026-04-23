@@ -1,0 +1,23 @@
+name = "gennaker"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".svelte-kit/cloudflare"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "gennaker"
+database_id = "12658bfb-4283-4351-874f-746c4dc3b564"
+migrations_dir = "drizzle/migrations"
+
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "gennaker-questions"
+
+[vars]
+R2_PUBLIC_URL = "https://pub-0e064f00c5ed41ab8c84f152a44329c8.r2.dev"
+ADMIN_EMAIL = ""
+RESEND_API_KEY = ""
+
+# Secrets (via `wrangler secret put`) :
+# ADMIN_PASSWORD_HASH
+# ADMIN_SESSION_SECRET

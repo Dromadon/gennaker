@@ -1,66 +1,54 @@
 {
-  "name": "gennaker",
-  "version": "0.1.0",
-  "homepage": "https://gennaker.bzh",
-  "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.3.0",
-    "@testing-library/user-event": "^14.2.0",
-    "babel-jest": "^28.1.0",
-    "bootstrap": "^5.1.3",
-    "bootstrap-icons": "^1.8.3",
-    "npm-check-updates": "^13.0.3",
-    "react": "^18.1.0",
-    "react-bootstrap": "^2.4.0",
-    "react-dom": "^18.1.0",
-    "react-markdown": "^8.0.3",
-    "react-router-bootstrap": "^0.26.1",
-    "react-router-dom": "^6.3.0",
-    "react-router-hash-link": "^2.4.3",
-    "react-script": "^2.0.5",
-    "react-scripts": "^5.0.1",
-    "react-to-print": "^2.14.7",
-    "rehype-raw": "^6.1.1",
-    "remark-gfm": "^3.0.1",
-    "sass": "^1.52.2",
-    "use-immer": "^0.8.1",
-    "web-vitals": "^2.1.4"
-  },
-  "scripts": {
-    "predeploy": "npm run build",
-    "deploy": "node ./node_modules/gh-pages/bin/gh-pages.js -d build && ./deploy_404.sh",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!@toolz/allow-react)/\" --env=jsdom",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "devDependencies": {
-    "colors": "^1.4.0",
-    "gh-pages": "^4.0.0",
-    "jest-fetch-mock": "^3.0.3",
-    "node-dir": "^0.1.17",
-    "prompt-sync": "^4.2.0"
-  },
-  "jest": {
-    "resetMocks": false
-  }
+	"name": "gennaker",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"dev:cf": "npm run build && wrangler pages dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:int": "vitest run --config vitest.int.config.ts",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate:local": "wrangler d1 migrations apply gennaker --local",
+		"db:migrate:remote": "wrangler d1 migrations apply gennaker --remote",
+		"db:seed:generate:local": "tsx scripts/migrate-content.ts --local",
+		"db:seed:generate:remote": "tsx scripts/migrate-content.ts --remote",
+		"db:seed:local": "npm run db:seed:generate:local && wrangler d1 execute gennaker --local --file scripts/seed.sql",
+		"db:seed:remote": "npm run db:seed:generate:remote && wrangler d1 execute gennaker --remote --file scripts/seed.sql",
+		"images:local": "tsx scripts/migrate-images.ts --local",
+		"images:remote": "tsx scripts/migrate-images.ts --remote"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "^0.14.9",
+		"@cloudflare/workers-types": "^4.20260422.1",
+		"@sveltejs/adapter-auto": "^7.0.1",
+		"@sveltejs/kit": "^2.57.0",
+		"@sveltejs/vite-plugin-svelte": "^7.0.0",
+		"@tailwindcss/vite": "^4.2.4",
+		"@types/bcryptjs": "^2.4.6",
+		"@types/node": "^25.6.0",
+		"drizzle-kit": "^0.31.10",
+		"svelte": "^5.55.2",
+		"svelte-check": "^4.4.6",
+		"tailwindcss": "^4.2.4",
+		"tsx": "^4.21.0",
+		"typescript": "^6.0.2",
+		"vite": "^8.0.7",
+		"vitest": "^4.1.5",
+		"wrangler": "^4.84.1"
+	},
+	"dependencies": {
+		"@sveltejs/adapter-cloudflare": "^7.2.8",
+		"bcryptjs": "^3.0.3",
+		"drizzle-orm": "^0.45.2",
+		"marked": "^18.0.2",
+		"nanoid": "^5.1.9",
+		"zod": "^4.3.6"
+	}
 }

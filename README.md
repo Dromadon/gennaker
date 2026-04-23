@@ -1,70 +1,131 @@
-# Getting Started with Create React App
+# Gennaker
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Application web de génération et d'impression d'évaluations théoriques pour la formation aux brevets fédéraux de voile.
 
-## Available Scripts
+**Stack** : SvelteKit · Cloudflare Workers + D1 + R2 · Drizzle ORM · Tailwind CSS · TypeScript
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## Prérequis
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Node.js 22** — voir `.node-version`. Si tu utilises `fnm` ou `nvm`, la version est automatiquement sélectionnée.
+- **wrangler** (Cloudflare CLI) — installé comme dépendance de développement, accessible via `npx wrangler`.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Installation
 
-### `npm test`
+```bash
+npm install
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Setup local (sans compte Cloudflare)
 
-### `npm run build`
+Le développement local fonctionne entièrement sans compte Cloudflare. La base de données D1 tourne en SQLite local via wrangler.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+# 1. Créer les tables (migration de schéma)
+npm run db:migrate:local
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+# 2. (Optionnel) Avoir des images qui s'affichent
+npm run images:local
+npm run db:seed:local
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+# 3. Lancer le serveur de dev avec D1 (nécessaire pour les routes API)
+npm run dev:cf
+```
 
-### `npm run eject`
+Le serveur tourne sur [http://localhost:8788](http://localhost:8788).
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+> `npm run dev` (Vite seul, port 5173) est disponible pour travailler sur les composants sans D1, mais les routes API retourneront une erreur.
+>
+> **Sans l'étape 2**, les questions sont en base mais les images ne s'affichent pas. C'est acceptable pour travailler sur la logique métier.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Modifier le schéma de base de données
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Éditer [src/lib/server/db/schema.ts](src/lib/server/db/schema.ts) puis :
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+npm run db:generate      # génère un nouveau fichier SQL dans drizzle/migrations/
+npm run db:migrate:local # applique en local
+```
 
-## Learn More
+## Tests
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+npm run test          # tests unitaires (domaine)
+npm run test:watch    # mode watch
+npm run test:int      # tests d'intégration (nécessite wrangler)
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Build
 
-### Code Splitting
+```bash
+npm run build
+npm run preview
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+## Setup production (avec compte Cloudflare)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Première fois
 
-### Making a Progressive Web App
+```bash
+# Créer les ressources Cloudflare
+npx wrangler d1 create gennaker          # copier le database_id dans wrangler.toml
+npx wrangler r2 bucket create gennaker-questions
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+**Activer l'URL publique du bucket R2**
 
-### Advanced Configuration
+Les images doivent être accessibles publiquement depuis le navigateur. Cloudflare R2 propose deux options :
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- **URL `r2.dev` (la plus simple)** — dans le dashboard Cloudflare → R2 → `gennaker-questions` → onglet *Settings* → *Public Access* → *Allow Access*. Une URL de la forme `https://pub-xxxx.r2.dev` est générée. Copier cette URL.
+- **Domaine personnalisé** — dans le même onglet, attacher un sous-domaine (ex. `images.monsite.com`). Recommandé en production car Cloudflare déconseille `r2.dev` pour des usages à fort trafic.
 
-### Deployment
+> L'API S3 compatible de R2 (endpoint `https://<account>.r2.cloudflarestorage.com`) est réservée à l'accès programmatique (upload/download depuis un Worker ou un script). Elle ne sert pas les fichiers publiquement — n'utilise pas cette URL ici.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Renseigner ensuite les variables dans `wrangler.toml` : `R2_PUBLIC_URL` (l'URL obtenue ci-dessus), `ADMIN_EMAIL`, `RESEND_API_KEY`.
 
-### `npm run build` fails to minify
+```bash
+# Appliquer le schéma
+npm run db:migrate:remote
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+# Uploader les images vers R2
+npm run images:remote
+
+# Générer et importer les données (questions + templates)
+# (lit R2_PUBLIC_URL depuis wrangler.toml automatiquement)
+npm run db:seed:remote
+
+# Configurer les secrets
+npx wrangler secret put ADMIN_PASSWORD_HASH
+npx wrangler secret put ADMIN_SESSION_SECRET
+```
+
+### Déploiement continu
+
+Automatique via Cloudflare Pages Git integration à chaque push sur `main`.
+
+Pour appliquer de nouvelles migrations de schéma :
+
+```bash
+npm run db:migrate:remote
+```
+
+---
+
+## Structure du projet
+
+```
+src/
+├── lib/
+│   ├── domain/          # logique métier pure (TypeScript, sans dépendances)
+│   ├── server/
+│   │   └── db/          # schéma Drizzle, connexion D1, requêtes
+│   └── components/      # composants Svelte réutilisables
+└── routes/              # pages et routes API SvelteKit
+drizzle/migrations/      # migrations SQL générées par Drizzle Kit
+scripts/                 # scripts one-shot (migration contenu, images)
+```
+
+Voir [ARCHITECTURE.md](ARCHITECTURE.md) pour l'architecture détaillée et [STANDARDS.md](STANDARDS.md) pour les conventions de code.
