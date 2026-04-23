@@ -74,16 +74,19 @@ Ces tâches ne sont pas des user stories mais sont des prérequis bloquants.
 
 ---
 
-### US-04 — Afficher et masquer les titres de catégories
+### US-04 — Masquer les titres de catégories et/ou de sections à l'impression
 
 **En tant que** formateur,  
-**je veux** masquer les en-têtes de catégories lors de l'impression,  
-**afin de** produire un document plus neutre pour les candidats.
+**je veux** choisir de masquer les titres de catégories, les titres de sections, ou les deux lors de l'impression,  
+**afin de** produire un document plus neutre pour les candidats sans altérer la lisibilité à l'écran.
 
 **Critères d'acceptation**
-- Un toggle "Titres de catégories" est accessible en permanence
-- Quand désactivé, les séparateurs de catégorie disparaissent de la vue et de l'impression
-- L'état par défaut est "affiché"
+- Deux toggles distincts sont accessibles dans le header : "Masquer catégories" et "Masquer sections"
+- Ces toggles n'affectent que l'impression — les titres restent toujours visibles à l'écran
+- Quand "Masquer catégories" est actif, les en-têtes de catégorie n'apparaissent pas à l'impression
+- Quand "Masquer sections" est actif, les titres de section n'apparaissent pas à l'impression
+- Les deux toggles peuvent être combinés
+- L'état par défaut est "affiché" (toggles inactifs)
 
 ---
 

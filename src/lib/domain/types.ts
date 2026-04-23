@@ -1,6 +1,8 @@
 export type Support = 'deriveur' | 'catamaran' | 'windsurf' | 'croisiere'
 export type Format = 'standard' | 'raccourcie' | 'positionnement'
 
+export type AnswerSize = 'xs' | 'sm' | 'md' | 'lg'
+
 export type Question = {
 	id: number
 	sectionId: number
@@ -8,6 +10,7 @@ export type Question = {
 	questionMd: string
 	correctionMd: string
 	applicableSupports: Support[]
+	answerSize: AnswerSize
 }
 
 export type TemplateSlot = {

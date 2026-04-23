@@ -16,7 +16,8 @@ export async function getQuestionsBySection(
 			title: questions.title,
 			questionMd: questions.questionMd,
 			correctionMd: questions.correctionMd,
-			applicableSupports: questions.applicableSupports
+			applicableSupports: questions.applicableSupports,
+			answerSize: questions.answerSize
 		})
 		.from(questions)
 		.where(and(inArray(questions.sectionId, sectionIds), eq(questions.status, 'publie')))
@@ -25,7 +26,8 @@ export async function getQuestionsBySection(
 	for (const row of rows) {
 		const q: Question = {
 			...row,
-			applicableSupports: JSON.parse(row.applicableSupports ?? '[]')
+			applicableSupports: JSON.parse(row.applicableSupports ?? '[]'),
+			answerSize: (row.answerSize ?? 'md') as Question['answerSize']
 		}
 		;(result[q.sectionId] ??= []).push(q)
 	}

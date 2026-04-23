@@ -337,7 +337,30 @@ wrangler d1 migrations apply gennaker --remote
 
 ---
 
-## 9. Migration du contenu existant
+## 9. Impression
+
+L'impression est déclenchée par `window.print()` depuis le bouton "Imprimer" de la page évaluation.
+
+**Nommage du document** : avant d'appeler `window.print()`, le script met `document.title` à `Evaluation-{support}-{format}-{YYYY-MM-DD}`. Le titre est restauré via l'événement `afterprint`.
+
+**Absence de coupure** : chaque article question porte `break-inside: avoid` (classe Tailwind `break-inside-avoid`). Les titres de catégorie et de section restent attachés au premier article qui suit grâce à `break-after: avoid`.
+
+**Espace de réponse** : un `<div>` invisible à l'écran (`hidden print:block`) est inséré sous l'énoncé de chaque question. Sa hauteur est fixée via `style` inline en fonction du champ `answer_size` de la question :
+
+| `answer_size` | Hauteur |
+|---------------|---------|
+| `xs`          | 2 rem   |
+| `sm`          | 4 rem   |
+| `md`          | 6 rem   |
+| `lg`          | 10 rem  |
+
+**Éléments masqués à l'impression** : le header (titre, toggles, bouton imprimer) porte `print:hidden`.
+
+**Correction** : la correction s'imprime si et seulement si le toggle "Afficher la correction" est actif au moment de l'impression — aucune logique spécifique, c'est le même rendu DOM que l'écran.
+
+---
+
+## 10. Migration du contenu existant
 
 Script one-shot `scripts/migrate-content.ts` exécuté via `wrangler d1 execute` ou localement contre D1 remote.
 
@@ -362,7 +385,7 @@ Pour chaque fichier public/evaluations/*.json :
 
 ---
 
-## 10. Variables et secrets
+## 11. Variables et secrets
 
 ### Déclarés dans wrangler.toml (`[vars]`)
 ```
