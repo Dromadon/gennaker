@@ -102,11 +102,13 @@ Ces tâches ne sont pas des user stories mais sont des prérequis bloquants.
 - Sur écran large (≥ 1024px), le panneau est visible en permanence à gauche
 - Sur écran étroit, le panneau est accessible via un bouton flottant (tiroir)
 - Chaque slot affiche : catégorie, section, nombre de questions
-- Le panneau est synchronisé avec l'état courant de l'évaluation
+- Les titres de catégories dans le panneau sont cliquables et font défiler l'évaluation jusqu'à la catégorie correspondante (smooth scroll)
+- Sur mobile, le tiroir se ferme automatiquement lors du clic sur une catégorie
 
 **Hors périmètre**
 - Ajouter / supprimer des slots (post-MVP)
 - Modifier le nombre de questions d'un slot (post-MVP)
+- Synchronisation dynamique du panneau après re-tirage (post US-06/07)
 
 ---
 

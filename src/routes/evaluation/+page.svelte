@@ -72,9 +72,14 @@
 			<!-- Contenu -->
 			<div class="flex-1 overflow-y-auto p-4">
 				{#if desktopTab === 'structure'}
-					{#each slotsByCategory.values() as category}
+					{#each slotsByCategory.entries() as [categoryId, category]}
 						<div class="mb-4">
-							<p class="mb-1 text-sm font-bold text-gray-700">{category.name}</p>
+							<a href="#cat-{categoryId}" class="mb-1 flex items-center justify-between text-sm font-bold text-gray-700 hover:text-gray-900">
+								{category.name}
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+								</svg>
+							</a>
 							{#each category.slots as slot}
 								<div class="flex items-center justify-between py-0.5 pl-2">
 									<span class="text-sm text-gray-600 leading-snug">{slot.sectionDisplayName}</span>
@@ -157,7 +162,7 @@
 					{@const newCategory = !prevSlot || prevSlot.categoryId !== slot.categoryId}
 
 					{#if newCategory}
-						<h2 class="mt-10 mb-4 border-b-2 border-gray-800 pb-1 text-lg font-bold uppercase tracking-wide break-after-avoid print:mt-6 {hideCategoriesOnPrint ? 'print:hidden' : ''}">
+						<h2 id="cat-{slot.categoryId}" class="mt-10 mb-4 border-b-2 border-gray-800 pb-1 text-lg font-bold uppercase tracking-wide break-after-avoid print:mt-6 {hideCategoriesOnPrint ? 'print:hidden' : ''}">
 							{slot.categoryDisplayName}
 						</h2>
 					{/if}
@@ -224,9 +229,18 @@
 
 				<div class="flex-1 overflow-y-auto p-4">
 					{#if activeTab === 'structure'}
-						{#each slotsByCategory.values() as category}
+						{#each slotsByCategory.entries() as [categoryId, category]}
 							<div class="mb-4">
-								<p class="mb-1 text-sm font-bold text-gray-700">{category.name}</p>
+								<a
+									href="#cat-{categoryId}"
+									onclick={() => (panelOpen = false)}
+									class="mb-1 flex items-center justify-between text-sm font-bold text-gray-700 hover:text-gray-900"
+								>
+									{category.name}
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+									</svg>
+								</a>
 								{#each category.slots as slot}
 									<div class="flex items-center justify-between py-0.5 pl-2">
 										<span class="text-sm text-gray-600 leading-snug">{slot.sectionDisplayName}</span>
