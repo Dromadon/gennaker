@@ -1,14 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { drawEvaluation } from './draw'
+import { drawEvaluation, pickReplacement } from './draw'
 import type { EvaluationTemplate, Question } from './types'
 
-const makeQuestion = (id: number, supports: string[] = []): Question => ({
+const makeQuestion = (id: number, supports: string[] = [], sectionId = 1): Question => ({
 	id,
-	sectionId: 1,
+	sectionId,
 	title: `Question ${id}`,
 	questionMd: `Énoncé ${id}`,
 	correctionMd: `Correction ${id}`,
-	applicableSupports: supports as Question['applicableSupports']
+	applicableSupports: supports as Question['applicableSupports'],
+	answerSize: 'md'
 })
 
 const makeTemplate = (questionCount: number): EvaluationTemplate => ({
@@ -91,5 +92,38 @@ describe('drawEvaluation', () => {
 		const ids1 = result1.value.slots[0].questions.map((q) => q.id)
 		const ids2 = result2.value.slots[0].questions.map((q) => q.id)
 		expect(ids1).not.toEqual(ids2)
+	})
+})
+
+describe('pickReplacement', () => {
+	it("exclut les questions dont l'id est dans excludeIds", () => {
+		const pool = [1, 2, 3].map((id) => makeQuestion(id))
+		const result = pickReplacement(pool, [1, 2], 'deriveur')
+		expect(result?.id).toBe(3)
+	})
+
+	it('exclut les questions incompatibles avec le support', () => {
+		const pool = [makeQuestion(1, ['catamaran']), makeQuestion(2, []), makeQuestion(3, ['deriveur'])]
+		const result = pickReplacement(pool, [], 'deriveur')
+		expect(result?.id).not.toBe(1)
+	})
+
+	it('retourne null si aucun candidat disponible', () => {
+		const pool = [makeQuestion(1), makeQuestion(2)]
+		const result = pickReplacement(pool, [1, 2], 'deriveur')
+		expect(result).toBeNull()
+	})
+
+	it('retourne une question valide parmi les candidats', () => {
+		const pool = [1, 2, 3].map((id) => makeQuestion(id))
+		const result = pickReplacement(pool, [1], 'deriveur')
+		expect(result).not.toBeNull()
+		expect([2, 3]).toContain(result!.id)
+	})
+
+	it('accepte les questions avec applicableSupports vide (tous supports)', () => {
+		const pool = [makeQuestion(1, []), makeQuestion(2, ['catamaran'])]
+		const result = pickReplacement(pool, [], 'deriveur')
+		expect(result?.id).toBe(1)
 	})
 })

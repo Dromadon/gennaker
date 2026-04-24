@@ -92,7 +92,7 @@ Ces tâches ne sont pas des user stories mais sont des prérequis bloquants.
 
 ## Epic 2 — Modification de l'évaluation
 
-### US-05 — Voir la structure de l'évaluation dans le panneau latéral
+### US-05 ✅ — Voir la structure de l'évaluation dans le panneau latéral
 
 **En tant que** formateur,  
 **je veux** voir la liste des slots de mon évaluation dans un panneau latéral,  
@@ -112,22 +112,7 @@ Ces tâches ne sont pas des user stories mais sont des prérequis bloquants.
 
 ---
 
-### US-06 — Re-tirer toutes les questions d'une section
-
-**En tant que** stagiaire ou formateur,  
-**je veux** re-tirer aléatoirement l'ensemble des questions d'un slot,  
-**afin d'** obtenir un jeu de questions différent pour cette section.
-
-**Critères d'acceptation**
-- Un bouton "Re-tirer" est disponible par slot dans le panneau latéral
-- Le re-tirage remplace toutes les questions du slot par de nouvelles questions tirées aléatoirement dans la même section
-- Les questions tirées respectent les supports applicables
-- Si la banque ne contient qu'une seule question dans la section, un message l'indique et aucun re-tirage n'est effectué
-
-
----
-
-### US-07 — Re-tirer une question individuelle
+### US-07 ✅ — Re-tirer une question individuelle
 
 **En tant que** stagiaire ou formateur,  
 **je veux** re-tirer une question spécifique dans un slot,  
@@ -224,6 +209,7 @@ Les stories suivantes sont identifiées mais hors scope MVP, classées par prior
 | 2 | Interface admin : CRUD questions (titre, énoncé, correction, supports, difficulté) |
 | 3 | Interface admin : gestion des templates et slots |
 | 4 | Modification de structure : ajouter / supprimer un slot dans une évaluation |
+| 4b | US-06 : Re-tirer toutes les questions d'un slot (bouton par slot dans le panneau latéral) |
 | 5 | Sélection manuelle d'une question dans la banque |
 | 6 | Gestion de la difficulté des questions (annotation + filtre au tirage) |
 | 7 | Questions épinglées et questions par défaut dans les templates |

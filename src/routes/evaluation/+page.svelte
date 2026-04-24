@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
-	import { evaluationStore } from '$lib/stores/evaluation'
+	import { evaluationStore, replaceQuestion } from '$lib/stores/evaluation'
 	import type { EvaluationSlot } from '$lib/domain/types'
 	import { marked } from 'marked'
 
@@ -12,6 +12,10 @@
 	let panelOpen = $state(false)
 	let activeTab = $state<'structure' | 'impression'>('structure')
 	let desktopTab = $state<'structure' | 'impression'>('structure')
+	let redrawingId = $state<number | null>(null)
+	let toastMessage = $state('')
+	let toastVisible = $state(false)
+	let toastTimer: ReturnType<typeof setTimeout> | null = null
 
 	$effect(() => {
 		if (!evaluation) goto('/')
@@ -39,6 +43,38 @@
 		lg: 'height:10rem'
 	}
 
+	function showToast(msg: string) {
+		if (toastTimer) clearTimeout(toastTimer)
+		toastMessage = msg
+		toastVisible = true
+		toastTimer = setTimeout(() => (toastVisible = false), 4000)
+	}
+
+	async function redrawQuestion(slotId: number, questionId: number, sectionId: number) {
+		if (!evaluation || redrawingId !== null) return
+		redrawingId = questionId
+		const slot = evaluation.slots.find((s) => s.slotId === slotId)!
+		const excludeQuestionIds = slot.questions.map((q) => q.id)
+		try {
+			const res = await fetch('/api/evaluation/redraw-question', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ sectionId, excludeQuestionIds, support: evaluation.support })
+			})
+			if (res.status === 422) {
+				showToast('Aucune autre question disponible dans cette section')
+			} else if (res.ok) {
+				replaceQuestion(slotId, questionId, await res.json())
+			} else {
+				showToast('Erreur lors du re-tirage')
+			}
+		} catch {
+			showToast('Erreur réseau')
+		} finally {
+			redrawingId = null
+		}
+	}
+
 	function printEvaluation() {
 		if (!evaluation) return
 		const date = new Date().toISOString().slice(0, 10)
@@ -48,6 +84,17 @@
 		window.print()
 	}
 </script>
+
+{#if toastVisible}
+	<div class="fixed top-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-lg bg-gray-900 px-4 py-3 text-sm text-white shadow-lg print:hidden">
+		<span>{toastMessage}</span>
+		<button onclick={() => (toastVisible = false)} class="text-gray-400 hover:text-white" aria-label="Fermer">
+			<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+			</svg>
+		</button>
+	</div>
+{/if}
 
 {#if evaluation}
 	<div class="flex min-h-screen print:block">
@@ -173,7 +220,18 @@
 						</h3>
 
 						{#each slot.questions as question}
-							<article class="mb-6 break-inside-avoid rounded-lg border border-gray-200 p-5 print:rounded-none print:border-0 print:p-3">
+							<article class="relative mb-6 break-inside-avoid rounded-lg border border-gray-200 p-5 print:rounded-none print:border-0 print:p-3">
+								<button
+									onclick={() => redrawQuestion(slot.slotId, question.id, slot.sectionId)}
+									disabled={redrawingId !== null}
+									class="absolute -top-3 right-4 rounded-md border border-gray-200 bg-white p-1 text-gray-400 shadow-sm transition-colors hover:border-gray-400 hover:text-gray-700 disabled:opacity-40 print:hidden"
+									aria-label="Re-tirer cette question"
+									title="Re-tirer cette question"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 {redrawingId === question.id ? 'animate-spin' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+									</svg>
+								</button>
 								<p class="mb-3 font-medium">{question.title}</p>
 								<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 								<div class="prose prose-sm max-w-none">{@html renderMd(question.questionMd)}</div>

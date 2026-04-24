@@ -1,4 +1,4 @@
-import type { Evaluation, EvaluationTemplate, Question } from './types'
+import type { Evaluation, EvaluationTemplate, Question, Support } from './types'
 
 type Result<T> = { ok: true; value: T } | { ok: false; error: string }
 
@@ -44,4 +44,18 @@ export function drawEvaluation(
 		ok: true,
 		value: { support: template.support, format: template.format, slots }
 	}
+}
+
+export function pickReplacement(
+	pool: Question[],
+	excludeIds: number[],
+	support: Support
+): Question | null {
+	const candidates = pool.filter(
+		(q) =>
+			!excludeIds.includes(q.id) &&
+			(q.applicableSupports.length === 0 || q.applicableSupports.includes(support))
+	)
+	if (candidates.length === 0) return null
+	return candidates[Math.floor(Math.random() * candidates.length)]
 }
