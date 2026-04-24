@@ -16,6 +16,7 @@ Ces tâches ne sont pas des user stories mais sont des prérequis bloquants.
 | T2 | Configurer Cloudflare D1, écrire le schéma Drizzle (SQLite dialect), générer les migrations | ✅ |
 | T3 | Écrire et exécuter `scripts/migrate-content.ts` : importer les 146 questions et 9 templates depuis `archive/` vers D1 | ✅ |
 | T4 | Configurer Cloudflare R2 et migrer les images existantes | ✅ |
+| T5 | Mettre en place l'authentification admin : formulaire login, vérification bcryptjs, cookie de session signé (HttpOnly/Secure), guard `admin/+layout.server.ts`, secrets Wrangler (`ADMIN_PASSWORD_HASH`, `ADMIN_SESSION_SECRET`) | |
 
 ---
 

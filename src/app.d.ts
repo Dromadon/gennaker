@@ -4,7 +4,9 @@
 declare global {
 	namespace App {
 		// interface Error {}
-		// interface Locals {}
+		interface Locals {
+			isAdmin: boolean
+		}
 		// interface PageData {}
 		// interface PageState {}
 		interface Platform {
@@ -14,6 +16,8 @@ declare global {
 				R2_PUBLIC_URL: string
 				ADMIN_EMAIL: string
 				RESEND_API_KEY: string
+				ADMIN_PASSWORD_HASH: string
+				ADMIN_SESSION_SECRET: string
 			}
 		}
 	}

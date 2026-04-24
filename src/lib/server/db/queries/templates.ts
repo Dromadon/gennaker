@@ -3,6 +3,51 @@ import { getDb } from '../index'
 import { categories, evaluationTemplates, sections, templateSlots } from '../schema'
 import type { EvaluationTemplate, Format, Support } from '$lib/domain/types'
 
+export type TemplateExportRow = {
+	id: number
+	supportSlug: string
+	format: string
+	slots: {
+		id: number
+		sectionId: number
+		sectionSlug: string
+		position: number
+		questionCount: number
+		difficultyFilter: string
+		pinnedQuestionId: number | null
+		preferredQuestionIds: string
+	}[]
+}
+
+export async function getAllTemplatesForExport(d1: D1Database): Promise<TemplateExportRow[]> {
+	const db = getDb(d1)
+
+	const templateRows = await db
+		.select({ id: evaluationTemplates.id, supportSlug: evaluationTemplates.supportSlug, format: evaluationTemplates.format })
+		.from(evaluationTemplates)
+
+	const result: TemplateExportRow[] = []
+	for (const t of templateRows) {
+		const slots = await db
+			.select({
+				id: templateSlots.id,
+				sectionId: templateSlots.sectionId,
+				sectionSlug: sections.slug,
+				position: templateSlots.position,
+				questionCount: templateSlots.questionCount,
+				difficultyFilter: templateSlots.difficultyFilter,
+				pinnedQuestionId: templateSlots.pinnedQuestionId,
+				preferredQuestionIds: templateSlots.preferredQuestionIds
+			})
+			.from(templateSlots)
+			.innerJoin(sections, eq(sections.id, templateSlots.sectionId))
+			.where(eq(templateSlots.templateId, t.id))
+			.orderBy(templateSlots.position)
+		result.push({ ...t, slots })
+	}
+	return result
+}
+
 export async function getTemplate(
 	d1: D1Database,
 	support: Support,

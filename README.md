@@ -97,9 +97,34 @@ npm run images:remote
 # (lit R2_PUBLIC_URL depuis wrangler.toml automatiquement)
 npm run db:seed:remote
 
-# Configurer les secrets
+# Configurer les secrets (voir ci-dessous pour générer les valeurs)
 npx wrangler secret put ADMIN_PASSWORD_HASH
 npx wrangler secret put ADMIN_SESSION_SECRET
+```
+
+#### Générer le hash du mot de passe admin
+
+Le mot de passe n'est jamais stocké en clair. Générer le hash bcrypt (cost 12) :
+
+```bash
+node -e "require('bcryptjs').hash('MON_MDP', 12).then(console.log)"
+```
+
+Copier le hash obtenu et le passer à `wrangler secret put ADMIN_PASSWORD_HASH`.
+
+Pour `ADMIN_SESSION_SECRET`, utiliser une chaîne aléatoire longue :
+
+```bash
+openssl rand -hex 32
+```
+
+#### Dev local — fichier `.dev.vars`
+
+Créer un fichier `.dev.vars` à la racine (ignoré par git) pour que les secrets soient disponibles avec `npm run dev:cf` :
+
+```
+ADMIN_PASSWORD_HASH=<hash bcrypt>
+ADMIN_SESSION_SECRET=<chaîne aléatoire>
 ```
 
 ### Connecter le repo GitHub à Cloudflare
