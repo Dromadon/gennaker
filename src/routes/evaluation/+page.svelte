@@ -11,6 +11,7 @@
 	let hideSectionsOnPrint = $state(false)
 	let panelOpen = $state(false)
 	let activeTab = $state<'structure' | 'impression'>('structure')
+	let desktopTab = $state<'structure' | 'impression'>('structure')
 
 	$effect(() => {
 		if (!evaluation) goto('/')
@@ -52,19 +53,55 @@
 	<div class="flex min-h-screen print:block">
 
 		<!-- Panel latéral desktop -->
-		<aside class="hidden lg:block w-56 shrink-0 border-r border-gray-200 sticky top-0 h-screen overflow-y-auto p-4 print:hidden">
-			<p class="mb-4 text-xs font-semibold uppercase tracking-wide text-gray-400">Structure</p>
-			{#each slotsByCategory.values() as category}
-				<div class="mb-4">
-					<p class="mb-1 text-sm font-bold text-gray-700">{category.name}</p>
-					{#each category.slots as slot}
-						<div class="flex items-center justify-between py-0.5 pl-2">
-							<span class="text-sm text-gray-600 leading-snug">{slot.sectionDisplayName}</span>
-							<span class="ml-2 shrink-0 text-xs text-gray-400">{slot.questions.length} q.</span>
+		<aside class="hidden lg:flex w-56 shrink-0 border-r border-gray-200 sticky top-0 h-screen flex-col print:hidden">
+			<!-- Onglets -->
+			<div class="flex border-b border-gray-200 px-2 pt-3">
+				<button
+					onclick={() => (desktopTab = 'structure')}
+					class="flex-1 rounded-t-md px-2 py-1.5 text-xs font-medium transition-colors {desktopTab === 'structure' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:text-gray-700'}"
+				>
+					Structure
+				</button>
+				<button
+					onclick={() => (desktopTab = 'impression')}
+					class="flex-1 rounded-t-md px-2 py-1.5 text-xs font-medium transition-colors {desktopTab === 'impression' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:text-gray-700'}"
+				>
+					Impression
+				</button>
+			</div>
+			<!-- Contenu -->
+			<div class="flex-1 overflow-y-auto p-4">
+				{#if desktopTab === 'structure'}
+					{#each slotsByCategory.values() as category}
+						<div class="mb-4">
+							<p class="mb-1 text-sm font-bold text-gray-700">{category.name}</p>
+							{#each category.slots as slot}
+								<div class="flex items-center justify-between py-0.5 pl-2">
+									<span class="text-sm text-gray-600 leading-snug">{slot.sectionDisplayName}</span>
+									<span class="ml-2 shrink-0 text-xs text-gray-400">{slot.questions.length} q.</span>
+								</div>
+							{/each}
 						</div>
 					{/each}
-				</div>
-			{/each}
+				{:else}
+					<div class="space-y-4">
+						<label class="flex cursor-pointer items-center justify-between">
+							<span class="text-sm text-gray-700">Masquer catégories</span>
+							<input type="checkbox" bind:checked={hideCategoriesOnPrint} class="h-4 w-4" />
+						</label>
+						<label class="flex cursor-pointer items-center justify-between">
+							<span class="text-sm text-gray-700">Masquer sections</span>
+							<input type="checkbox" bind:checked={hideSectionsOnPrint} class="h-4 w-4" />
+						</label>
+						<button
+							onclick={printEvaluation}
+							class="mt-2 w-full rounded bg-gray-800 py-2.5 text-sm text-white hover:bg-gray-700"
+						>
+							Imprimer
+						</button>
+					</div>
+				{/if}
+			</div>
 		</aside>
 
 		<!-- Contenu principal -->
@@ -99,33 +136,20 @@
 			<div class="mx-auto max-w-3xl px-4 py-10 print:px-0 print:py-0">
 
 				<!-- Header desktop -->
-				<header class="mb-8 hidden lg:block print:hidden">
-					<h1 class="mb-4 text-2xl font-bold capitalize">
+				<header class="mb-8 hidden lg:flex items-center justify-between print:hidden">
+					<h1 class="text-2xl font-bold capitalize">
 						Évaluation {evaluation.support} — {evaluation.format}
 					</h1>
-					<div class="flex flex-wrap items-center justify-between gap-4">
-						<label class="flex cursor-pointer items-center gap-2 text-sm">
-							<input type="checkbox" bind:checked={showCorrection} class="h-4 w-4" />
-							Afficher la correction
-						</label>
-						<div class="flex items-center gap-3 rounded-lg border border-gray-200 px-3 py-2">
-							<span class="text-xs font-semibold uppercase tracking-wide text-gray-400">Impression</span>
-							<label class="flex cursor-pointer items-center gap-2 text-sm">
-								<input type="checkbox" bind:checked={hideCategoriesOnPrint} class="h-4 w-4" />
-								Masquer catégories
-							</label>
-							<label class="flex cursor-pointer items-center gap-2 text-sm">
-								<input type="checkbox" bind:checked={hideSectionsOnPrint} class="h-4 w-4" />
-								Masquer sections
-							</label>
-							<button
-								onclick={printEvaluation}
-								class="rounded bg-gray-800 px-4 py-1 text-sm text-white hover:bg-gray-700"
-							>
-								Imprimer
-							</button>
-						</div>
-					</div>
+					<button
+						onclick={() => (showCorrection = !showCorrection)}
+						class="flex items-center justify-center rounded-md p-1.5 transition-colors {showCorrection ? 'bg-gray-800 text-white' : 'text-gray-500 hover:bg-gray-100'}"
+						aria-label="Afficher la correction"
+						title="Afficher la correction"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+						</svg>
+					</button>
 				</header>
 
 				{#each evaluation.slots as slot, i}
