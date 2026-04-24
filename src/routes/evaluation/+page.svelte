@@ -55,16 +55,16 @@
 		<!-- Panel latéral desktop -->
 		<aside class="hidden lg:flex w-56 shrink-0 border-r border-gray-200 sticky top-0 h-screen flex-col print:hidden">
 			<!-- Onglets -->
-			<div class="flex border-b border-gray-200 px-2 pt-3">
+			<div class="flex border-b border-gray-200 px-2">
 				<button
 					onclick={() => (desktopTab = 'structure')}
-					class="flex-1 rounded-t-md px-2 py-1.5 text-xs font-medium transition-colors {desktopTab === 'structure' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:text-gray-700'}"
+					class="flex-1 px-2 py-3 text-xs font-medium transition-colors border-b-2 {desktopTab === 'structure' ? 'border-gray-800 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700'}"
 				>
 					Structure
 				</button>
 				<button
 					onclick={() => (desktopTab = 'impression')}
-					class="flex-1 rounded-t-md px-2 py-1.5 text-xs font-medium transition-colors {desktopTab === 'impression' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:text-gray-700'}"
+					class="flex-1 px-2 py-3 text-xs font-medium transition-colors border-b-2 {desktopTab === 'impression' ? 'border-gray-800 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700'}"
 				>
 					Impression
 				</button>
@@ -123,13 +123,13 @@
 				</h1>
 				<button
 					onclick={() => (showCorrection = !showCorrection)}
-					class="flex items-center justify-center rounded-md p-1.5 transition-colors {showCorrection ? 'bg-gray-800 text-white' : 'text-gray-500 hover:bg-gray-100'}"
+					class="flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors {showCorrection ? 'border-gray-800 bg-gray-800 text-white' : 'border-gray-200 text-gray-500 hover:bg-gray-50'}"
 					aria-label="Afficher la correction"
-					title="Afficher la correction"
 				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
 					</svg>
+					<span class="hidden sm:inline">Correction</span>
 				</button>
 			</div>
 
@@ -142,13 +142,13 @@
 					</h1>
 					<button
 						onclick={() => (showCorrection = !showCorrection)}
-						class="flex items-center justify-center rounded-md p-1.5 transition-colors {showCorrection ? 'bg-gray-800 text-white' : 'text-gray-500 hover:bg-gray-100'}"
+						class="flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors {showCorrection ? 'border-gray-800 bg-gray-800 text-white' : 'border-gray-200 text-gray-500 hover:bg-gray-50'}"
 						aria-label="Afficher la correction"
-						title="Afficher la correction"
 					>
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
 						</svg>
+						Correction
 					</button>
 				</header>
 
