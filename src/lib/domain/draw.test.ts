@@ -23,6 +23,8 @@ const makeTemplate = (questionCount: number): EvaluationTemplate => ({
 			categoryId: 1,
 			sectionDisplayName: 'Section test',
 			categoryDisplayName: 'Catégorie test',
+			categorySlug: 'test-cat',
+			sectionSlug: 'test-section',
 			position: 1,
 			questionCount
 		}

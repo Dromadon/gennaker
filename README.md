@@ -25,13 +25,17 @@ Le développement local fonctionne entièrement sans compte Cloudflare. La base 
 # 1. Créer les tables (migration de schéma)
 npm run db:migrate:local
 
-# 2. (Optionnel) Avoir des images qui s'affichent
-npm run images:local
+# 2. (Optionnel) Avoir des données et des images qui s'affichent
 npm run db:seed:local
 
 # 3. Lancer le serveur de dev avec D1 (nécessaire pour les routes API)
 npm run dev:cf
 ```
+
+> `npm run db:seed:local` génère le SQL depuis `archive/`, peuple D1, **et** copie les images
+> dans `static/questions-images/{cat}/{sec}/{id}/images/`. Le renderer local résout les URLs
+> relatives (`images/schema.png`) via `R2_PUBLIC_URL=/questions-images` — à ajouter dans
+> `.dev.vars` (voir ci-dessous).
 
 Le serveur tourne sur [http://localhost:8788](http://localhost:8788).
 
@@ -125,6 +129,7 @@ Créer un fichier `.dev.vars` à la racine (ignoré par git) pour que les secret
 ```
 ADMIN_PASSWORD_HASH=<hash bcrypt>
 ADMIN_SESSION_SECRET=<chaîne aléatoire>
+R2_PUBLIC_URL=/questions-images
 ```
 
 ### Connecter le repo GitHub à Cloudflare

@@ -3,45 +3,34 @@
  * Génère scripts/seed.sql à exécuter via wrangler d1 execute.
  *
  * Usage :
- *   npx tsx scripts/migrate-content.ts --local   (images servies depuis /questions-images)
- *   npx tsx scripts/migrate-content.ts --remote  (images servies depuis R2_PUBLIC_URL dans wrangler.toml)
+ *   npx tsx scripts/migrate-content.ts --local   (markdown gardé tel quel + images copiées
+ *                                                  dans static/questions-images/{cat}/{sec}/{id}/images/)
+ *   npx tsx scripts/migrate-content.ts --remote  (markdown gardé tel quel, images dans R2 via migrate-image-urls)
  *   npx tsx scripts/migrate-content.ts           (IMAGES_BASE_URL depuis l'environnement, ou chemins relatifs)
  */
 
-import { readFileSync, readdirSync, existsSync, writeFileSync } from 'fs'
-import { dirname, join, relative, resolve } from 'path'
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs'
+import { join, resolve } from 'path'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const ARCHIVE_QUESTIONS = join(ROOT, 'archive/public/questions')
 const ARCHIVE_EVALUATIONS = join(ROOT, 'archive/public/evaluations')
 const OUTPUT = join(ROOT, 'scripts/seed.sql')
 
-function resolveImagesBaseUrl(): string {
-	const flag = process.argv[2]
-	if (flag === '--local') return '/questions-images'
-	if (flag === '--remote') {
-		const toml = readFileSync(join(ROOT, 'wrangler.toml'), 'utf-8')
-		const match = toml.match(/^R2_PUBLIC_URL\s*=\s*"([^"]+)"/m)
-		if (!match?.[1]) {
-			console.error('Erreur : R2_PUBLIC_URL est vide dans wrangler.toml')
-			process.exit(1)
-		}
-		return match[1]
+const IS_LOCAL = process.argv[2] === '--local'
+const STATIC_IMAGES = join(ROOT, 'static/questions-images')
+
+// Pour --local : copie les images d'une section dans le dossier dédié à la question.
+// Les images restent référencées par images/{fn} dans le markdown ; le renderer local
+// résout via R2_PUBLIC_URL=/questions-images → /questions-images/{cat}/{sec}/{id}/images/{fn}.
+function copyImagesForQuestion(catSlug: string, secSlug: string, secDirPath: string, qId: number) {
+	const imagesDir = join(secDirPath, 'images')
+	if (!existsSync(imagesDir)) return
+	const destDir = join(STATIC_IMAGES, catSlug, secSlug, String(qId), 'images')
+	mkdirSync(destDir, { recursive: true })
+	for (const file of readdirSync(imagesDir)) {
+		copyFileSync(join(imagesDir, file), join(destDir, file))
 	}
-	return process.env.IMAGES_BASE_URL ?? ''
-}
-
-const IMAGES_BASE_URL = resolveImagesBaseUrl()
-
-// Remplace les références relatives images/{file} par des URLs absolues.
-// Si IMAGES_BASE_URL est vide, le markdown est retourné tel quel.
-function resolveImageUrls(markdown: string, mdAbsPath: string): string {
-	if (!IMAGES_BASE_URL) return markdown
-	const mdDir = dirname(mdAbsPath)
-	const relDir = relative(ARCHIVE_QUESTIONS, mdDir)
-	return markdown.replace(/!\[([^\]]*)\]\(images\/([^)]+)\)/g, (_match, alt, filename) => {
-		return `![${alt}](${IMAGES_BASE_URL}/${relDir}/images/${filename})`
-	})
 }
 
 // --- SQL helpers ---
@@ -239,11 +228,10 @@ for (const [catSlug] of Object.entries(categoriesDB)) {
 			const key = `${catSlug}/${secSlug}/${entry.fileName}`
 			questionIds[key] = qId
 
-			const questionMd = resolveImageUrls(parsed.questionMd, mdPath)
-			const correctionMd = resolveImageUrls(parsed.correctionMd, mdPath)
+			if (IS_LOCAL) copyImagesForQuestion(catSlug, secSlug, secDirPath, qId)
 
 			emit(
-				`INSERT OR REPLACE INTO questions (id, section_id, title, question_md, correction_md, difficulty, answer_size, applicable_supports, status, source_md, created_at, updated_at) VALUES (${qId}, ${sectionId}, ${esc(parsed.title)}, ${esc(questionMd)}, ${esc(correctionMd)}, 'moyen', ${esc(answerSize)}, ${esc(applicableSupports)}, 'publie', ${esc(parsed.sourceMd)}, ${now}, ${now});`
+				`INSERT OR REPLACE INTO questions (id, section_id, title, question_md, correction_md, difficulty, answer_size, applicable_supports, status, source_md, created_at, updated_at) VALUES (${qId}, ${sectionId}, ${esc(parsed.title)}, ${esc(parsed.questionMd)}, ${esc(parsed.correctionMd)}, 'moyen', ${esc(answerSize)}, ${esc(applicableSupports)}, 'publie', ${esc(parsed.sourceMd)}, ${now}, ${now});`
 			)
 		}
 	}

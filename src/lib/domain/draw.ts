@@ -36,6 +36,8 @@ export function drawEvaluation(
 			categoryId: slot.categoryId,
 			sectionDisplayName: slot.sectionDisplayName,
 			categoryDisplayName: slot.categoryDisplayName,
+			categorySlug: slot.categorySlug,
+			sectionSlug: slot.sectionSlug,
 			questions: shuffle(pool).slice(0, slot.questionCount)
 		})
 	}

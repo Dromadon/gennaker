@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
-		"dev:cf": "vite build --watch & wrangler dev",
+		"dev:cf": "vite build && (vite build --watch & wrangler dev)",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
@@ -22,7 +22,9 @@
 		"db:seed:local": "npm run db:seed:generate:local && wrangler d1 execute gennaker --local --file scripts/seed.sql",
 		"db:seed:remote": "npm run db:seed:generate:remote && wrangler d1 execute gennaker --remote --file scripts/seed.sql",
 		"images:local": "tsx scripts/migrate-images.ts --local",
-		"images:remote": "tsx scripts/migrate-images.ts --remote"
+		"images:remote": "tsx scripts/migrate-images.ts --remote",
+		"db:migrate-image-urls:local": "tsx scripts/migrate-image-urls.ts --local",
+		"db:migrate-image-urls:remote": "tsx scripts/migrate-image-urls.ts --remote"
 	},
 	"devDependencies": {
 		"@cloudflare/vitest-pool-workers": "^0.14.9",

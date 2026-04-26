@@ -19,6 +19,8 @@ export type TemplateSlot = {
 	categoryId: number
 	sectionDisplayName: string
 	categoryDisplayName: string
+	categorySlug: string
+	sectionSlug: string
 	position: number
 	questionCount: number
 }
@@ -36,6 +38,8 @@ export type EvaluationSlot = {
 	categoryId: number
 	sectionDisplayName: string
 	categoryDisplayName: string
+	categorySlug: string
+	sectionSlug: string
 	questions: Question[]
 }
 

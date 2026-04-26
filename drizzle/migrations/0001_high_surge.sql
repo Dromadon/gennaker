@@ -1,0 +1,1 @@
+ALTER TABLE `question_images` DROP COLUMN `in_correction`;

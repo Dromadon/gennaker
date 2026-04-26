@@ -50,8 +50,7 @@ export const questionImages = sqliteTable('question_images', {
 		.notNull()
 		.references(() => questions.id),
 	filename: text('filename').notNull(),
-	storageUrl: text('storage_url').notNull(),
-	inCorrection: integer('in_correction').notNull().default(0)
+	storageUrl: text('storage_url').notNull()
 });
 
 export const evaluationTemplates = sqliteTable('evaluation_templates', {

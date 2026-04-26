@@ -12,8 +12,7 @@ vi.mock('$lib/server/db/queries/questions', () => ({
 			questionMd: 'Quels sont les signaux de détresse ?',
 			correctionMd: 'Fusées, fumigènes...'
 		}
-	]),
-	getAllImagesForExport: vi.fn().mockResolvedValue([])
+	])
 }))
 
 vi.mock('$lib/server/db/queries/templates', () => ({
@@ -23,8 +22,11 @@ vi.mock('$lib/server/db/queries/templates', () => ({
 }))
 
 const mockR2 = {
-	list: vi.fn().mockResolvedValue({ objects: [] }),
-	get: vi.fn().mockResolvedValue(null)
+	list: vi.fn().mockResolvedValue({
+		objects: [{ key: 'securite/feux/1/images/schema.png' }],
+		truncated: false
+	}),
+	get: vi.fn().mockResolvedValue({ arrayBuffer: () => Promise.resolve(new ArrayBuffer(4)) })
 }
 
 function makeEvent(isAdmin: boolean) {
@@ -53,7 +55,7 @@ describe('GET /admin/export', () => {
 		const zip = unzipSync(new Uint8Array(buf))
 		const keys = Object.keys(zip)
 		expect(keys).toContain('templates.json')
-		expect(keys.some((k) => k.startsWith('questions/'))).toBe(true)
+		expect(keys.some((k) => k.endsWith('.md'))).toBe(true)
 	})
 
 	it('templates.json contient les données mockées', async () => {
@@ -68,9 +70,27 @@ describe('GET /admin/export', () => {
 		const response = await GET(makeEvent(true))
 		const buf = await response.arrayBuffer()
 		const zip = unzipSync(new Uint8Array(buf))
-		const qKey = Object.keys(zip).find((k) => k.startsWith('questions/'))!
+		const qKey = Object.keys(zip).find((k) => k.endsWith('.md'))!
 		const content = new TextDecoder().decode(zip[qKey])
 		expect(content).toContain('Signaux de détresse')
 		expect(content).toContain('# Correction')
+	})
+
+	it('le ZIP contient les images dans un sous-dossier images/', async () => {
+		const response = await GET(makeEvent(true))
+		const buf = await response.arrayBuffer()
+		const zip = unzipSync(new Uint8Array(buf))
+		expect(Object.keys(zip).some((k) => k.includes('/images/') && k.endsWith('.png'))).toBe(true)
+	})
+
+	it("l'image et son markdown sont dans le même répertoire parent", async () => {
+		const response = await GET(makeEvent(true))
+		const buf = await response.arrayBuffer()
+		const zip = unzipSync(new Uint8Array(buf))
+		const imgKey = Object.keys(zip).find((k) => k.endsWith('.png'))!
+		const mdKey = Object.keys(zip).find((k) => k.endsWith('.md'))!
+		const imgDir = imgKey.split('/').slice(0, -2).join('/')
+		const mdDir = mdKey.split('/').slice(0, -1).join('/')
+		expect(imgDir).toBe(mdDir)
 	})
 })

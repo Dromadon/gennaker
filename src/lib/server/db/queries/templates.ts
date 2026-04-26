@@ -72,6 +72,8 @@ export async function getTemplate(
 			categoryId: sections.categoryId,
 			sectionDisplayName: sections.displayName,
 			categoryDisplayName: categories.displayName,
+			categorySlug: categories.slug,
+			sectionSlug: sections.slug,
 			position: templateSlots.position,
 			questionCount: templateSlots.questionCount
 		})
