@@ -28,11 +28,23 @@
 	)
 	let selectedSectionId = $state(question.sectionId ? String(question.sectionId) : '')
 
+	const isEditMode = $derived(!!question.id)
+	let isLocationLocked = $state(isEditMode)
+	let locationDialog: HTMLDialogElement
+
 	const visibleSections = $derived(
 		selectedCategoryId
 			? (categories.find((c) => c.id === Number(selectedCategoryId))?.sections ?? [])
 			: []
 	)
+
+	function toggleLock() {
+		if (isEditMode && isLocationLocked) {
+			locationDialog?.showModal()
+		} else {
+			isLocationLocked = !isLocationLocked
+		}
+	}
 
 	let questionMd = $state(question.questionMd ?? '')
 	let correctionMd = $state(question.correctionMd ?? '')
@@ -57,21 +69,38 @@
 		{#if errors.title}<p class="mt-1 text-xs text-red-600">{errors.title[0]}</p>{/if}
 	</div>
 
-	<!-- Catégorie / Section -->
+	<!-- Catégorie / Section avec verrouillage -->
 	<div class="grid grid-cols-2 gap-4">
 		<div>
 			<label for="category" class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
-			<select
-				id="category"
-				bind:value={selectedCategoryId}
-				onchange={() => { selectedSectionId = '' }}
-				class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-			>
-				<option value="">— choisir —</option>
-				{#each categories as cat}
-					<option value={cat.id}>{cat.displayName}</option>
-				{/each}
-			</select>
+			<div class="flex gap-2">
+				<select
+					id="category"
+					bind:value={selectedCategoryId}
+					onchange={() => { selectedSectionId = '' }}
+					disabled={isLocationLocked}
+					class="flex-1 rounded-md border px-3 py-2 text-sm disabled:opacity-50 {errors.category ? 'border-red-400' : 'border-gray-300'}"
+				>
+					<option value="">— choisir —</option>
+					{#each categories as cat}
+						<option value={cat.id}>{cat.displayName}</option>
+					{/each}
+				</select>
+				{#if isEditMode}
+					<button
+						type="button"
+						onclick={toggleLock}
+						title={isLocationLocked ? 'Cliquer pour éditer la catégorie/section' : 'Cliquer pour verrouiller'}
+						class="flex items-center justify-center w-10 rounded-md border px-2 text-sm hover:bg-gray-50 transition"
+					>
+						{#if isLocationLocked}
+							🔒
+						{:else}
+							🔓
+						{/if}
+					</button>
+				{/if}
+			</div>
 		</div>
 		<div>
 			<label for="sectionId" class="block text-sm font-medium text-gray-700 mb-1">Section</label>
@@ -79,7 +108,7 @@
 				id="sectionId"
 				name="sectionId"
 				bind:value={selectedSectionId}
-				disabled={!selectedCategoryId}
+				disabled={!selectedCategoryId || isLocationLocked}
 				class="w-full rounded-md border px-3 py-2 text-sm disabled:opacity-50 {errors.sectionId ? 'border-red-400' : 'border-gray-300'}"
 			>
 				<option value="">— choisir —</option>
@@ -223,3 +252,35 @@
 		</button>
 	</div>
 </form>
+
+<!-- Dialog changement catégorie/section -->
+{#if isEditMode}
+	<dialog bind:this={locationDialog} class="rounded-lg p-6 shadow-xl backdrop:bg-black/40 max-w-sm w-full">
+		<h2 class="mb-2 text-base font-semibold text-gray-900">Changer la catégorie ou la section ?</h2>
+		<p class="mb-6 text-sm text-gray-500">
+			Vous allez déplacer cette question vers une autre catégorie ou section. Êtes-vous sûr·e ?
+		</p>
+		<div class="flex justify-end gap-3">
+			<button
+				type="button"
+				onclick={() => {
+					locationDialog.close()
+					isLocationLocked = true
+				}}
+				class="rounded-md border px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+			>
+				Annuler
+			</button>
+			<button
+				type="button"
+				onclick={() => {
+					locationDialog.close()
+					isLocationLocked = false
+				}}
+				class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+			>
+				Oui, déverrouiller
+			</button>
+		</div>
+	</dialog>
+{/if}

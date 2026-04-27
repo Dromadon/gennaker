@@ -229,6 +229,7 @@ Les stories suivantes sont identifiées mais hors scope MVP, classées par prior
 | 1 | Partage d'une évaluation via lien court (short code, expiration 30 jours) |
 | 2a | US-11 : Interface admin — CRUD questions sans images (voir ci-dessous) |
 | 2b | US-12 : Interface admin — Gestion des images dans le CRUD questions (voir ci-dessous) |
+| 2c | US-13 : Sources des questions — affichage et gestion (voir ci-dessous) |
 | 3 | Interface admin : gestion des templates et slots |
 | 4 | Modification de structure : ajouter / supprimer un slot dans une évaluation |
 | 4b | US-06 : Re-tirer toutes les questions d'un slot (bouton par slot dans le panneau latéral) |
@@ -317,3 +318,33 @@ _Clé R2_
 - Recadrage ou redimensionnement d'image dans le browser
 - Gestion de versions d'images
 - Réorganisation des images entre questions
+
+---
+
+### US-13 — Sources des questions — affichage et gestion
+
+**En tant que** administrateur ou lecteur d'une évaluation,  
+**je veux** voir et gérer les sources des questions (auteur, examen d'origine, date, etc.),  
+**afin de** créditer les sources et maintenir la traçabilité du contenu.
+
+**Critères d'acceptation**
+
+_Admin : édition_
+- Le champ source du formulaire d'édition US-11 est renommé de `sourceMd` à `source` et utilise un champ texte simple (pas de markdown)
+- Format libre : "Examen fédéral 2023, question 42" ou "D'après Cousteau, Manuel de voile 1995"
+- Optionnel (peut être vide)
+
+_Affichage public_
+- Sur une question affichée dans une évaluation (`/evaluation`), la source apparaît sous la correction
+  dans une petite zone grisée (footNote style) : `Source : {source}`
+- Invisible si le champ est vide
+- Format : juste du texte, pas de markdown
+
+_Admin : visualisation_
+- Sur la page liste `/admin/questions`, une colonne "Source" affiche un aperçu tronqué (premiers 40 caractères)
+- La source complète est visible au survol (tooltip) ou dans le formulaire d'édition
+
+**Hors périmètre**
+- Parsing de la source (extraction d'auteur, date) — stockage texte libre uniquement
+- Liens hypertextes dans la source — texte brut seulement
+- Historique des sources modifiées
