@@ -28,8 +28,8 @@ npm run db:migrate:local
 # 2. (Optionnel) Avoir des données et des images qui s'affichent
 npm run db:seed:local
 
-# 3. Lancer le serveur de dev avec D1 (nécessaire pour les routes API)
-npm run dev:cf
+# 3. Lancer le serveur de dev
+npm run dev
 ```
 
 > `npm run db:seed:local` génère le SQL depuis `archive/`, peuple D1, **et** copie les images
@@ -37,11 +37,13 @@ npm run dev:cf
 > relatives (`images/schema.png`) via `R2_PUBLIC_URL=/questions-images` — à ajouter dans
 > `.dev.vars` (voir ci-dessous).
 
-Le serveur tourne sur [http://localhost:8788](http://localhost:8788).
+Le serveur tourne sur [http://localhost:5173](http://localhost:5173).
 
-> `npm run dev` (Vite seul, port 5173) est disponible pour travailler sur les composants sans D1, mais les routes API retourneront une erreur.
->
+`npm run dev` utilise `vite dev` avec `platformProxy` (`@sveltejs/adapter-cloudflare`) : les bindings D1, R2 et les variables d'environnement de `.dev.vars` sont injectés automatiquement, et le HMR fonctionne normalement.
+
 > **Sans l'étape 2**, les questions sont en base mais les images ne s'affichent pas. C'est acceptable pour travailler sur la logique métier.
+
+> `npm run dev:cf` (`vite build --watch + wrangler dev`, port 8788) reste disponible pour valider un comportement spécifique au runtime Workers avant de pusher, mais le HMR CSS n'y fonctionne pas — réserver à la validation finale.
 
 ## Modifier le schéma de base de données
 
@@ -124,7 +126,7 @@ openssl rand -hex 32
 
 #### Dev local — fichier `.dev.vars`
 
-Créer un fichier `.dev.vars` à la racine (ignoré par git) pour que les secrets soient disponibles avec `npm run dev:cf` :
+Créer un fichier `.dev.vars` à la racine (ignoré par git) pour que les secrets soient disponibles avec `npm run dev` (et `npm run dev:cf`) :
 
 ```
 ADMIN_PASSWORD_HASH=<hash bcrypt>
