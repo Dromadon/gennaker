@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte'
 	import { marked } from 'marked'
 	import type { CategoryWithSections, QuestionAdminDetail } from '$lib/domain/types'
 
@@ -19,18 +20,31 @@
 		{ value: 'publie', label: 'Publié' }
 	]
 
-	let selectedCategoryId = $state(
-		question.sectionId
+	// Capture all original values once at mount — intentionally not reactive.
+	const orig = untrack(() => ({
+		isEditMode: !!question.id,
+		categoryId: question.sectionId
 			? String(
 					categories.find((c) => c.sections.some((s) => s.id === question.sectionId))?.id ?? ''
 				)
-			: ''
-	)
-	let selectedSectionId = $state(question.sectionId ? String(question.sectionId) : '')
+			: '',
+		sectionId: question.sectionId ? String(question.sectionId) : '',
+		title: question.title ?? '',
+		difficulty: question.difficulty ?? difficulties[0],
+		answerSize: question.answerSize ?? answerSizes[0],
+		status: question.status ?? statuses[0].value,
+		applicableSupports: [...(question.applicableSupports ?? [])],
+		questionMd: question.questionMd ?? '',
+		correctionMd: question.correctionMd ?? '',
+		sourceMd: question.sourceMd ?? ''
+	}))
 
-	const isEditMode = $derived(!!question.id)
-	let isLocationLocked = $state(isEditMode)
-	let locationDialog: HTMLDialogElement
+	let selectedCategoryId = $state(orig.categoryId)
+	let selectedSectionId = $state(orig.sectionId)
+
+	const isEditMode = orig.isEditMode
+	let isLocationLocked = $state(orig.isEditMode)
+	let locationDialog = $state<HTMLDialogElement | undefined>()
 
 	const visibleSections = $derived(
 		selectedCategoryId
@@ -46,8 +60,43 @@
 		}
 	}
 
-	let questionMd = $state(question.questionMd ?? '')
-	let correctionMd = $state(question.correctionMd ?? '')
+	let title = $state(orig.title)
+	let difficulty = $state(orig.difficulty)
+	let answerSize = $state(orig.answerSize)
+	let status = $state(orig.status)
+	let applicableSupports = $state<string[]>(orig.applicableSupports)
+	let questionMd = $state(orig.questionMd)
+	let correctionMd = $state(orig.correctionMd)
+	let sourceMd = $state(orig.sourceMd)
+
+	const dirty = $derived(
+		isEditMode
+			? {
+					title: title !== orig.title,
+					location: selectedSectionId !== orig.sectionId || selectedCategoryId !== orig.categoryId,
+					difficulty: difficulty !== orig.difficulty,
+					answerSize: answerSize !== orig.answerSize,
+					status: status !== orig.status,
+					applicableSupports:
+						[...applicableSupports].sort().join() !== [...orig.applicableSupports].sort().join(),
+					questionMd: questionMd !== orig.questionMd,
+					correctionMd: correctionMd !== orig.correctionMd,
+					sourceMd: sourceMd !== orig.sourceMd
+				}
+			: null
+	)
+
+	const BAR = 'border-yellow-400'
+
+	const border = $derived({
+		title:      errors.title      ? 'border-red-400' : '',
+		category:   errors.category   ? 'border-red-400' : '',
+		sectionId:  errors.sectionId  ? 'border-red-400' : '',
+		difficulty: errors.difficulty ? 'border-red-400' : '',
+		answerSize: errors.answerSize ? 'border-red-400' : '',
+		status:     errors.status     ? 'border-red-400' : '',
+		sourceMd:   errors.sourceMd   ? 'border-red-400' : '',
+	})
 
 	const questionPreview = $derived(marked.parse(questionMd || '') as string)
 	const correctionPreview = $derived(marked.parse(correctionMd || '') as string)
@@ -57,20 +106,20 @@
 
 <form method="POST" {action} class="space-y-6">
 	<!-- Titre -->
-	<div>
+	<div class="border-l-2 pl-2 transition {dirty?.title ? BAR : 'border-transparent'}">
 		<label for="title" class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
 		<input
 			id="title"
 			name="title"
 			type="text"
-			value={question.title ?? ''}
-			class="w-full rounded-md border px-3 py-2 text-sm {errors.title ? 'border-red-400' : 'border-gray-300'}"
+			bind:value={title}
+			class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm transition {border.title}"
 		/>
 		{#if errors.title}<p class="mt-1 text-xs text-red-600">{errors.title[0]}</p>{/if}
 	</div>
 
 	<!-- Catégorie / Section avec verrouillage -->
-	<div class="flex gap-3 items-start">
+	<div class="flex gap-3 items-start border-l-2 pl-2 transition {dirty?.location ? BAR : 'border-transparent'}">
 		<div class="flex-1">
 			<label for="category" class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
 			<select
@@ -78,7 +127,7 @@
 				bind:value={selectedCategoryId}
 				onchange={() => { selectedSectionId = '' }}
 				disabled={isLocationLocked}
-				class="w-full rounded-md border px-3 py-2 text-sm transition {isLocationLocked ? 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed' : errors.category ? 'border-red-400' : 'border-gray-300'}"
+				class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm transition {isLocationLocked ? 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed' : border.category}"
 			>
 				<option value="">— choisir —</option>
 				{#each categories as cat}
@@ -90,16 +139,19 @@
 			<label for="sectionId" class="block text-sm font-medium text-gray-700 mb-1">Section</label>
 			<select
 				id="sectionId"
-				name="sectionId"
+				name={isLocationLocked ? undefined : 'sectionId'}
 				bind:value={selectedSectionId}
 				disabled={!selectedCategoryId || isLocationLocked}
-				class="w-full rounded-md border px-3 py-2 text-sm transition {isLocationLocked ? 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed' : errors.sectionId ? 'border-red-400' : 'border-gray-300'}"
+				class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm transition {isLocationLocked ? 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed' : border.sectionId}"
 			>
 				<option value="">— choisir —</option>
 				{#each visibleSections as sec}
 					<option value={String(sec.id)}>{sec.displayName}</option>
 				{/each}
 			</select>
+			{#if isLocationLocked}
+				<input type="hidden" name="sectionId" value={selectedSectionId} />
+			{/if}
 			{#if errors.sectionId}<p class="mt-1 text-xs text-red-600">{errors.sectionId[0]}</p>{/if}
 		</div>
 		{#if isEditMode}
@@ -118,46 +170,49 @@
 
 	<!-- Difficulté / Answer size / Status -->
 	<div class="grid grid-cols-3 gap-4">
-		<div>
+		<div class="border-l-2 pl-2 transition {dirty?.difficulty ? BAR : 'border-transparent'}">
 			<label for="difficulty" class="block text-sm font-medium text-gray-700 mb-1">Difficulté</label>
 			<select
 				id="difficulty"
 				name="difficulty"
-				class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+				bind:value={difficulty}
+				class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm transition {border.difficulty}"
 			>
 				{#each difficulties as d}
-					<option value={d} selected={question.difficulty === d}>{d}</option>
+					<option value={d}>{d}</option>
 				{/each}
 			</select>
 		</div>
-		<div>
+		<div class="border-l-2 pl-2 transition {dirty?.answerSize ? BAR : 'border-transparent'}">
 			<label for="answerSize" class="block text-sm font-medium text-gray-700 mb-1">Taille réponse</label>
 			<select
 				id="answerSize"
 				name="answerSize"
-				class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+				bind:value={answerSize}
+				class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm transition {border.answerSize}"
 			>
 				{#each answerSizes as s}
-					<option value={s} selected={question.answerSize === s}>{s}</option>
+					<option value={s}>{s}</option>
 				{/each}
 			</select>
 		</div>
-		<div>
+		<div class="border-l-2 pl-2 transition {dirty?.status ? BAR : 'border-transparent'}">
 			<label for="status" class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
 			<select
 				id="status"
 				name="status"
-				class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+				bind:value={status}
+				class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm transition {border.status}"
 			>
 				{#each statuses as s}
-					<option value={s.value} selected={question.status === s.value}>{s.label}</option>
+					<option value={s.value}>{s.label}</option>
 				{/each}
 			</select>
 		</div>
 	</div>
 
 	<!-- Supports applicables -->
-	<div>
+	<div class="border-l-2 pl-2 transition {dirty?.applicableSupports ? BAR : 'border-transparent'}">
 		<fieldset>
 			<legend class="block text-sm font-medium text-gray-700 mb-2">Supports applicables (vide = tous)</legend>
 			<div class="flex gap-4">
@@ -167,7 +222,14 @@
 							type="checkbox"
 							name="applicableSupports"
 							value={s}
-							checked={question.applicableSupports?.includes(s) ?? false}
+							checked={applicableSupports.includes(s)}
+							onchange={(e) => {
+								if (e.currentTarget.checked) {
+									applicableSupports = [...applicableSupports, s]
+								} else {
+									applicableSupports = applicableSupports.filter((x) => x !== s)
+								}
+							}}
 						/>
 						{s}
 					</label>
@@ -177,7 +239,7 @@
 	</div>
 
 	<!-- Éditeur markdown : onglets énoncé / correction -->
-	<div>
+	<div class="border-l-2 pl-2 transition {dirty?.questionMd || dirty?.correctionMd ? BAR : 'border-transparent'}">
 		<div class="flex gap-1 mb-0 border-b border-gray-200">
 			<button
 				type="button"
@@ -196,7 +258,7 @@
 		</div>
 
 		{#if activeTab === 'question'}
-			<div class="grid grid-cols-2 gap-0 border border-gray-200 rounded-b-md rounded-tr-md">
+			<div class="grid grid-cols-2 gap-0 border border-gray-200 rounded-b-md rounded-tr-md transition {errors.questionMd ? 'border-red-400' : ''}">
 				<textarea
 					name="questionMd"
 					bind:value={questionMd}
@@ -210,7 +272,7 @@
 			</div>
 			{#if errors.questionMd}<p class="mt-1 text-xs text-red-600">{errors.questionMd[0]}</p>{/if}
 		{:else}
-			<div class="grid grid-cols-2 gap-0 border border-gray-200 rounded-b-md rounded-tr-md">
+			<div class="grid grid-cols-2 gap-0 border border-gray-200 rounded-b-md rounded-tr-md transition {errors.correctionMd ? 'border-red-400' : ''}">
 				<textarea
 					name="correctionMd"
 					bind:value={correctionMd}
@@ -226,14 +288,14 @@
 	</div>
 
 	<!-- Source -->
-	<div>
+	<div class="border-l-2 pl-2 transition {dirty?.sourceMd ? BAR : 'border-transparent'}">
 		<label for="sourceMd" class="block text-sm font-medium text-gray-700 mb-1">Source (optionnel)</label>
 		<input
 			id="sourceMd"
 			name="sourceMd"
 			type="text"
-			value={question.sourceMd ?? ''}
-			class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+			bind:value={sourceMd}
+			class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm transition {border.sourceMd}"
 		/>
 	</div>
 
@@ -260,7 +322,7 @@
 			<button
 				type="button"
 				onclick={() => {
-					locationDialog.close()
+					locationDialog?.close()
 					isLocationLocked = true
 				}}
 				class="rounded-md border px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
@@ -270,7 +332,7 @@
 			<button
 				type="button"
 				onclick={() => {
-					locationDialog.close()
+					locationDialog?.close()
 					isLocationLocked = false
 				}}
 				class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
