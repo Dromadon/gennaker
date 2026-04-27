@@ -227,7 +227,8 @@ Les stories suivantes sont identifiées mais hors scope MVP, classées par prior
 | Priorité | Story |
 |----------|-------|
 | 1 | Partage d'une évaluation via lien court (short code, expiration 30 jours) |
-| 2 | Interface admin : CRUD questions (titre, énoncé, correction, supports, difficulté) |
+| 2a | US-11 : Interface admin — CRUD questions sans images (voir ci-dessous) |
+| 2b | US-12 : Interface admin — Gestion des images dans le CRUD questions (voir ci-dessous) |
 | 3 | Interface admin : gestion des templates et slots |
 | 4 | Modification de structure : ajouter / supprimer un slot dans une évaluation |
 | 4b | US-06 : Re-tirer toutes les questions d'un slot (bouton par slot dans le panneau latéral) |
@@ -238,3 +239,81 @@ Les stories suivantes sont identifiées mais hors scope MVP, classées par prior
 | 9 | Soumission communautaire de questions |
 | 10 | Signalement d'un problème sur une question |
 | 11 | Interface admin : modération des soumissions |
+
+---
+
+### US-11 — Interface admin : CRUD questions (sans images)
+
+**En tant que** administrateur,  
+**je veux** lister, créer, modifier et supprimer des questions depuis l'interface admin,  
+**afin de** maintenir la banque de questions sans passer par des scripts SQL.
+
+**Critères d'acceptation**
+
+_Liste_
+- La page `/admin/questions` liste toutes les questions avec : titre, catégorie, section, difficulté, status (brouillon / publié), nombre de supports applicables
+- Des filtres permettent de restreindre la liste : catégorie, section, support applicable, status
+- La liste est paginée (20 questions par page) et triée par catégorie → section → id par défaut
+- Chaque ligne propose des liens directs vers modifier et supprimer
+
+_Création_
+- Le formulaire `/admin/questions/new` expose tous les champs éditables : titre, catégorie/section (sélecteurs liés), difficulté, answer_size, supports applicables (checkboxes), status, source
+- L'énoncé et la correction sont saisis dans deux zones markdown distinctes, chacune avec une preview en temps réel côte à côte (rendu via `createMarkdownRenderer`)
+- La soumission crée la question en D1 avec `created_at` et `updated_at` à l'heure courante
+- En cas d'erreur de validation, les champs sont conservés et les erreurs affichées inline
+
+_Modification_
+- Le formulaire `/admin/questions/{id}/edit` est pré-rempli avec les valeurs actuelles
+- La soumission met à jour la question et rafraîchit `updated_at`
+- Un lien "Voir dans une évaluation" permet de prévisualiser la question hors du formulaire
+
+_Suppression_
+- La suppression est déclenchée depuis la liste ou le formulaire d'édition
+- Une confirmation explicite est demandée (dialog ou page de confirmation)
+- La suppression efface la question de D1 ; les images R2 associées ne sont **pas** touchées par cette story (voir US-12)
+- Si la question est référencée dans `preferred_question_ids` ou comme `pinned_question_id` d'un slot, un avertissement est affiché avant confirmation
+
+**Hors périmètre**
+- Upload, affichage et suppression d'images (voir US-12)
+- Éditeur WYSIWYG avec insertion d'images (voir US-12)
+- Historique des modifications
+- Import en masse
+
+---
+
+### US-12 — Interface admin : gestion des images dans le CRUD questions
+
+**En tant que** administrateur,  
+**je veux** pouvoir uploader, prévisualiser et supprimer les images d'une question directement depuis l'interface d'édition,  
+**afin de** gérer l'intégralité du contenu d'une question sans intervention manuelle sur R2.
+
+**Critères d'acceptation**
+
+_Éditeur_
+- L'éditeur markdown (énoncé et correction) expose un bouton "Insérer une image" qui ouvre un sélecteur de fichier
+- L'image sélectionnée est uploadée immédiatement vers R2 via un endpoint dédié (`POST /admin/questions/{id}/images`) qui utilise le binding R2 du Worker (pas de clé S3)
+- L'upload insère automatiquement la référence `![alt](images/{filename})` à la position du curseur
+- L'image uploadée est visible dans la preview markdown en temps réel (résolution via `createMarkdownRenderer`)
+- Les images déjà associées à la question sont listées dans un panneau latéral avec miniature
+
+_À la création_
+- L'upload d'images n'est disponible qu'après la première sauvegarde (la clé R2 nécessite l'`id` de la question)
+- Un flux alternatif propose : sauvegarder en brouillon → uploader les images → publier
+
+_À la modification_
+- Lors de la sauvegarde, le serveur compare les références `images/{fn}` dans le markdown avant/après
+- Les images déréférencées (absentes du nouveau markdown mais présentes dans `question_images`) sont supprimées de R2 (`r2.delete(key)`) et retirées de `question_images`
+- Si la suppression R2 échoue, la sauvegarde continue ; l'erreur est loguée et remontée en avertissement non bloquant
+
+_À la suppression de la question_
+- Toutes les images R2 associées (listées dans `question_images`) sont supprimées de R2 avant la suppression D1
+- Si une suppression R2 échoue, l'administrateur en est informé et peut forcer la suppression
+
+_Clé R2_
+- Les images sont stockées sous `{categorySlug}/{sectionSlug}/{questionId}/images/{filename}` — même convention que le renderer et l'export ZIP
+- `question_images` est tenu à jour à chaque upload et suppression
+
+**Hors périmètre**
+- Recadrage ou redimensionnement d'image dans le browser
+- Gestion de versions d'images
+- Réorganisation des images entre questions
