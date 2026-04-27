@@ -60,7 +60,7 @@
 	>
 		<option value="">Toutes les catégories</option>
 		{#each data.categories as cat}
-			<option value={cat.id}>{cat.displayName}</option>
+			<option value={String(cat.id)}>{cat.displayName}</option>
 		{/each}
 	</select>
 
