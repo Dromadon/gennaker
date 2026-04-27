@@ -98,6 +98,22 @@
 		sourceMd:   errors.sourceMd   ? 'border-red-400' : '',
 	})
 
+	function reset() {
+		title = orig.title
+		selectedCategoryId = orig.categoryId
+		selectedSectionId = orig.sectionId
+		difficulty = orig.difficulty
+		answerSize = orig.answerSize
+		status = orig.status
+		applicableSupports = [...orig.applicableSupports]
+		questionMd = orig.questionMd
+		correctionMd = orig.correctionMd
+		sourceMd = orig.sourceMd
+		isLocationLocked = true
+	}
+
+	const anyDirty = $derived(dirty !== null && Object.values(dirty).some(Boolean))
+
 	const questionPreview = $derived(marked.parse(questionMd || '') as string)
 	const correctionPreview = $derived(marked.parse(correctionMd || '') as string)
 
@@ -300,8 +316,17 @@
 	</div>
 
 	<!-- Actions -->
-	<div class="flex justify-between pt-2">
-		<a href="/admin/questions" class="text-sm text-gray-500 hover:text-gray-900">← Retour</a>
+	<div class="flex justify-end gap-2 pt-2">
+		{#if isEditMode}
+			<button
+				type="button"
+				onclick={reset}
+				disabled={!anyDirty}
+				class="rounded-md border px-5 py-2 text-sm font-medium transition {anyDirty ? 'border-gray-300 text-gray-600 hover:bg-gray-50' : 'border-gray-200 text-gray-300 cursor-not-allowed'}"
+			>
+				Réinitialiser
+			</button>
+		{/if}
 		<button
 			type="submit"
 			class="rounded-md bg-gray-900 px-5 py-2 text-sm font-medium text-white hover:bg-gray-700"
@@ -313,7 +338,7 @@
 
 <!-- Dialog changement catégorie/section -->
 {#if isEditMode}
-	<dialog bind:this={locationDialog} class="rounded-lg p-6 shadow-xl backdrop:bg-black/40 max-w-sm w-full">
+	<dialog bind:this={locationDialog} class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg p-6 shadow-xl backdrop:bg-black/40 w-full max-w-sm">
 		<h2 class="mb-2 text-base font-semibold text-gray-900">Changer la catégorie ou la section ?</h2>
 		<p class="mb-6 text-sm text-gray-500">
 			Vous allez déplacer cette question vers une autre catégorie ou section. Êtes-vous sûr·e ?

@@ -5,6 +5,7 @@
 	let { data, form }: { data: PageData; form: ActionData } = $props()
 
 	let deleteDialog: HTMLDialogElement
+	let deleteConfirm = $state('')
 </script>
 
 <div class="mb-6 flex items-start justify-between">
@@ -14,7 +15,7 @@
 	</div>
 	<button
 		type="button"
-		onclick={() => deleteDialog.showModal()}
+		onclick={() => { deleteConfirm = ''; deleteDialog.showModal() }}
 		class="rounded-md border border-red-300 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
 	>
 		Supprimer
@@ -41,11 +42,17 @@
 </div>
 
 <!-- Dialog suppression -->
-<dialog bind:this={deleteDialog} class="rounded-lg p-6 shadow-xl backdrop:bg-black/40 max-w-sm w-full">
+<dialog bind:this={deleteDialog} class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg p-6 shadow-xl backdrop:bg-black/40 w-full max-w-sm">
 	<h2 class="mb-2 text-base font-semibold text-gray-900">Supprimer cette question ?</h2>
-	<p class="mb-6 text-sm text-gray-500">
-		La question #{data.question.id} « {data.question.title} » sera définitivement supprimée.
+	<p class="mb-4 text-sm text-gray-500">
+		La question #{data.question.id} « {data.question.title} » sera définitivement supprimée. Tape <strong class="text-gray-700">suppression</strong> pour confirmer.
 	</p>
+	<input
+		type="text"
+		bind:value={deleteConfirm}
+		placeholder="suppression"
+		class="mb-4 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none"
+	/>
 	<div class="flex justify-end gap-3">
 		<button
 			type="button"
@@ -57,7 +64,8 @@
 		<form method="POST" action="?/delete">
 			<button
 				type="submit"
-				class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+				disabled={deleteConfirm !== 'suppression'}
+				class="rounded-md px-4 py-2 text-sm font-medium text-white transition {deleteConfirm === 'suppression' ? 'bg-red-600 hover:bg-red-700' : 'bg-red-200 cursor-not-allowed'}"
 			>
 				Supprimer
 			</button>

@@ -16,7 +16,7 @@
 			</button>
 		</form>
 	</nav>
-	<main class="mx-auto max-w-3xl px-6 py-10">
+	<main class="mx-auto max-w-6xl px-6 py-10">
 		{@render children()}
 	</main>
 </div>
