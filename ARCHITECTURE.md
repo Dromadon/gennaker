@@ -143,13 +143,6 @@ questions: {
   updated_at          integer
 }
 
-question_images: {
-  id            integer PK autoincrement
-  question_id   FK → questions
-  filename      text
-  storage_url   text          -- URL Cloudflare R2
-  in_correction integer       -- 0 | 1
-}
 ```
 
 ### Templates d'évaluation
@@ -284,11 +277,35 @@ Pas de bibliothèque d'authentification externe. Un seul compte admin.
 
 Les images référencées dans le markdown des questions sont stockées dans Cloudflare R2.
 
-- **Nommage** : `questions/{question_id}/{filename}` — stable et prévisible
-- **Upload** : depuis l'interface admin, via le binding R2 natif dans Workers (pas besoin de clés S3)
-- **Référencement** : dans le markdown, les images utilisent des URLs absolues vers le domaine public R2 (`https://pub-xxx.r2.dev/questions/42/image.png`)
-- **Rendu** : le markdown est rendu tel quel — les URLs étant absolues, aucun post-traitement n'est nécessaire
-- **Impression** : les images sont incluses normalement dans le CSS print
+### Convention de référencement
+
+Dans `question_md` et `correction_md`, les images utilisent des **URLs relatives** :
+
+```markdown
+![alt](images/schema.png)
+```
+
+### Clé R2 — mapping déterministe
+
+```
+{categorySlug}/{sectionSlug}/{questionId}/images/{filename}
+```
+
+Exemple : `meteo/carte_meteo/42/images/schema.png`
+
+La clé est entièrement dérivable depuis les données de la question (JOIN `questions → sections → categories`). Il n'existe pas de table catalogue : pour connaître ou supprimer les images d'une question, on parse ses champs markdown et on reconstruit les clés R2.
+
+### Résolution au rendu
+
+`createMarkdownRenderer(questionId, categorySlug, sectionSlug, r2BaseUrl)` (`src/lib/markdown.ts`) transforme `images/{fn}` → `${r2BaseUrl}/{cat}/{sec}/{id}/images/{fn}`. `r2BaseUrl` provient de `platform.env.R2_PUBLIC_URL` (exposé par `src/routes/+layout.server.ts`).
+
+### Upload
+
+Via le binding R2 natif dans Workers (`env.QUESTIONS`) — pas de clés S3. La clé est calculée côté serveur depuis les slugs et l'ID de la question.
+
+### Local
+
+`R2_PUBLIC_URL=/questions-images` dans `.dev.vars`. Les images sont copiées dans `static/questions-images/{cat}/{sec}/{id}/images/` par `npm run db:seed:local` et servies statiquement par Vite.
 
 ---
 

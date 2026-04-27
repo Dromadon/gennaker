@@ -112,11 +112,6 @@ for (const row of rows) {
 			skipCount++
 		}
 
-		// question_images catalog
-		sqlLines.push(
-			`INSERT OR IGNORE INTO question_images (question_id, filename, storage_url) ` +
-				`VALUES (${id}, '${esc(filename)}', '${esc(newR2Key)}');`
-		)
 	}
 
 	// Update markdown: replace absolute URLs with images/{filename}

@@ -44,15 +44,6 @@ export const questions = sqliteTable('questions', {
 	updatedAt: integer('updated_at').notNull()
 });
 
-export const questionImages = sqliteTable('question_images', {
-	id: integer('id').primaryKey({ autoIncrement: true }),
-	questionId: integer('question_id')
-		.notNull()
-		.references(() => questions.id),
-	filename: text('filename').notNull(),
-	storageUrl: text('storage_url').notNull()
-});
-
 export const evaluationTemplates = sqliteTable('evaluation_templates', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
 	supportSlug: text('support_slug')

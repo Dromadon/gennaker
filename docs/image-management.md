@@ -74,26 +74,29 @@ directement dans le ZIP avec la même clé (chemin R2 = chemin ZIP).
 
 ---
 
-## Table `question_images`
+## Mapping R2 déterministe — pas de table catalogue
 
-Catalogue pour le futur admin CRUD. Non utilisée par l'export ZIP ni par le renderer.
+La clé R2 d'une image est entièrement dérivable depuis les données de la question :
 
-```sql
-question_images (
-  id          INTEGER PRIMARY KEY,
-  question_id INTEGER NOT NULL REFERENCES questions(id),
-  filename    TEXT NOT NULL,
-  storage_url TEXT NOT NULL   -- clé R2 : {cat}/{section}/{id}/images/{filename}
-)
 ```
+{categorySlug}/{sectionSlug}/{questionId}/images/{filename}
+```
+
+- `categorySlug` / `sectionSlug` : obtenus par JOIN `questions → sections → categories`
+- `questionId` : clé primaire D1 de la question
+- `filename` : extrait du markdown — chaque `images/{filename}` dans `question_md`
+  ou `correction_md` correspond exactement à une clé R2
+
+Il n'y a donc pas besoin de table catalogue. Pour connaître les images d'une question,
+on parse son markdown. Pour les supprimer, on reconstruit les clés R2 et on appelle
+`r2.delete(key)` pour chacune.
 
 ---
 
 ## Ajouter une image (futur admin CRUD)
 
 1. Upload vers R2 : clé `{cat}/{section}/{questionId}/images/{filename}`
-2. Insérer dans `question_images`
-3. Référencer dans le markdown : `![alt](images/{filename})`
+2. Référencer dans le markdown : `![alt](images/{filename})`
 
 ---
 
@@ -126,7 +129,6 @@ Le script `scripts/migrate-image-urls.ts` :
 1. Requête D1 avec JOIN pour obtenir `id`, `category_slug`, `section_slug` et les markdowns
 2. Pour chaque URL absolue trouvée (`https://pub-xxx.r2.dev/{cat}/{section}/images/{fn}`) :
    - Upload depuis `archive/public/questions/{cat}/{section}/images/{fn}` vers la nouvelle clé R2
-   - Insère dans `question_images`
    - Remplace dans le markdown par `images/{fn}`
 3. Exécute les `UPDATE` SQL sur D1
 

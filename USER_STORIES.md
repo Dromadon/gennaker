@@ -259,7 +259,7 @@ _Liste_
 _Création_
 - Le formulaire `/admin/questions/new` expose tous les champs éditables : titre, catégorie/section (sélecteurs liés), difficulté, answer_size, supports applicables (checkboxes), status, source
 - L'énoncé et la correction sont saisis dans deux zones markdown distinctes, chacune avec une preview en temps réel côte à côte (rendu via `createMarkdownRenderer`)
-- La soumission crée la question en D1 avec `created_at` et `updated_at` à l'heure courante
+- La soumission crée la question en D1 avec `created_at` et `updated_at` à l'heure courante, et en statut brouillon
 - En cas d'erreur de validation, les champs sont conservés et les erreurs affichées inline
 
 _Modification_
@@ -269,16 +269,16 @@ _Modification_
 
 _Suppression_
 - La suppression est déclenchée depuis la liste ou le formulaire d'édition
-- Une confirmation explicite est demandée (dialog ou page de confirmation)
+- Une confirmation explicite est demandée (dialog ou page de confirmation) avec une saisie utilisateur d'un slug de la question
 - La suppression efface la question de D1 ; les images R2 associées ne sont **pas** touchées par cette story (voir US-12)
-- Si la question est référencée dans `preferred_question_ids` ou comme `pinned_question_id` d'un slot, un avertissement est affiché avant confirmation
+
 
 **Hors périmètre**
 - Upload, affichage et suppression d'images (voir US-12)
 - Éditeur WYSIWYG avec insertion d'images (voir US-12)
 - Historique des modifications
 - Import en masse
-
+- Si la question est référencée dans `preferred_question_ids` ou comme `pinned_question_id` d'un slot, un avertissement est affiché avant confirmation
 ---
 
 ### US-12 — Interface admin : gestion des images dans le CRUD questions
@@ -302,7 +302,7 @@ _À la création_
 
 _À la modification_
 - Lors de la sauvegarde, le serveur compare les références `images/{fn}` dans le markdown avant/après
-- Les images déréférencées (absentes du nouveau markdown mais présentes dans `question_images`) sont supprimées de R2 (`r2.delete(key)`) et retirées de `question_images`
+- Les images déréférencées (référencées dans l'ancien markdown mais absentes du nouveau) sont supprimées de R2 (`r2.delete(key)`) — la clé est reconstruite depuis `{cat}/{sec}/{id}/images/{fn}`
 - Si la suppression R2 échoue, la sauvegarde continue ; l'erreur est loguée et remontée en avertissement non bloquant
 
 _À la suppression de la question_
@@ -311,7 +311,7 @@ _À la suppression de la question_
 
 _Clé R2_
 - Les images sont stockées sous `{categorySlug}/{sectionSlug}/{questionId}/images/{filename}` — même convention que le renderer et l'export ZIP
-- `question_images` est tenu à jour à chaque upload et suppression
+- Pas de table catalogue : les images d'une question sont toujours dérivées de son markdown
 
 **Hors périmètre**
 - Recadrage ou redimensionnement d'image dans le browser
