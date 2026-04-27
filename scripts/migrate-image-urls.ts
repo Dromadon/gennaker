@@ -63,9 +63,10 @@ const parsed = JSON.parse(raw) as Array<{ results: Row[] }>
 const rows = parsed[0]?.results ?? []
 console.log(`${rows.length} questions lues.`)
 
-// Regex matching absolute R2 URLs: captures {cat}/{section}/images/{filename}
+// Regex matching absolute R2 URLs: captures any depth path ending in /images/{filename}
+// Handles both {cat}/{section}/images/{fn} and {cat}/{section}/{subfolder}/images/{fn}
 const ABSOLUTE_URL_RE =
-	/https?:\/\/[^/\s)]+\/([a-z0-9_-]+\/[a-z0-9_-]+\/images\/[^)\s"']+)/g
+	/https?:\/\/[^/\s)]+\/((?:[a-z0-9_-]+\/)+images\/[^)\s"']+)/g
 
 const sqlLines: string[] = []
 let uploadCount = 0

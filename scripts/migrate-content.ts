@@ -10,7 +10,7 @@
  */
 
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs'
-import { join, resolve } from 'path'
+import { dirname, join, resolve } from 'path'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const ARCHIVE_QUESTIONS = join(ROOT, 'archive/public/questions')
@@ -20,11 +20,13 @@ const OUTPUT = join(ROOT, 'scripts/seed.sql')
 const IS_LOCAL = process.argv[2] === '--local'
 const STATIC_IMAGES = join(ROOT, 'static/questions-images')
 
-// Pour --local : copie les images d'une section dans le dossier dédié à la question.
+// Pour --local : copie les images co-localisées avec le .md dans le dossier dédié à la question.
 // Les images restent référencées par images/{fn} dans le markdown ; le renderer local
 // résout via R2_PUBLIC_URL=/questions-images → /questions-images/{cat}/{sec}/{id}/images/{fn}.
-function copyImagesForQuestion(catSlug: string, secSlug: string, secDirPath: string, qId: number) {
-	const imagesDir = join(secDirPath, 'images')
+// mdPath peut être dans un sous-dossier (ex. secDir/brise_thermique/question.md) — on
+// cherche toujours dans dirname(mdPath)/images/, co-localisé avec le fichier markdown.
+function copyImagesForQuestion(catSlug: string, secSlug: string, mdPath: string, qId: number) {
+	const imagesDir = join(dirname(mdPath), 'images')
 	if (!existsSync(imagesDir)) return
 	const destDir = join(STATIC_IMAGES, catSlug, secSlug, String(qId), 'images')
 	mkdirSync(destDir, { recursive: true })
@@ -228,7 +230,7 @@ for (const [catSlug] of Object.entries(categoriesDB)) {
 			const key = `${catSlug}/${secSlug}/${entry.fileName}`
 			questionIds[key] = qId
 
-			if (IS_LOCAL) copyImagesForQuestion(catSlug, secSlug, secDirPath, qId)
+			if (IS_LOCAL) copyImagesForQuestion(catSlug, secSlug, mdPath, qId)
 
 			emit(
 				`INSERT OR REPLACE INTO questions (id, section_id, title, question_md, correction_md, difficulty, answer_size, applicable_supports, status, source_md, created_at, updated_at) VALUES (${qId}, ${sectionId}, ${esc(parsed.title)}, ${esc(parsed.questionMd)}, ${esc(parsed.correctionMd)}, 'moyen', ${esc(answerSize)}, ${esc(applicableSupports)}, 'publie', ${esc(parsed.sourceMd)}, ${now}, ${now});`
