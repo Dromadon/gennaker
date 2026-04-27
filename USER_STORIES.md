@@ -151,7 +151,7 @@ Ces tâches ne sont pas des user stories mais sont des prérequis bloquants.
 
 ## Epic 4 — Sauvegarde et DRP
 
-### US-09 — Exporter le contenu en ZIP (backup on-demand)
+### US-09 ✅ — Exporter le contenu en ZIP (backup on-demand)
 
 **En tant que** administrateur,  
 **je veux** télécharger un export complet du contenu (questions et images) en un clic,  
@@ -159,8 +159,8 @@ Ces tâches ne sont pas des user stories mais sont des prérequis bloquants.
 
 **Critères d'acceptation**
 - Un endpoint admin `GET /admin/export` génère et retourne un fichier ZIP
-- Le ZIP contient toutes les questions au format markdown, organisées en `{catégorie}/{section}/{titre}.md`, avec l'énoncé et la correction séparés par `# Correction`
-- Le ZIP contient toutes les images depuis R2, dans leur arborescence d'origine (`images/{catégorie}/{section}/images/{fichier}`)
+- Le ZIP contient toutes les questions au format markdown, organisées en `{catégorie}/{section}/{id}/{titre}.md`, avec l'énoncé et la correction séparés par `# Correction`
+- Le ZIP contient toutes les images depuis R2, co-localisées avec le markdown (`{catégorie}/{section}/{id}/images/{fichier}`)
 - Le ZIP contient un fichier `templates.json` décrivant les templates et leurs slots
 - Le fichier est nommé `gennaker-backup-{YYYY-MM-DD}.zip`
 - L'endpoint est protégé par l'authentification admin existante
@@ -169,6 +169,26 @@ Ces tâches ne sont pas des user stories mais sont des prérequis bloquants.
 **Hors périmètre**
 - Planification automatique depuis l'interface
 - Backup incrémental
+- Logs et monitoring de l'export (voir US-09b)
+
+---
+
+### US-09b — Visualiser les logs et erreurs durant l'export
+
+**En tant que** administrateur,  
+**je veux** voir la progression et les erreurs détaillées lors de l'export en ZIP,  
+**afin de** diagnostiquer et corriger les problèmes sans avoir à consulter les logs Cloudflare.
+
+**Critères d'acceptation**
+- Une page admin dédiée affiche la progression de l'export en temps réel (nombre de questions traitées, d'images uploadées, etc.)
+- Les erreurs sont listées avec détails : fichier concerné, type d'erreur, timestamp
+- La page présente un résumé final : nombre total de questions, d'images, d'erreurs, durée totale
+- Un historique des 10 derniers exports est conservé (timestamp, status, nb erreurs)
+- Les erreurs graves (ex. plus de 10 % d'images manquantes) déclenchent une alerte visible
+
+**Hors périmètre**
+- Relancement automatique d'une question en erreur
+- Retry configurables
 
 ---
 
