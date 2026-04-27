@@ -48,3 +48,30 @@ export type Evaluation = {
 	format: Format
 	slots: EvaluationSlot[]
 }
+
+export type QuestionListRow = {
+	id: number
+	title: string
+	difficulty: 'facile' | 'moyen' | 'difficile'
+	status: 'brouillon' | 'publie'
+	answerSize: AnswerSize
+	applicableSupports: Support[]
+	categoryDisplayName: string
+	sectionDisplayName: string
+	categorySlug: string
+	sectionSlug: string
+}
+
+export type QuestionAdminDetail = QuestionListRow & {
+	sectionId: number
+	questionMd: string
+	correctionMd: string
+	sourceMd: string | null
+}
+
+export type CategoryWithSections = {
+	id: number
+	slug: string
+	displayName: string
+	sections: { id: number; slug: string; displayName: string }[]
+}
