@@ -10,10 +10,21 @@ vi.mock('$lib/server/db/queries/questions', () => ({
 			sectionSlug: 'feux',
 			title: 'Signaux de détresse',
 			questionMd: 'Quels sont les signaux de détresse ?',
-			correctionMd: 'Fusées, fumigènes...'
+			correctionMd: 'Fusées, fumigènes...',
+			sourceMd: null
+		},
+		{
+			id: 2,
+			categorySlug: 'securite',
+			sectionSlug: 'feux',
+			title: 'Question avec source',
+			questionMd: 'Quelle est la question ?',
+			correctionMd: 'La réponse.',
+			sourceMd: 'Manuel FFV p.42'
 		}
 	]),
 	getStructureForExport: vi.fn().mockResolvedValue({
+		supports: [{ slug: 'deriveur', displayName: 'Dériveur', enabled: true }],
 		categories: [
 			{
 				slug: 'securite',
@@ -129,5 +140,34 @@ describe('GET /admin/export', () => {
 		expect(structure.categories[0].displayName).toBe('Sécurité')
 		expect(structure.categories[0].sections).toHaveLength(1)
 		expect(structure.categories[0].sections[0].slug).toBe('feux')
+	})
+
+	it('structure.json contient les supports', async () => {
+		const response = await GET(makeEvent(true))
+		const buf = await response.arrayBuffer()
+		const zip = unzipSync(new Uint8Array(buf))
+		const structure = JSON.parse(new TextDecoder().decode(zip['structure.json']))
+		expect(structure.supports).toHaveLength(1)
+		expect(structure.supports[0].slug).toBe('deriveur')
+		expect(structure.supports[0].displayName).toBe('Dériveur')
+		expect(structure.supports[0].enabled).toBe(true)
+	})
+
+	it('le markdown de la question inclut sourceMd quand non null', async () => {
+		const response = await GET(makeEvent(true))
+		const buf = await response.arrayBuffer()
+		const zip = unzipSync(new Uint8Array(buf))
+		const qKey = Object.keys(zip).find((k) => k.endsWith('.md') && k.includes('/2/'))!
+		const content = new TextDecoder().decode(zip[qKey])
+		expect(content).toContain('<small>Manuel FFV p.42</small>')
+	})
+
+	it('le markdown de la question sans source ne contient pas de balise small', async () => {
+		const response = await GET(makeEvent(true))
+		const buf = await response.arrayBuffer()
+		const zip = unzipSync(new Uint8Array(buf))
+		const qKey = Object.keys(zip).find((k) => k.endsWith('.md') && k.includes('/1/'))!
+		const content = new TextDecoder().decode(zip[qKey])
+		expect(content).not.toContain('<small>')
 	})
 })
