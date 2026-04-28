@@ -43,7 +43,7 @@ export function generateQuestionsSql(questions: ParsedQuestion[]): string {
 		const sourcePart = q.sourceMd ? `'${escape(q.sourceMd)}'` : 'NULL'
 		lines.push(
 			`INSERT INTO questions (id, section_id, title, question_md, correction_md, difficulty, answer_size, applicable_supports, status, source_md, created_at, updated_at)` +
-			` VALUES (${q.id}, (SELECT id FROM sections WHERE slug='${escape(q.sectionSlug)}'), '${escape(q.title)}', '${escape(q.questionMd)}', '${escape(q.correctionMd)}', 'moyen', 'md', '[]', 'publie', ${sourcePart}, ${now}, ${now})` +
+			` VALUES (${q.id}, (SELECT s.id FROM sections s INNER JOIN categories c ON c.id = s.category_id WHERE s.slug='${escape(q.sectionSlug)}' AND c.slug='${escape(q.categorySlug)}'), '${escape(q.title)}', '${escape(q.questionMd)}', '${escape(q.correctionMd)}', 'moyen', 'md', '[]', 'publie', ${sourcePart}, ${now}, ${now})` +
 			` ON CONFLICT(id) DO UPDATE SET section_id=excluded.section_id, title=excluded.title, question_md=excluded.question_md, correction_md=excluded.correction_md, source_md=excluded.source_md, updated_at=excluded.updated_at;`
 		)
 	}

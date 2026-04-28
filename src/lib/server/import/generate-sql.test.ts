@@ -87,9 +87,9 @@ describe('generateQuestionsSql', () => {
 		expect(count).toBe(2)
 	})
 
-	it('utilise subquery pour section_id', () => {
+	it('utilise subquery pour section_id avec jointure sur la catégorie', () => {
 		const sql = generateQuestionsSql(questions)
-		expect(sql).toContain("SELECT id FROM sections WHERE slug='carte_meteo'")
+		expect(sql).toContain("WHERE s.slug='carte_meteo' AND c.slug='meteo'")
 	})
 
 	it('utilise ON CONFLICT(id) pour l\'idempotence', () => {

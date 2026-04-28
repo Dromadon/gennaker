@@ -77,7 +77,7 @@ function uploadImage(questionId: number, filename: string, data: Uint8Array) {
 	try {
 		writeFileSync(tmpFile, data)
 		const key = `${questionId}/images/${filename}`
-		const localFlag = r2Target ? `--local` : ''
+		const localFlag = isRemote ? '' : '--local'
 		run(`wrangler r2 object put "gennaker-questions/${key}" --file "${tmpFile}" ${localFlag}`.trim())
 	} finally {
 		try { unlinkSync(tmpFile) } catch {}
