@@ -234,10 +234,10 @@ Les stories suivantes sont identifiées mais hors scope MVP, classées par prior
 | 3 | Interface admin : gestion des templates et slots |
 | 4 | Modification de structure : ajouter / supprimer un slot dans une évaluation |
 | 4b | US-06 : Re-tirer toutes les questions d'un slot (bouton par slot dans le panneau latéral) |
-| 5 | Sélection manuelle d'une question dans la banque |
+| 5 | US-14 : Sélection manuelle d'une question dans la banque |
 | 6 | Gestion de la difficulté des questions (annotation + filtre au tirage) |
 | 7 | Questions épinglées et questions par défaut dans les templates |
-| 8 | Banque publique de questions (consultation filtrée) |
+| 8 | US-15 : Banque publique de questions (consultation filtrée, voir ci-dessous) |
 | 9 | Soumission communautaire de questions |
 | 10 | Signalement d'un problème sur une question |
 | 11 | Interface admin : modération des soumissions |
@@ -384,3 +384,36 @@ _Sauvegarde et état_
 - Historique des sélections manuelles
 - Possibilité de sélectionner des questions d'une autre catégorie ou section
 - Tri ou tri personnalisé de la liste de recherche (tri par défaut : pertinence fulltext)
+
+---
+
+### US-15 — Banque publique de questions (consultation filtrée)
+
+**En tant que** stagiaire ou formateur,  
+**je veux** consulter la banque de questions avec les mêmes filtres que l'interface admin,  
+**afin de** explorer les questions disponibles et prévisualiser leur contenu avant ou après une évaluation.
+
+**Critères d'acceptation**
+
+_Liste_
+- La page `/questions` liste toutes les questions publiées (statut `published`) avec : titre, catégorie, section, difficulté, supports applicables
+- Les mêmes filtres que `/admin/questions` sont disponibles : catégorie, section, support applicable
+- La liste est paginée (20 questions par page) et triée par catégorie → section → id par défaut
+- Aucun lien de modification ou suppression n'est affiché
+
+_Filtrage_
+- Les filtres catégorie et section sont liés : sélectionner une catégorie restreint les sections disponibles
+- Le filtre support est une liste déroulante ou un groupe de boutons (dériveur, catamaran, windsurf)
+- Les filtres sont conservés dans les paramètres d'URL (navigation arrière et partage du lien)
+
+_Prévisualisation_
+- Cliquer sur une question ouvre un panneau de prévisualisation sur la droite (layout deux colonnes)
+- Le panneau affiche : titre, énoncé (rendu markdown avec images), correction (rendu markdown avec images), source (si renseignée), difficulté, catégorie, section
+- Le panneau peut être fermé avec un bouton ou en cliquant en dehors
+- Sur mobile, la prévisualisation s'ouvre en plein écran (drawer ou page dédiée)
+
+**Hors périmètre**
+- Modification ou suppression de questions
+- Questions en statut brouillon (non visibles)
+- Recherche fulltext (voir US-14 pour la modale de sélection qui inclut déjà cette fonctionnalité)
+- Export ou impression de la banque

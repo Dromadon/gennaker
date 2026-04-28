@@ -81,4 +81,8 @@
 			{loading ? 'Génération…' : 'Générer une évaluation'}
 		</button>
 	</form>
+
+	<p class="mt-8 text-center text-sm text-gray-400">
+		<a href="/questions" class="hover:text-gray-600 hover:underline">Consulter la banque de questions</a>
+	</p>
 </main>

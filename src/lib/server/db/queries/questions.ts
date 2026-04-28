@@ -252,6 +252,84 @@ export async function deleteQuestion(d1: D1Database, id: number): Promise<void> 
 	await getDb(d1).delete(questions).where(eq(questions.id, id))
 }
 
+export type QuestionPublicRow = QuestionListRow & {
+	questionMd: string
+	correctionMd: string
+	sourceMd: string | null
+}
+
+export async function getQuestionsPublic(
+	d1: D1Database,
+	filters: {
+		categoryId?: number | null
+		sectionId?: number | null
+		support?: string | null
+		page: number
+	}
+): Promise<{ rows: QuestionPublicRow[]; total: number }> {
+	const db = getDb(d1)
+
+	const conditions = [eq(questions.status, 'publie')]
+	if (filters.sectionId) conditions.push(eq(questions.sectionId, filters.sectionId))
+	if (filters.categoryId) conditions.push(eq(sections.categoryId, filters.categoryId))
+	if (filters.support) {
+		conditions.push(
+			or(
+				eq(questions.applicableSupports, '[]'),
+				like(questions.applicableSupports, `%"${filters.support}"%`)
+			)!
+		)
+	}
+
+	const where = and(...conditions)
+
+	const base = db
+		.select({
+			id: questions.id,
+			title: questions.title,
+			difficulty: questions.difficulty,
+			status: questions.status,
+			answerSize: questions.answerSize,
+			applicableSupports: questions.applicableSupports,
+			categoryDisplayName: categories.displayName,
+			sectionDisplayName: sections.displayName,
+			categorySlug: categories.slug,
+			sectionSlug: sections.slug,
+			questionMd: questions.questionMd,
+			correctionMd: questions.correctionMd,
+			sourceMd: questions.sourceMd
+		})
+		.from(questions)
+		.innerJoin(sections, eq(sections.id, questions.sectionId))
+		.innerJoin(categories, eq(categories.id, sections.categoryId))
+
+	const [rows, [{ total }]] = await Promise.all([
+		base
+			.where(where)
+			.orderBy(categories.id, sections.id, questions.id)
+			.limit(PAGE_SIZE)
+			.offset((filters.page - 1) * PAGE_SIZE),
+		db
+			.select({ total: count() })
+			.from(questions)
+			.innerJoin(sections, eq(sections.id, questions.sectionId))
+			.innerJoin(categories, eq(categories.id, sections.categoryId))
+			.where(where)
+	])
+
+	return {
+		rows: rows.map((r) => ({
+			...r,
+			difficulty: r.difficulty as QuestionPublicRow['difficulty'],
+			status: r.status as QuestionPublicRow['status'],
+			answerSize: r.answerSize as QuestionPublicRow['answerSize'],
+			applicableSupports: JSON.parse(r.applicableSupports ?? '[]'),
+			sourceMd: r.sourceMd ?? null
+		})),
+		total
+	}
+}
+
 export type QuestionCandidateRow = {
 	id: number
 	sectionId: number
