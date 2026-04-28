@@ -7,6 +7,7 @@ import {
 	getQuestionAdminById,
 	updateQuestion
 } from '$lib/server/db/queries/questions'
+import { extractImageRefs, deleteOrphanImages, deleteImagesForQuestion } from '$lib/server/r2-images'
 
 const QuestionSchema = z.object({
 	title: z.string().min(1).max(500),
@@ -28,6 +29,7 @@ export const load: PageServerLoad = async ({ params, platform, locals }) => {
 	const d1 = platform?.env.DB
 	if (!d1) error(500, 'DB unavailable')
 
+	const r2 = platform?.env.IMAGES
 	const id = Number(params.id)
 	if (!id || isNaN(id)) error(404, 'Question introuvable')
 
@@ -37,7 +39,14 @@ export const load: PageServerLoad = async ({ params, platform, locals }) => {
 	])
 
 	if (!question) error(404, 'Question introuvable')
-	return { question, categories }
+
+	let existingImages: string[] = []
+	if (r2) {
+		const listed = await r2.list({ prefix: `${id}/images/` })
+		existingImages = listed.objects.map((o) => o.key.split('/').pop()!)
+	}
+
+	return { question, categories, existingImages }
 }
 
 export const actions: Actions = {
@@ -47,7 +56,9 @@ export const actions: Actions = {
 		const d1 = platform?.env.DB
 		if (!d1) error(500, 'DB unavailable')
 
+		const r2 = platform?.env.IMAGES
 		const id = Number(params.id)
+
 		const data = await request.formData()
 		const raw = {
 			title: data.get('title'),
@@ -67,6 +78,17 @@ export const actions: Actions = {
 		}
 
 		await updateQuestion(d1, id, parsed.data)
+
+		// Supprimer toutes les images R2 non référencées dans le nouveau markdown (orphelines incluses)
+		if (r2) {
+			const newRefs = new Set([
+				...extractImageRefs(parsed.data.questionMd),
+				...extractImageRefs(parsed.data.correctionMd)
+			])
+			const { errors } = await deleteOrphanImages(r2, id, newRefs)
+			for (const err of errors) console.error('Erreur suppression R2:', err)
+		}
+
 		return { updated: true }
 	},
 
@@ -76,7 +98,18 @@ export const actions: Actions = {
 		const d1 = platform?.env.DB
 		if (!d1) error(500, 'DB unavailable')
 
+		const r2 = platform?.env.IMAGES
 		const id = Number(params.id)
+
+		if (r2) {
+			const { errors } = await deleteImagesForQuestion(r2, id)
+			if (errors.length > 0) {
+				return fail(500, {
+					deleteError: `Impossible de supprimer ${errors.length} image(s) R2. Suppression annulée. Erreurs : ${errors.join(', ')}`
+				})
+			}
+		}
+
 		await deleteQuestion(d1, id)
 		redirect(302, '/admin/questions')
 	}

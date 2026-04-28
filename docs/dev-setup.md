@@ -48,6 +48,28 @@ npm run dev:seed -- --file backup.zip --only=images
 
 La commande est idempotente : la relancer avec le même fichier ne duplique pas les données (SQLite upsert `ON CONFLICT DO UPDATE`).
 
+## Après une migration de schéma locale
+
+`npm run db:migrate:local` peut créer un nouveau fichier SQLite miniflare (le hash du fichier dépend de la version de miniflare et de la config). Le serveur de dev bascule alors sur ce fichier vide. Si les questions ont disparu après une migration, relancer le seed complet :
+
+```bash
+npm run dev:seed -- --file gennaker-backup-YYYY-MM-DD.zip
+```
+
+## Inspecter le R2 local
+
+Wrangler n'expose pas de commande `list` — passer par le SQLite miniflare directement :
+
+Utiliser les scripts dédiés dans `scripts/dev/` :
+
+```bash
+# Lister les images d'une question (remplacer 1 par l'id voulu)
+NODE_OPTIONS=--experimental-sqlite npx tsx scripts/dev/r2-list.ts 1
+
+# Lister toutes les clés R2
+NODE_OPTIONS=--experimental-sqlite npx tsx scripts/dev/r2-list.ts
+```
+
 ## Equivalents production
 
 ```bash

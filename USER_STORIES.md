@@ -283,42 +283,41 @@ _Suppression_
 - Si la question est référencée dans `preferred_question_ids` ou comme `pinned_question_id` d'un slot, un avertissement est affiché avant confirmation
 ---
 
-### US-12 — Interface admin : gestion des images dans le CRUD questions
+### US-12 ✅ — Interface admin : gestion des images dans le CRUD questions
 
 **En tant que** administrateur,  
-**je veux** pouvoir uploader, prévisualiser et supprimer les images d'une question directement depuis l'interface d'édition,  
+**je veux** pouvoir insérer et gérer les images d'une question directement depuis l'interface d'édition,  
 **afin de** gérer l'intégralité du contenu d'une question sans intervention manuelle sur R2.
 
 **Critères d'acceptation**
 
-_Éditeur_
-- L'éditeur markdown (énoncé et correction) expose un bouton "Insérer une image" qui ouvre un sélecteur de fichier
-- L'image sélectionnée est uploadée immédiatement vers R2 via un endpoint dédié (`POST /admin/questions/{id}/images`) qui utilise le binding R2 du Worker (pas de clé S3)
-- L'upload insère automatiquement la référence `![alt](images/{filename})` à la position du curseur
-- L'image uploadée est visible dans la preview markdown en temps réel (résolution via `createMarkdownRenderer`)
-- Les images déjà associées à la question sont listées dans un panneau latéral avec miniature
+_Panneau images (modification)_
+- Un panneau liste toutes les images : existantes (chargées depuis R2) et nouvellement ajoutées (en attente d'upload), avec miniature
+- Les images existantes non référencées dans le markdown apparaissent avec leur nom barré et un bouton "Insérer"
+- Les images existantes référencées affichent un bouton "Enlever" qui retire la ref du markdown sans supprimer l'image immédiatement
+- Les nouvelles images non insérées affichent un avertissement et ne sont pas uploadées à la sauvegarde
+- Un texte avertit que les images enlevées seront supprimées lors de l'enregistrement
 
-_À la création_
-- L'upload d'images n'est disponible qu'après la première sauvegarde (la clé R2 nécessite l'`id` de la question)
-- Un flux alternatif propose : sauvegarder en brouillon → uploader les images → publier
+_Insertion dans le markdown_
+- Cliquer "Insérer" insère `![image_question](images/{filename})` dans l'énoncé ou `![image_correction](images/{filename})` dans la correction, selon le dernier textarea focalisé
+- L'image insérée est visible dans la preview markdown en temps réel (objectURL pour les pending, URL R2 pour les existantes)
 
-_À la modification_
-- Lors de la sauvegarde, le serveur compare les références `images/{fn}` dans le markdown avant/après
-- Les images déréférencées (référencées dans l'ancien markdown mais absentes du nouveau) sont supprimées de R2 (`r2.delete(key)`) — la clé est reconstruite depuis `{cat}/{sec}/{id}/images/{fn}`
-- Si la suppression R2 échoue, la sauvegarde continue ; l'erreur est loguée et remontée en avertissement non bloquant
+_Sauvegarde (modification)_
+- Seules les nouvelles images **effectivement référencées** dans le markdown sont uploadées vers R2
+- Les images qui ne sont plus référencées dans le markdown sauvegardé sont supprimées de R2 (`deleteOrphanImages`)
+- Les erreurs R2 (upload ou suppression) sont non bloquantes : la question est sauvegardée, un avertissement est affiché
 
-_À la suppression de la question_
-- Toutes les images R2 associées (listées dans `question_images`) sont supprimées de R2 avant la suppression D1
-- Si une suppression R2 échoue, l'administrateur en est informé et peut forcer la suppression
-
-_Clé R2_
-- Les images sont stockées sous `{categorySlug}/{sectionSlug}/{questionId}/images/{filename}` — même convention que le renderer et l'export ZIP
-- Pas de table catalogue : les images d'une question sont toujours dérivées de son markdown
+_Suppression de la question_
+- Toutes les images R2 associées sont supprimées **avant** la suppression en D1
+- Si la suppression R2 échoue, l'administrateur en est informé et la suppression D1 est bloquée
 
 **Hors périmètre**
-- Recadrage ou redimensionnement d'image dans le browser
+- Recadrage ou redimensionnement d'image dans le navigateur
 - Gestion de versions d'images
 - Réorganisation des images entre questions
+- Upload multiple en une seule sélection
+
+**Documentation détaillée** : `docs/image-editing.md`
 
 ---
 

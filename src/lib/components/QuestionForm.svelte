@@ -1,16 +1,21 @@
 <script lang="ts">
 	import { untrack } from 'svelte'
-	import { marked } from 'marked'
+	import { page } from '$app/state'
+	import { enhance } from '$app/forms'
 	import type { CategoryWithSections, QuestionAdminDetail } from '$lib/domain/types'
+	import { createLocalMarkdownRenderer, extractImageRefs } from '$lib/markdown'
+	import ImagePanel from '$lib/components/ImagePanel.svelte'
 
 	type Props = {
 		categories: CategoryWithSections[]
 		question?: Partial<QuestionAdminDetail>
 		errors?: Record<string, string[]>
 		action: string
+		questionId?: number
+		existingImages?: string[]
 	}
 
-	let { categories, question = {}, errors = {}, action }: Props = $props()
+	let { categories, question = {}, errors = {}, action, questionId, existingImages = [] }: Props = $props()
 
 	const supports = ['deriveur', 'catamaran', 'windsurf', 'croisiere'] as const
 	const difficulties = ['facile', 'moyen', 'difficile'] as const
@@ -114,13 +119,75 @@
 
 	const anyDirty = $derived(dirty !== null && Object.values(dirty).some(Boolean))
 
-	const questionPreview = $derived(marked.parse(questionMd || '') as string)
-	const correctionPreview = $derived(marked.parse(correctionMd || '') as string)
+	// Images
+	type PendingImage = { file: File; objectUrl: string }
+	let pendingImages = $state(new Map<string, PendingImage>())
+	let questionTextarea = $state<HTMLTextAreaElement | undefined>(undefined)
+	let correctionTextarea = $state<HTMLTextAreaElement | undefined>(undefined)
+	let lastFocusedField = $state<'question' | 'correction'>('question')
 
-	let activeTab = $state<'question' | 'correction'>('question')
+	const r2BaseUrl = $derived(page.data.r2BaseUrl as string)
+
+	const questionPreview = $derived(
+		createLocalMarkdownRenderer(pendingImages, questionId ?? 0, r2BaseUrl)(questionMd || '')
+	)
+	const correctionPreview = $derived(
+		createLocalMarkdownRenderer(pendingImages, questionId ?? 0, r2BaseUrl)(correctionMd || '')
+	)
+
+	// Submit via enhance : SvelteKit gère D1, on enchaîne les uploads R2 après succès
+	let submitError = $state('')
+	let isSubmitting = $state(false)
+
+	function handleEnhance() {
+		isSubmitting = true
+		submitError = ''
+
+		return async ({ result, update }: { result: import('@sveltejs/kit').ActionResult; update: () => Promise<void> }) => {
+			if (result.type === 'redirect') {
+				// Création : le serveur redirige vers /edit — on laisse SvelteKit suivre
+				await update()
+				return
+			}
+
+			if (result.type === 'failure' || result.type === 'error') {
+				isSubmitting = false
+				window.location.reload()
+				return
+			}
+
+			// Succès D1 — upload des images pending
+			const id = questionId
+			if (id && pendingImages.size > 0) {
+				const uploadErrors: string[] = []
+				const refs = new Set([...extractImageRefs(questionMd), ...extractImageRefs(correctionMd)])
+				await Promise.all(
+					[...pendingImages.entries()]
+					.filter(([filename]) => refs.has(filename))
+					.map(async ([filename, { file, objectUrl }]) => {
+						const fd = new FormData()
+						fd.append('file', file)
+						const res = await fetch(`/admin/questions/${id}/images`, { method: 'POST', body: fd })
+						if (!res.ok) {
+							uploadErrors.push(filename)
+						} else {
+							URL.revokeObjectURL(objectUrl)
+						}
+					})
+				)
+				if (uploadErrors.length > 0) {
+					submitError = `Question sauvegardée, mais ${uploadErrors.length} image(s) n'ont pas pu être uploadées : ${uploadErrors.join(', ')}`
+				}
+			}
+
+			isSubmitting = false
+			window.location.reload()
+		}
+	}
 </script>
 
-<form method="POST" {action} class="space-y-6">
+
+<form method="POST" {action} use:enhance={handleEnhance} class="space-y-6">
 	<!-- Titre -->
 	<div class="border-l-2 pl-2 transition {dirty?.title ? BAR : 'border-transparent'}">
 		<label for="title" class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
@@ -254,54 +321,60 @@
 		</fieldset>
 	</div>
 
-	<!-- Éditeur markdown : onglets énoncé / correction -->
-	<div class="border-l-2 pl-2 transition {dirty?.questionMd || dirty?.correctionMd ? BAR : 'border-transparent'}">
-		<div class="flex gap-1 mb-0 border-b border-gray-200">
-			<button
-				type="button"
-				onclick={() => (activeTab = 'question')}
-				class="px-4 py-2 text-sm font-medium rounded-t-md {activeTab === 'question' ? 'bg-white border border-b-white border-gray-200 text-gray-900' : 'text-gray-500 hover:text-gray-700'}"
-			>
-				Énoncé
-			</button>
-			<button
-				type="button"
-				onclick={() => (activeTab = 'correction')}
-				class="px-4 py-2 text-sm font-medium rounded-t-md {activeTab === 'correction' ? 'bg-white border border-b-white border-gray-200 text-gray-900' : 'text-gray-500 hover:text-gray-700'}"
-			>
-				Correction
-			</button>
+	<!-- Éditeur markdown : énoncé -->
+	<div class="border-l-2 pl-2 transition {dirty?.questionMd ? BAR : 'border-transparent'}">
+		<label for="questionMd" class="block text-sm font-medium text-gray-700 mb-1">Énoncé</label>
+		<div class="grid grid-cols-2 gap-0 border border-gray-200 rounded-md transition {errors.questionMd ? 'border-red-400' : ''}">
+			<textarea
+				id="questionMd"
+				bind:this={questionTextarea}
+				name="questionMd"
+				bind:value={questionMd}
+				rows="12"
+				onfocus={() => (lastFocusedField = 'question')}
+				class="w-full resize-none border-0 border-r border-gray-200 p-3 font-mono text-sm focus:outline-none rounded-l-md"
+				placeholder="Énoncé en markdown…"
+			></textarea>
+			<div class="prose prose-sm max-w-none p-3 overflow-y-auto text-sm">
+				{@html questionPreview}
+			</div>
 		</div>
-
-		{#if activeTab === 'question'}
-			<div class="grid grid-cols-2 gap-0 border border-gray-200 rounded-b-md rounded-tr-md transition {errors.questionMd ? 'border-red-400' : ''}">
-				<textarea
-					name="questionMd"
-					bind:value={questionMd}
-					rows="14"
-					class="w-full resize-none border-0 border-r border-gray-200 p-3 font-mono text-sm focus:outline-none rounded-bl-md"
-					placeholder="Énoncé en markdown…"
-				></textarea>
-				<div class="prose prose-sm max-w-none p-3 overflow-y-auto text-sm">
-					{@html questionPreview}
-				</div>
-			</div>
-			{#if errors.questionMd}<p class="mt-1 text-xs text-red-600">{errors.questionMd[0]}</p>{/if}
-		{:else}
-			<div class="grid grid-cols-2 gap-0 border border-gray-200 rounded-b-md rounded-tr-md transition {errors.correctionMd ? 'border-red-400' : ''}">
-				<textarea
-					name="correctionMd"
-					bind:value={correctionMd}
-					rows="14"
-					class="w-full resize-none border-0 border-r border-gray-200 p-3 font-mono text-sm focus:outline-none rounded-bl-md"
-					placeholder="Correction en markdown…"
-				></textarea>
-				<div class="prose prose-sm max-w-none p-3 overflow-y-auto text-sm">
-					{@html correctionPreview}
-				</div>
-			</div>
-		{/if}
+		{#if errors.questionMd}<p class="mt-1 text-xs text-red-600">{errors.questionMd[0]}</p>{/if}
 	</div>
+
+	<!-- Éditeur markdown : correction -->
+	<div class="border-l-2 pl-2 transition {dirty?.correctionMd ? BAR : 'border-transparent'}">
+		<label for="correctionMd" class="block text-sm font-medium text-gray-700 mb-1">Correction</label>
+		<div class="grid grid-cols-2 gap-0 border border-gray-200 rounded-md transition {errors.correctionMd ? 'border-red-400' : ''}">
+			<textarea
+				id="correctionMd"
+				bind:this={correctionTextarea}
+				name="correctionMd"
+				bind:value={correctionMd}
+				rows="12"
+				onfocus={() => (lastFocusedField = 'correction')}
+				class="w-full resize-none border-0 border-r border-gray-200 p-3 font-mono text-sm focus:outline-none rounded-l-md"
+				placeholder="Correction en markdown…"
+			></textarea>
+			<div class="prose prose-sm max-w-none p-3 overflow-y-auto text-sm">
+				{@html correctionPreview}
+			</div>
+		</div>
+		{#if errors.correctionMd}<p class="mt-1 text-xs text-red-600">{errors.correctionMd[0]}</p>{/if}
+	</div>
+
+	<!-- Panneau images -->
+	<ImagePanel
+		{existingImages}
+		{questionId}
+		{r2BaseUrl}
+		bind:questionMd
+		bind:correctionMd
+		bind:pendingImages
+		{lastFocusedField}
+		{questionTextarea}
+		{correctionTextarea}
+	/>
 
 	<!-- Source -->
 	<div class="border-l-2 pl-2 transition {dirty?.sourceMd ? BAR : 'border-transparent'}">
@@ -314,6 +387,10 @@
 			class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm transition {border.sourceMd}"
 		/>
 	</div>
+
+	{#if submitError}
+		<div class="rounded-md bg-yellow-50 p-3 text-sm text-yellow-800">{submitError}</div>
+	{/if}
 
 	<!-- Actions -->
 	<div class="flex justify-end gap-2 pt-2">
@@ -329,9 +406,10 @@
 		{/if}
 		<button
 			type="submit"
-			class="rounded-md bg-gray-900 px-5 py-2 text-sm font-medium text-white hover:bg-gray-700"
+			disabled={isSubmitting}
+			class="rounded-md bg-gray-900 px-5 py-2 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-50"
 		>
-			Enregistrer
+			{isSubmitting ? 'Enregistrement…' : 'Enregistrer'}
 		</button>
 	</div>
 </form>

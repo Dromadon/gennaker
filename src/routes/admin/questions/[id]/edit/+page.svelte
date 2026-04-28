@@ -32,12 +32,18 @@
 	</div>
 {/if}
 
+{#if form?.deleteError}
+	<div class="mb-4 rounded-md bg-red-50 p-4 text-sm text-red-700">{form.deleteError}</div>
+{/if}
+
 <div class="rounded-lg border border-gray-200 bg-white p-6">
 	<QuestionForm
 		categories={data.categories}
 		question={data.question}
 		errors={form?.errors ?? {}}
 		action="?/update"
+		questionId={data.question.id}
+		existingImages={data.existingImages}
 	/>
 </div>
 
