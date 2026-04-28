@@ -1,6 +1,6 @@
 import { and, count, eq, inArray, like, or, sql } from 'drizzle-orm'
 import { getDb } from '../index'
-import { categories, questions, sections } from '../schema'
+import { categories, questions, sections, supports } from '../schema'
 import type { Question, QuestionAdminDetail, QuestionListRow, Support } from '$lib/domain/types'
 
 const PAGE_SIZE = 20
@@ -24,9 +24,11 @@ export type QuestionExportRow = {
 	title: string
 	questionMd: string
 	correctionMd: string
+	sourceMd: string | null
 }
 
 export type StructureExportRow = {
+	supports: { slug: string; displayName: string; enabled: boolean }[]
 	categories: {
 		slug: string
 		displayName: string
@@ -47,7 +49,8 @@ export async function getAllQuestionsForExport(d1: D1Database): Promise<Question
 			sectionSlug: sections.slug,
 			title: questions.title,
 			questionMd: questions.questionMd,
-			correctionMd: questions.correctionMd
+			correctionMd: questions.correctionMd,
+			sourceMd: questions.sourceMd
 		})
 		.from(questions)
 		.innerJoin(sections, eq(sections.id, questions.sectionId))
@@ -58,14 +61,10 @@ export async function getAllQuestionsForExport(d1: D1Database): Promise<Question
 export async function getStructureForExport(d1: D1Database): Promise<StructureExportRow> {
 	const db = getDb(d1)
 
-	const categoryRows = await db
-		.select({
-			id: categories.id,
-			slug: categories.slug,
-			displayName: categories.displayName,
-			applicableSupports: categories.applicableSupports
-		})
-		.from(categories)
+	const [supportRows, categoryRows] = await Promise.all([
+		db.select({ slug: supports.slug, displayName: supports.displayName, enabled: supports.enabled }).from(supports),
+		db.select({ id: categories.id, slug: categories.slug, displayName: categories.displayName, applicableSupports: categories.applicableSupports }).from(categories)
+	])
 
 	const structureCategories = []
 
@@ -91,7 +90,10 @@ export async function getStructureForExport(d1: D1Database): Promise<StructureEx
 		})
 	}
 
-	return { categories: structureCategories }
+	return {
+		supports: supportRows.map((s) => ({ slug: s.slug, displayName: s.displayName, enabled: Boolean(s.enabled) })),
+		categories: structureCategories
+	}
 }
 
 export async function getQuestionsAdmin(
