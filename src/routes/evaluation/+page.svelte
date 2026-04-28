@@ -33,8 +33,8 @@
 			: new Map<number, { name: string; slots: EvaluationSlot[] }>()
 	)
 
-	function renderMd(md: string, questionId: number, catSlug: string, secSlug: string): string {
-		return createMarkdownRenderer(questionId, catSlug, secSlug, page.data.r2BaseUrl)(md)
+	function renderMd(md: string, questionId: number): string {
+		return createMarkdownRenderer(questionId, page.data.r2BaseUrl)(md)
 	}
 
 	const answerHeightStyle: Record<string, string> = {
@@ -235,7 +235,7 @@
 								</button>
 								<p class="mb-3 font-medium">{question.title}</p>
 								<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-								<div class="prose prose-sm max-w-none">{@html renderMd(question.questionMd, question.id, slot.categorySlug, slot.sectionSlug)}</div>
+								<div class="prose prose-sm max-w-none">{@html renderMd(question.questionMd, question.id)}</div>
 								{#if !showCorrection}
 									<div
 										class="hidden print:block"
@@ -246,7 +246,7 @@
 									<div class="mt-4 border-t border-gray-200 pt-4">
 										<p class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Correction</p>
 										<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-										<div class="prose prose-sm max-w-none">{@html renderMd(question.correctionMd, question.id, slot.categorySlug, slot.sectionSlug)}</div>
+										<div class="prose prose-sm max-w-none">{@html renderMd(question.correctionMd, question.id)}</div>
 									</div>
 								{/if}
 							</article>

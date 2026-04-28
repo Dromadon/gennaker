@@ -288,24 +288,34 @@ Dans `question_md` et `correction_md`, les images utilisent des **URLs relatives
 ### Clé R2 — mapping déterministe
 
 ```
-{categorySlug}/{sectionSlug}/{questionId}/images/{filename}
+{questionId}/images/{filename}
 ```
 
-Exemple : `meteo/carte_meteo/42/images/schema.png`
+Exemple : `42/images/schema.png`
 
-La clé est entièrement dérivable depuis les données de la question (JOIN `questions → sections → categories`). Il n'existe pas de table catalogue : pour connaître ou supprimer les images d'une question, on parse ses champs markdown et on reconstruit les clés R2.
+La clé dépend uniquement de l'ID de la question — stable même si la question change de catégorie/section. Il n'existe pas de table catalogue : pour connaître ou supprimer les images d'une question, on parse ses champs markdown et on reconstruit les clés R2.
 
 ### Résolution au rendu
 
-`createMarkdownRenderer(questionId, categorySlug, sectionSlug, r2BaseUrl)` (`src/lib/markdown.ts`) transforme `images/{fn}` → `${r2BaseUrl}/{cat}/{sec}/{id}/images/{fn}`. `r2BaseUrl` provient de `platform.env.R2_PUBLIC_URL` (exposé par `src/routes/+layout.server.ts`).
+`createMarkdownRenderer(questionId, r2BaseUrl)` (`src/lib/markdown.ts`) transforme `images/{fn}` → `${r2BaseUrl}/${questionId}/images/${fn}`. `r2BaseUrl` provient de `platform.env.R2_PUBLIC_URL` (exposé par `src/routes/+layout.server.ts`).
+
+### Export ZIP
+
+Les clés R2 sont plates mais le ZIP d'export (`GET /admin/export`) reconstruit la hiérarchie `{cat}/{sec}/{id}/images/{fn}` en résolvant la question depuis la DB — les fichiers markdown et images restent co-localisés dans le ZIP.
 
 ### Upload
 
-Via le binding R2 natif dans Workers (`env.QUESTIONS`) — pas de clés S3. La clé est calculée côté serveur depuis les slugs et l'ID de la question.
+Via le binding R2 natif dans Workers (`env.IMAGES`) — pas de clés S3. La clé est calculée côté serveur depuis l'ID de la question.
 
 ### Local
 
-`R2_PUBLIC_URL=/questions-images` dans `.dev.vars`. Les images sont copiées dans `static/questions-images/{cat}/{sec}/{id}/images/` par `npm run db:seed:local` et servies statiquement par Vite.
+En dev, les images sont stockées dans le **R2 local** (miniflare via `platformProxy`) exactement comme en prod. `npm run db:seed:local` injecte les images dans le R2 local via `wrangler r2 object put --local`. La route `GET /r2-proxy/[...path]` (`src/routes/r2-proxy/[...path]/+server.ts`) les sert en lisant depuis le binding R2.
+
+```
+R2_PUBLIC_URL=/r2-proxy   # dans .dev.vars
+```
+
+Pas de dossier `static/questions-images/` — les images ne sont pas servies comme fichiers statiques.
 
 ---
 
@@ -344,13 +354,6 @@ Les migrations D1 sont jouées manuellement ou via un script npm `predeploy` :
 ```
 wrangler d1 migrations apply gennaker --remote
 ```
-
-### Environnements
-
-| Env | Branche git | URL |
-|-----|-------------|-----|
-| Preview | toute branche | `*.gennaker.pages.dev` |
-| Production | `main` | `gennaker.bzh` |
 
 ---
 

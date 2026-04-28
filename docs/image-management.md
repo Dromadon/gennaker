@@ -15,9 +15,12 @@ Les URLs commençant par `/` ou `http` passent à travers le renderer sans trans
 
 ## Stockage R2
 
-Clé R2 : `{categorySlug}/{sectionSlug}/{questionId}/images/{filename}`
+Clé R2 : `{questionId}/images/{filename}`
 
-Exemple : `meteo/carte_meteo/42/images/schema.png`
+Exemple : `42/images/schema.png`
+
+La clé est **stable** — elle ne dépend pas de la catégorie ou section. Déplacer une question
+vers une autre catégorie/section ne nécessite aucune opération R2.
 
 Chaque question dispose de son propre dossier `images/` — deux questions peuvent
 référencer la même image source mais auront chacune leur copie dans R2.
@@ -31,29 +34,19 @@ référencer la même image source mais auront chacune leur copie dans R2.
 ```typescript
 createMarkdownRenderer(
   questionId: number,
-  categorySlug: string,
-  sectionSlug: string,
   r2BaseUrl: string
 ): (md: string) => string
 ```
 
-Pour `images/{filename}` → `${r2BaseUrl}/${categorySlug}/${sectionSlug}/${questionId}/images/${filename}`
+Pour `images/{filename}` → `${r2BaseUrl}/${questionId}/images/${filename}`
 
 `r2BaseUrl` est exposé par `src/routes/+layout.server.ts` depuis `platform.env.R2_PUBLIC_URL`.
 
 ### Utilisation dans la page d'évaluation
 
-`slot.categorySlug` et `slot.sectionSlug` sont disponibles dans le template via `EvaluationSlot` :
-
 ```svelte
-{@html renderMd(question.questionMd, question.id, slot.categorySlug, slot.sectionSlug)}
+{@html renderMd(question.questionMd, question.id)}
 ```
-
-### Origine des slugs
-
-`getTemplate` (`src/lib/server/db/queries/templates.ts`) fait déjà les JOINs
-`templateSlots → sections → categories` et sélectionne `categories.slug` et `sections.slug`.
-`drawEvaluation` propage ces champs de `TemplateSlot` vers `EvaluationSlot`.
 
 ---
 
@@ -69,20 +62,23 @@ Pour `images/{filename}` → `${r2BaseUrl}/${categorySlug}/${sectionSlug}/${ques
 templates.json
 ```
 
-L'export (`GET /admin/export`) liste tous les objets R2 avec `r2.list()` et les place
-directement dans le ZIP avec la même clé (chemin R2 = chemin ZIP).
+L'export (`GET /admin/export`) :
+1. Liste tous les objets R2 avec pagination (`r2.list()` + curseur tant que `truncated`)
+2. Pour chaque clé `{id}/images/{fn}`, retrouve la question dans le `questionMap` (déjà chargé)
+3. Reconstruit la clé ZIP : `{cat}/{sec}/{id}/images/{fn}`
+
+Les clés R2 (plates) et les chemins ZIP (hiérarchiques) sont donc distincts.
 
 ---
 
 ## Mapping R2 déterministe — pas de table catalogue
 
-La clé R2 d'une image est entièrement dérivable depuis les données de la question :
+La clé R2 d'une image est entièrement dérivable depuis l'ID de la question :
 
 ```
-{categorySlug}/{sectionSlug}/{questionId}/images/{filename}
+{questionId}/images/{filename}
 ```
 
-- `categorySlug` / `sectionSlug` : obtenus par JOIN `questions → sections → categories`
 - `questionId` : clé primaire D1 de la question
 - `filename` : extrait du markdown — chaque `images/{filename}` dans `question_md`
   ou `correction_md` correspond exactement à une clé R2
@@ -95,46 +91,61 @@ on parse son markdown. Pour les supprimer, on reconstruit les clés R2 et on app
 
 ## Ajouter une image (futur admin CRUD)
 
-1. Upload vers R2 : clé `{cat}/{section}/{questionId}/images/{filename}`
+1. Upload vers R2 : clé `{questionId}/images/{filename}`
 2. Référencer dans le markdown : `![alt](images/{filename})`
 
 ---
 
 ## Setup local
 
-Le développement local utilise le même format de markdown que la production (`images/{fn}`).
+Le développement local est le plus proche possible de la prod : les images sont stockées dans
+le **R2 local** (miniflare, via `platformProxy`) et servies par la route proxy
+`GET /r2-proxy/[...path]` (`src/routes/r2-proxy/[...path]/+server.ts`).
 
 **Flow initial :**
 ```bash
 npm run db:seed:local
 ```
-`migrate-content.ts --local` génère le SQL **et** copie les images depuis `archive/` vers
-`static/questions-images/{cat}/{sec}/{questionId}/images/`.
 
-**`.dev.vars`** — ajouter la ligne suivante pour que le renderer sache résoudre les URLs :
+`migrate-content.ts --local` génère le SQL **et** injecte les images depuis `archive/` dans
+le R2 local via `wrangler r2 object put ... --local` sous les clés `{id}/images/{fn}`.
+
+**`.dev.vars`** :
 ```
-R2_PUBLIC_URL=/questions-images
+R2_PUBLIC_URL=/r2-proxy
 ```
 
-Le renderer résout alors `images/schema.png` → `/questions-images/{cat}/{sec}/{id}/images/schema.png`,
-servi statiquement par Vite/wrangler.
-
-> `npm run images:local` est désormais obsolète — son rôle est absorbé par `db:seed:local`.
+Le renderer résout `images/schema.png` → `/r2-proxy/{id}/images/schema.png`, servi par la
+route proxy qui lit depuis R2 local.
 
 ---
 
-## Migration depuis les URLs absolues (remote)
+## Migration R2 vers la structure plate (one-shot remote)
 
-Le script `scripts/migrate-image-urls.ts` :
+Le script `scripts/migrate-r2-flat.ts` renomme toutes les clés R2 :
+
+```
+Avant : {cat}/{section}/{question_id}/images/{filename}
+Après  : {question_id}/images/{filename}
+```
+
+```bash
+npm run r2:migrate-flat:remote
+```
+
+Le script est idempotent : les clés déjà au format plat sont ignorées.
+
+---
+
+## Migration depuis les URLs absolues (historique)
+
+Le script `scripts/migrate-image-urls.ts` (déjà exécuté) :
 1. Requête D1 avec JOIN pour obtenir `id`, `category_slug`, `section_slug` et les markdowns
-2. Pour chaque URL absolue trouvée (`https://pub-xxx.r2.dev/{cat}/{section}/images/{fn}`) :
-   - Upload depuis `archive/public/questions/{cat}/{section}/images/{fn}` vers la nouvelle clé R2
+2. Pour chaque URL absolue trouvée (`https://pub-xxx.r2.dev/...`) :
+   - Upload depuis `archive/` vers la clé R2
    - Remplace dans le markdown par `images/{fn}`
 3. Exécute les `UPDATE` SQL sur D1
 
 ```bash
 npm run db:migrate-image-urls:remote
 ```
-
-La DB locale utilise des chemins `/questions-images/...` (statique) qui passent
-à travers le renderer sans transformation — pas de migration locale nécessaire.

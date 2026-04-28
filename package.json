@@ -24,7 +24,8 @@
 		"images:local": "tsx scripts/migrate-images.ts --local",
 		"images:remote": "tsx scripts/migrate-images.ts --remote",
 		"db:migrate-image-urls:local": "tsx scripts/migrate-image-urls.ts --local",
-		"db:migrate-image-urls:remote": "tsx scripts/migrate-image-urls.ts --remote"
+		"db:migrate-image-urls:remote": "tsx scripts/migrate-image-urls.ts --remote",
+		"r2:migrate-flat:remote": "tsx scripts/migrate-r2-flat.ts --remote"
 	},
 	"devDependencies": {
 		"@cloudflare/vitest-pool-workers": "^0.14.9",

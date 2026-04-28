@@ -2,11 +2,11 @@ import { describe, it, expect } from 'vitest'
 import { createMarkdownRenderer } from './markdown'
 
 describe('createMarkdownRenderer', () => {
-	const render = createMarkdownRenderer(42, 'securite', 'feux', 'https://r2.example.com')
+	const render = createMarkdownRenderer(42, 'https://r2.example.com')
 
 	it('résout images/schema.png → URL R2 complète', () => {
 		expect(render('![alt](images/schema.png)')).toContain(
-			'https://r2.example.com/securite/feux/42/images/schema.png'
+			'https://r2.example.com/42/images/schema.png'
 		)
 	})
 

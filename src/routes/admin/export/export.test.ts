@@ -23,7 +23,7 @@ vi.mock('$lib/server/db/queries/templates', () => ({
 
 const mockR2 = {
 	list: vi.fn().mockResolvedValue({
-		objects: [{ key: 'securite/feux/1/images/schema.png' }],
+		objects: [{ key: '1/images/schema.png' }],
 		truncated: false
 	}),
 	get: vi.fn().mockResolvedValue({ arrayBuffer: () => Promise.resolve(new ArrayBuffer(4)) })
@@ -92,5 +92,13 @@ describe('GET /admin/export', () => {
 		const imgDir = imgKey.split('/').slice(0, -2).join('/')
 		const mdDir = mdKey.split('/').slice(0, -1).join('/')
 		expect(imgDir).toBe(mdDir)
+	})
+
+	it('la clé ZIP des images est hiérarchique même si R2 est plat', async () => {
+		const response = await GET(makeEvent(true))
+		const buf = await response.arrayBuffer()
+		const zip = unzipSync(new Uint8Array(buf))
+		const imgKey = Object.keys(zip).find((k) => k.endsWith('.png'))!
+		expect(imgKey).toBe('securite/feux/1/images/schema.png')
 	})
 })

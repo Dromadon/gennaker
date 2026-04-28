@@ -29,18 +29,35 @@ export const GET = async ({ locals, platform }) => {
 	// Templates JSON
 	files['templates.json'] = strToU8(JSON.stringify(templates, null, 2))
 
-	// Images from R2 — keys follow {cat}/{section}/{id}/images/{filename}
-	// ZIP path = R2 key directly (co-located with markdown)
-	const listed = await r2.list()
-	for (const obj of listed.objects) {
-		try {
-			const r2obj = await r2.get(obj.key)
-			if (!r2obj) continue
-			files[obj.key] = new Uint8Array(await r2obj.arrayBuffer())
-		} catch {
-			console.error(`Erreur R2 : ${obj.key}`)
+	// Images from R2 — keys are flat: "{id}/images/{filename}"
+	// ZIP path reconstructs the hierarchy: "{cat}/{section}/{id}/images/{filename}"
+	let cursor: string | undefined
+	do {
+		const listed = await r2.list(cursor ? { cursor } : undefined)
+		for (const obj of listed.objects) {
+			// Expected key format: "{id}/images/{filename}"
+			const parts = obj.key.split('/')
+			if (parts.length !== 3 || parts[1] !== 'images') {
+				console.error(`Clé R2 inattendue (ignorée) : ${obj.key}`)
+				continue
+			}
+			const [idStr, , filename] = parts
+			const q = questionMap.get(Number(idStr))
+			if (!q) {
+				console.error(`Question inconnue pour clé R2 : ${obj.key}`)
+				continue
+			}
+			const zipKey = `${q.categorySlug}/${q.sectionSlug}/${q.id}/images/${filename}`
+			try {
+				const r2obj = await r2.get(obj.key)
+				if (!r2obj) continue
+				files[zipKey] = new Uint8Array(await r2obj.arrayBuffer())
+			} catch {
+				console.error(`Erreur R2 : ${obj.key}`)
+			}
 		}
-	}
+		cursor = listed.truncated ? listed.cursor : undefined
+	} while (cursor)
 
 	const date = new Date().toISOString().slice(0, 10)
 	const filename = `gennaker-backup-${date}.zip`

@@ -3,13 +3,14 @@
  * Génère scripts/seed.sql à exécuter via wrangler d1 execute.
  *
  * Usage :
- *   npx tsx scripts/migrate-content.ts --local   (markdown gardé tel quel + images copiées
- *                                                  dans static/questions-images/{cat}/{sec}/{id}/images/)
+ *   npx tsx scripts/migrate-content.ts --local   (markdown gardé tel quel + images injectées
+ *                                                  dans le R2 local via wrangler CLI)
  *   npx tsx scripts/migrate-content.ts --remote  (markdown gardé tel quel, images dans R2 via migrate-image-urls)
  *   npx tsx scripts/migrate-content.ts           (IMAGES_BASE_URL depuis l'environnement, ou chemins relatifs)
  */
 
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs'
+import { execSync } from 'child_process'
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs'
 import { dirname, join, resolve } from 'path'
 
 const ROOT = resolve(import.meta.dirname, '..')
@@ -18,20 +19,21 @@ const ARCHIVE_EVALUATIONS = join(ROOT, 'archive/public/evaluations')
 const OUTPUT = join(ROOT, 'scripts/seed.sql')
 
 const IS_LOCAL = process.argv[2] === '--local'
-const STATIC_IMAGES = join(ROOT, 'static/questions-images')
 
-// Pour --local : copie les images co-localisées avec le .md dans le dossier dédié à la question.
+// Pour --local : injecte les images dans le R2 local (miniflare via wrangler CLI).
 // Les images restent référencées par images/{fn} dans le markdown ; le renderer local
-// résout via R2_PUBLIC_URL=/questions-images → /questions-images/{cat}/{sec}/{id}/images/{fn}.
+// résout via R2_PUBLIC_URL=/r2-proxy → /r2-proxy/{id}/images/{fn} servi par la route proxy.
 // mdPath peut être dans un sous-dossier (ex. secDir/brise_thermique/question.md) — on
 // cherche toujours dans dirname(mdPath)/images/, co-localisé avec le fichier markdown.
-function copyImagesForQuestion(catSlug: string, secSlug: string, mdPath: string, qId: number) {
+function uploadImagesToLocalR2(mdPath: string, qId: number) {
 	const imagesDir = join(dirname(mdPath), 'images')
 	if (!existsSync(imagesDir)) return
-	const destDir = join(STATIC_IMAGES, catSlug, secSlug, String(qId), 'images')
-	mkdirSync(destDir, { recursive: true })
 	for (const file of readdirSync(imagesDir)) {
-		copyFileSync(join(imagesDir, file), join(destDir, file))
+		const r2Key = `gennaker-questions/${qId}/images/${file}`
+		const filePath = join(imagesDir, file)
+		execSync(`npx wrangler r2 object put "${r2Key}" --file "${filePath}" --local`, {
+			stdio: 'pipe'
+		})
 	}
 }
 
@@ -230,7 +232,7 @@ for (const [catSlug] of Object.entries(categoriesDB)) {
 			const key = `${catSlug}/${secSlug}/${entry.fileName}`
 			questionIds[key] = qId
 
-			if (IS_LOCAL) copyImagesForQuestion(catSlug, secSlug, mdPath, qId)
+			if (IS_LOCAL) uploadImagesToLocalR2(mdPath, qId)
 
 			emit(
 				`INSERT OR REPLACE INTO questions (id, section_id, title, question_md, correction_md, difficulty, answer_size, applicable_supports, status, source_md, created_at, updated_at) VALUES (${qId}, ${sectionId}, ${esc(parsed.title)}, ${esc(parsed.questionMd)}, ${esc(parsed.correctionMd)}, 'moyen', ${esc(answerSize)}, ${esc(applicableSupports)}, 'publie', ${esc(parsed.sourceMd)}, ${now}, ${now});`
