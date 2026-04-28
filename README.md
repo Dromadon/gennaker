@@ -25,23 +25,20 @@ Le développement local fonctionne entièrement sans compte Cloudflare. La base 
 # 1. Créer les tables (migration de schéma)
 npm run db:migrate:local
 
-# 2. (Optionnel) Avoir des données et des images qui s'affichent
-npm run db:seed:local
+# 2. (Optionnel) Peupler depuis un export de production
+npm run dev:seed -- --file gennaker-backup-YYYY-MM-DD.zip
 
 # 3. Lancer le serveur de dev
 npm run dev
 ```
 
-> `npm run db:seed:local` génère le SQL depuis `archive/`, peuple D1, **et** copie les images
-> dans `static/questions-images/{cat}/{sec}/{id}/images/`. Le renderer local résout les URLs
-> relatives (`images/schema.png`) via `R2_PUBLIC_URL=/questions-images` — à ajouter dans
-> `.dev.vars` (voir ci-dessous).
+L'export ZIP se télécharge depuis l'interface admin en production : `/admin` → **Télécharger le backup**. Voir [docs/dev-setup.md](docs/dev-setup.md) pour le détail et les sous-commandes disponibles.
 
 Le serveur tourne sur [http://localhost:5173](http://localhost:5173).
 
 `npm run dev` utilise `vite dev` avec `platformProxy` (`@sveltejs/adapter-cloudflare`) : les bindings D1, R2 et les variables d'environnement de `.dev.vars` sont injectés automatiquement, et le HMR fonctionne normalement.
 
-> **Sans l'étape 2**, les questions sont en base mais les images ne s'affichent pas. C'est acceptable pour travailler sur la logique métier.
+> **Sans l'étape 2**, l'application fonctionne avec une base vide. Acceptable pour travailler sur la logique métier.
 
 > **`npm run dev`** (par défaut) — À utiliser pour la majorité du développement : HMR CSS, rechargement rapide, bonne expérience DX. Les bindings Cloudflare (D1, R2) sont simulés via `platformProxy`.
 >
@@ -104,12 +101,8 @@ Renseigner ensuite les variables dans `wrangler.toml` : `R2_PUBLIC_URL` (l'URL o
 # Appliquer le schéma
 npm run db:migrate:remote
 
-# Uploader les images vers R2
-npm run images:remote
-
-# Générer et importer les données (questions + templates)
-# (lit R2_PUBLIC_URL depuis wrangler.toml automatiquement)
-npm run db:seed:remote
+# Importer les données et images depuis un export de production
+npm run prod:seed -- --file gennaker-backup-YYYY-MM-DD.zip
 
 # Configurer les secrets (voir ci-dessous pour générer les valeurs)
 npx wrangler secret put ADMIN_PASSWORD_HASH
@@ -179,7 +172,7 @@ src/
 │   └── components/      # composants Svelte réutilisables
 └── routes/              # pages et routes API SvelteKit
 drizzle/migrations/      # migrations SQL générées par Drizzle Kit
-scripts/                 # scripts one-shot (migration contenu, images)
+scripts/                 # import depuis export de production
 ```
 
 Voir [ARCHITECTURE.md](ARCHITECTURE.md) pour l'architecture détaillée et [STANDARDS.md](STANDARDS.md) pour les conventions de code.

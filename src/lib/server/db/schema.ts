@@ -1,4 +1,4 @@
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 export const supports = sqliteTable('supports', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
@@ -24,7 +24,7 @@ export const sections = sqliteTable('sections', {
 	displayName: text('display_name').notNull(),
 	// JSON stringifié : '[]' = tous les supports
 	applicableSupports: text('applicable_supports').notNull().default('[]')
-});
+}, (t) => [uniqueIndex('sections_category_slug_unique').on(t.categoryId, t.slug)]);
 
 export const questions = sqliteTable('questions', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
@@ -52,7 +52,7 @@ export const evaluationTemplates = sqliteTable('evaluation_templates', {
 	format: text('format').notNull(), // 'standard' | 'raccourcie' | 'positionnement'
 	createdAt: integer('created_at').notNull(),
 	updatedAt: integer('updated_at').notNull()
-});
+}, (t) => [uniqueIndex('evaluation_templates_support_format_unique').on(t.supportSlug, t.format)]);
 
 export const templateSlots = sqliteTable('template_slots', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
@@ -68,7 +68,7 @@ export const templateSlots = sqliteTable('template_slots', {
 	pinnedQuestionId: integer('pinned_question_id').references(() => questions.id),
 	// JSON stringifié : '[42, 17]'
 	preferredQuestionIds: text('preferred_question_ids').notNull().default('[]')
-});
+}, (t) => [uniqueIndex('template_slots_template_position_unique').on(t.templateId, t.position)]);
 
 export const sharedEvaluations = sqliteTable('shared_evaluations', {
 	id: integer('id').primaryKey({ autoIncrement: true }),

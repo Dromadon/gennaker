@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { generateStructureSql, generateQuestionsSql, generateTemplatesSql } from './generate-sql'
+import { generateStructureSql, generateQuestionsSql, generateTemplatesSql, generateWipeSql } from './generate-sql'
 import type { StructureJson, ParsedQuestion } from './parse-zip'
 
 const STRUCTURE: StructureJson = {
@@ -149,5 +149,19 @@ describe('generateTemplatesSql', () => {
 	it('met NULL pour pinnedQuestionId null', () => {
 		const sql = generateTemplatesSql(templates)
 		expect(sql).toContain(', NULL,')
+	})
+})
+
+describe('generateWipeSql', () => {
+	it('contient DELETE pour chaque table', () => {
+		const sql = generateWipeSql()
+		for (const table of ['template_slots', 'evaluation_templates', 'shared_evaluations', 'community_submissions', 'questions', 'sections', 'categories', 'supports']) {
+			expect(sql).toContain(`DELETE FROM ${table}`)
+		}
+	})
+
+	it('template_slots apparaît avant evaluation_templates (ordre FK)', () => {
+		const sql = generateWipeSql()
+		expect(sql.indexOf('DELETE FROM template_slots')).toBeLessThan(sql.indexOf('DELETE FROM evaluation_templates'))
 	})
 })

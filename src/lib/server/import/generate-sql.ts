@@ -77,3 +77,16 @@ export function generateTemplatesSql(templates: TemplateExportRow[]): string {
 
 	return lines.join('\n')
 }
+
+export function generateWipeSql(): string {
+	return [
+		'DELETE FROM template_slots;',
+		'DELETE FROM evaluation_templates;',
+		'DELETE FROM shared_evaluations;',
+		'DELETE FROM community_submissions;',
+		'DELETE FROM questions;',
+		'DELETE FROM sections;',
+		'DELETE FROM categories;',
+		'DELETE FROM supports;'
+	].join('\n')
+}

@@ -33,6 +33,9 @@ Correction en markdown…
 
 ```json
 {
+  "supports": [
+    { "slug": "deriveur", "displayName": "Dériveur", "enabled": true }
+  ],
   "categories": [
     {
       "slug": "securite",
@@ -50,9 +53,24 @@ Correction en markdown…
 }
 ```
 
-La structure décrit l'arborescence complète des catégories et sections pour permettre une reconstruction correcte du modèle de données lors d'une restauration.
-
 - `applicableSupports` est un tableau vide (`[]`) si la catégorie/section s'applique à tous les supports, sinon contient les slugs des supports applicables.
+- `supports` liste tous les supports avec leur état d'activation.
+
+### Format des fichiers question avec source
+
+Quand une question a un champ `sourceMd`, il est inclus après la correction :
+
+```markdown
+# Titre de la question
+
+Énoncé en markdown…
+
+# Correction
+
+Correction en markdown…
+
+<small>Manuel FFV p.42</small>
+```
 
 ## Utilisation
 
@@ -60,8 +78,14 @@ Depuis l'interface admin (`/admin`) → bouton **Télécharger le backup**.
 
 ## Reconstruction depuis un backup
 
-1. Re-créer les tables : `npm run db:migrate:remote`
-2. Importer la structure (catégories et sections) : adapter `scripts/migrate-content.ts` pour lire `structure.json` et créer les entrées dans les tables `categories` et `sections`
-3. Importer les questions : adapter le script pour lire les fichiers `.md` et créer les entrées dans `questions`
-4. Importer les templates : adapter le script pour lire `templates.json` et créer les entrées dans `evaluation_templates` et `template_slots`
-5. Uploader les images R2 : `wrangler r2 object put <bucket>/<key> --file <file> --remote` pour chaque image du dossier `{catégorie}/{section}/{id}/images/`
+Pour peupler un environnement (dev ou production) depuis un export ZIP :
+
+```bash
+# Dev local
+npm run dev:seed -- --file gennaker-backup-YYYY-MM-DD.zip
+
+# Production
+npm run prod:seed -- --file gennaker-backup-YYYY-MM-DD.zip
+```
+
+Voir [dev-setup.md](dev-setup.md) pour le détail complet du setup et des sous-commandes disponibles.

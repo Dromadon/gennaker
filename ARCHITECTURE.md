@@ -84,7 +84,7 @@ gennaker/
 │   └── migrations/                  -- fichiers SQL générés par Drizzle Kit
 │
 ├── scripts/
-│   └── migrate-content.ts           -- migration one-shot depuis les fichiers existants
+│   └── import-export.ts             -- peuplement D1 + R2 depuis un export ZIP de production
 │
 ├── static/                          -- assets statiques (favicon, etc.)
 ├── wrangler.toml                    -- configuration Cloudflare (bindings D1, R2, secrets)
@@ -126,6 +126,7 @@ sections: {
   slug                text
   display_name        text
   applicable_supports text      -- JSON stringifié : '[]' = tous les supports
+  UNIQUE(category_id, slug)     -- garantit l'idempotence de l'import
 }
 
 questions: {
@@ -154,6 +155,7 @@ evaluation_templates: {
   format       text      -- 'standard' | 'raccourcie' | 'positionnement'
   created_at   integer
   updated_at   integer
+  UNIQUE(support_slug, format)  -- garantit l'idempotence de l'import
 }
 
 template_slots: {
@@ -165,6 +167,7 @@ template_slots: {
   difficulty_filter      text     -- 'any' | 'facile' | 'moyen' | 'difficile'
   pinned_question_id     FK → questions (nullable)
   preferred_question_ids text     -- JSON stringifié : '[42, 17]'
+  UNIQUE(template_id, position)  -- garantit l'idempotence de l'import
 }
 ```
 
@@ -380,28 +383,54 @@ L'impression est déclenchée par `window.print()` depuis le bouton "Imprimer" d
 
 ---
 
-## 10. Migration du contenu existant
+## 10. Import depuis un export de production
 
-Script one-shot `scripts/migrate-content.ts` exécuté via `wrangler d1 execute` ou localement contre D1 remote.
+L'environnement de dev (et la production en cas de restauration) se peuple exclusivement depuis un export ZIP généré par `GET /admin/export`. Il n'existe plus de dépendance à un répertoire de données statiques.
+
+### Script
+
+`scripts/import-export.ts` — orchestrateur CLI, pas de logique métier directe.
+
+### Logique pure (testée unitairement)
+
+| Fichier | Rôle |
+|---------|------|
+| `src/lib/server/import/parse-zip.ts` | Désarchive le ZIP, parse les `.md`, extrait questions et images |
+| `src/lib/server/import/generate-sql.ts` | Génère le SQL d'upsert (`ON CONFLICT DO UPDATE`) et de wipe |
+
+### Flux d'import
 
 ```
-Pour chaque catégorie/section dans public/questions/ :
-  1. Lire categoriesDB.json → insérer les entrées categories et sections
-  2. Lire db.json de chaque section → récupérer answerSize et applicable_supports
-  3. Pour chaque fichier .md :
-     a. Extraire le titre (première ligne `# ...`)
-     b. Extraire l'énoncé (entre le titre et `# Correction`)
-     c. Extraire la correction (après `# Correction`)
-     d. Extraire la source (<small>...</small> en fin de correction)
-     e. Uploader les images du dossier images/ vers R2 (via API S3 ou wrangler r2)
-     f. Remplacer les chemins relatifs des images par les URLs R2 absolues
-     g. Insérer la question en D1 avec status='publie', difficulty='moyen'
-
-Pour chaque fichier public/evaluations/*.json :
-  1. Parser support × format depuis le nom de fichier
-  2. Créer l'evaluation_template correspondant
-  3. Créer les template_slots dans l'ordre de la structure JSON
+ZIP → parseZip()
+         ├── structure.json → generateStructureSql() → wrangler d1 execute
+         ├── questions .md  → generateQuestionsSql() → wrangler d1 execute
+         ├── templates.json → generateTemplatesSql() → wrangler d1 execute
+         └── images/        → wrangler r2 object put  (un appel par fichier)
 ```
+
+### Idempotence
+
+Toutes les tables utilisent `ON CONFLICT DO UPDATE` (upsert SQLite). Les tables `sections`, `evaluation_templates` et `template_slots` ont des index uniques composites pour que le `ON CONFLICT` puisse cibler la bonne ligne :
+
+- `sections` → `UNIQUE(category_id, slug)`
+- `evaluation_templates` → `UNIQUE(support_slug, format)`
+- `template_slots` → `UNIQUE(template_id, position)`
+
+### Comportement dev vs prod
+
+- **`npm run dev:seed`** passe `--wipe` : vide toutes les tables (ordre inverse des FK) puis importe. Repart toujours d'un état propre.
+- **`npm run prod:seed`** sans `--wipe` : upsert pur, aucune donnée supprimée. Sûr pour rattraper un diff ou restaurer.
+
+### Format du ZIP d'export
+
+```
+{cat}/{sec}/{id}/{titre}.md     ← question + correction (+ <small>source</small> si présent)
+{cat}/{sec}/{id}/images/{fn}    ← images
+templates.json                  ← templates et slots
+structure.json                  ← supports, catégories, sections
+```
+
+Voir [docs/admin-export.md](docs/admin-export.md) et [docs/dev-setup.md](docs/dev-setup.md).
 
 ---
 
