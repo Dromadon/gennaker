@@ -26,6 +26,19 @@ export type QuestionExportRow = {
 	correctionMd: string
 }
 
+export type StructureExportRow = {
+	categories: {
+		slug: string
+		displayName: string
+		applicableSupports: string[]
+		sections: {
+			slug: string
+			displayName: string
+			applicableSupports: string[]
+		}[]
+	}[]
+}
+
 export async function getAllQuestionsForExport(d1: D1Database): Promise<QuestionExportRow[]> {
 	return getDb(d1)
 		.select({
@@ -40,6 +53,45 @@ export async function getAllQuestionsForExport(d1: D1Database): Promise<Question
 		.innerJoin(sections, eq(sections.id, questions.sectionId))
 		.innerJoin(categories, eq(categories.id, sections.categoryId))
 		.where(eq(questions.status, 'publie'))
+}
+
+export async function getStructureForExport(d1: D1Database): Promise<StructureExportRow> {
+	const db = getDb(d1)
+
+	const categoryRows = await db
+		.select({
+			id: categories.id,
+			slug: categories.slug,
+			displayName: categories.displayName,
+			applicableSupports: categories.applicableSupports
+		})
+		.from(categories)
+
+	const structureCategories = []
+
+	for (const cat of categoryRows) {
+		const sectionRows = await db
+			.select({
+				slug: sections.slug,
+				displayName: sections.displayName,
+				applicableSupports: sections.applicableSupports
+			})
+			.from(sections)
+			.where(eq(sections.categoryId, cat.id))
+
+		structureCategories.push({
+			slug: cat.slug,
+			displayName: cat.displayName,
+			applicableSupports: JSON.parse(cat.applicableSupports),
+			sections: sectionRows.map((s) => ({
+				slug: s.slug,
+				displayName: s.displayName,
+				applicableSupports: JSON.parse(s.applicableSupports)
+			}))
+		})
+	}
+
+	return { categories: structureCategories }
 }
 
 export async function getQuestionsAdmin(

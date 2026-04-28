@@ -162,6 +162,7 @@ Ces tâches ne sont pas des user stories mais sont des prérequis bloquants.
 - Le ZIP contient toutes les questions au format markdown, organisées en `{catégorie}/{section}/{id}/{titre}.md`, avec l'énoncé et la correction séparés par `# Correction`
 - Le ZIP contient toutes les images depuis R2, co-localisées avec le markdown (`{catégorie}/{section}/{id}/images/{fichier}`)
 - Le ZIP contient un fichier `templates.json` décrivant les templates et leurs slots
+- Le ZIP contient un fichier `structure.json` décrivant les catégories et sections avec leurs métadonnées (slugs, order, etc.)
 - Le fichier est nommé `gennaker-backup-{YYYY-MM-DD}.zip`
 - L'endpoint est protégé par l'authentification admin existante
 - La génération ne dépasse pas les limites CPU/mémoire d'un Worker (streaming si nécessaire)

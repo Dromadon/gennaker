@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit'
 import { zipSync, strToU8 } from 'fflate'
-import { getAllQuestionsForExport } from '$lib/server/db/queries/questions'
+import { getAllQuestionsForExport, getStructureForExport } from '$lib/server/db/queries/questions'
 import { getAllTemplatesForExport } from '$lib/server/db/queries/templates'
 
 export const GET = async ({ locals, platform }) => {
@@ -9,9 +9,10 @@ export const GET = async ({ locals, platform }) => {
 	const db = platform!.env.DB
 	const r2 = platform!.env.IMAGES
 
-	const [questionRows, templates] = await Promise.all([
+	const [questionRows, templates, structure] = await Promise.all([
 		getAllQuestionsForExport(db),
-		getAllTemplatesForExport(db)
+		getAllTemplatesForExport(db),
+		getStructureForExport(db)
 	])
 
 	const files: Record<string, Uint8Array> = {}
@@ -28,6 +29,9 @@ export const GET = async ({ locals, platform }) => {
 
 	// Templates JSON
 	files['templates.json'] = strToU8(JSON.stringify(templates, null, 2))
+
+	// Structure JSON (categories and sections)
+	files['structure.json'] = strToU8(JSON.stringify(structure, null, 2))
 
 	// Images from R2 — keys are flat: "{id}/images/{filename}"
 	// ZIP path reconstructs the hierarchy: "{cat}/{section}/{id}/images/{filename}"

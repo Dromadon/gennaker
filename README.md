@@ -43,7 +43,15 @@ Le serveur tourne sur [http://localhost:5173](http://localhost:5173).
 
 > **Sans l'étape 2**, les questions sont en base mais les images ne s'affichent pas. C'est acceptable pour travailler sur la logique métier.
 
-> `npm run dev:cf` (`vite build --watch + wrangler dev`, port 8788) reste disponible pour valider un comportement spécifique au runtime Workers avant de pusher, mais le HMR CSS n'y fonctionne pas — réserver à la validation finale.
+> **`npm run dev`** (par défaut) — À utiliser pour la majorité du développement : HMR CSS, rechargement rapide, bonne expérience DX. Les bindings Cloudflare (D1, R2) sont simulés via `platformProxy`.
+>
+> **`npm run dev:cf`** (`vite build --watch + wrangler dev`, port 8788) — Simule l'environnement Workers réel. HMR CSS **ne fonctionne pas**, mais permet de valider des comportements qui diffèrent entre local et production :
+> - Limites de **timeout/CPU** (30s pour Workers standard)
+> - Limitations de **mémoire** (environ 128 MB)
+> - Résolution des **variables d'environnement et secrets** depuis `.dev.vars`
+> - Comportement exact de **R2** et **D1** en tant que bindings
+>
+> À utiliser avant de pusher si tu modifies : un endpoint CPU-intensif (ex. ZIP d'export), des opérations R2 en masse, ou la gestion des secrets/bindings.
 
 ## Modifier le schéma de base de données
 

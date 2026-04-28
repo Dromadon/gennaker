@@ -12,7 +12,23 @@ vi.mock('$lib/server/db/queries/questions', () => ({
 			questionMd: 'Quels sont les signaux de détresse ?',
 			correctionMd: 'Fusées, fumigènes...'
 		}
-	])
+	]),
+	getStructureForExport: vi.fn().mockResolvedValue({
+		categories: [
+			{
+				slug: 'securite',
+				displayName: 'Sécurité',
+				applicableSupports: [],
+				sections: [
+					{
+						slug: 'feux',
+						displayName: 'Feux et signaux',
+						applicableSupports: []
+					}
+				]
+			}
+		]
+	})
 }))
 
 vi.mock('$lib/server/db/queries/templates', () => ({
@@ -49,12 +65,13 @@ describe('GET /admin/export', () => {
 		expect(response.headers.get('Content-Disposition')).toMatch(/attachment.*\.zip/)
 	})
 
-	it('le ZIP contient templates.json et le fichier de la question', async () => {
+	it('le ZIP contient templates.json, structure.json et le fichier de la question', async () => {
 		const response = await GET(makeEvent(true))
 		const buf = await response.arrayBuffer()
 		const zip = unzipSync(new Uint8Array(buf))
 		const keys = Object.keys(zip)
 		expect(keys).toContain('templates.json')
+		expect(keys).toContain('structure.json')
 		expect(keys.some((k) => k.endsWith('.md'))).toBe(true)
 	})
 
@@ -100,5 +117,17 @@ describe('GET /admin/export', () => {
 		const zip = unzipSync(new Uint8Array(buf))
 		const imgKey = Object.keys(zip).find((k) => k.endsWith('.png'))!
 		expect(imgKey).toBe('securite/feux/1/images/schema.png')
+	})
+
+	it('structure.json contient les catégories et sections avec métadonnées', async () => {
+		const response = await GET(makeEvent(true))
+		const buf = await response.arrayBuffer()
+		const zip = unzipSync(new Uint8Array(buf))
+		const structure = JSON.parse(new TextDecoder().decode(zip['structure.json']))
+		expect(structure.categories).toHaveLength(1)
+		expect(structure.categories[0].slug).toBe('securite')
+		expect(structure.categories[0].displayName).toBe('Sécurité')
+		expect(structure.categories[0].sections).toHaveLength(1)
+		expect(structure.categories[0].sections[0].slug).toBe('feux')
 	})
 })
