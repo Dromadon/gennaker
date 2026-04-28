@@ -118,6 +118,7 @@ describe('generateTemplatesSql', () => {
 				{
 					id: 10,
 					sectionId: 1,
+					categorySlug: 'meteo',
 					sectionSlug: 'carte_meteo',
 					position: 1,
 					questionCount: 2,
@@ -140,10 +141,10 @@ describe('generateTemplatesSql', () => {
 		expect(sql).toContain('INSERT INTO template_slots')
 	})
 
-	it('utilise subquery pour template_id et section_id', () => {
+	it('utilise subquery pour template_id et section_id avec jointure catégorie', () => {
 		const sql = generateTemplatesSql(templates)
 		expect(sql).toContain("SELECT id FROM evaluation_templates WHERE support_slug='deriveur'")
-		expect(sql).toContain("SELECT id FROM sections WHERE slug='carte_meteo'")
+		expect(sql).toContain("SELECT s.id FROM sections s INNER JOIN categories c ON c.id = s.category_id WHERE s.slug='carte_meteo' AND c.slug='meteo'")
 	})
 
 	it('met NULL pour pinnedQuestionId null', () => {

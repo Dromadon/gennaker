@@ -2,8 +2,9 @@
 	import { goto } from '$app/navigation'
 	import { page } from '$app/state'
 	import { evaluationStore, replaceQuestion } from '$lib/stores/evaluation'
-	import type { EvaluationSlot } from '$lib/domain/types'
+	import type { EvaluationSlot, QuestionPickRow } from '$lib/domain/types'
 	import { createMarkdownRenderer } from '$lib/markdown'
+	import QuestionPickerModal from '$lib/components/QuestionPickerModal.svelte'
 
 	const evaluation = $derived($evaluationStore)
 
@@ -14,6 +15,8 @@
 	let activeTab = $state<'structure' | 'impression'>('structure')
 	let desktopTab = $state<'structure' | 'impression'>('structure')
 	let redrawingId = $state<number | null>(null)
+	let pickerSlot = $state<EvaluationSlot | null>(null)
+	let pickerQuestionId = $state<number | null>(null)
 	let toastMessage = $state('')
 	let toastVisible = $state(false)
 	let toastTimer: ReturnType<typeof setTimeout> | null = null
@@ -75,6 +78,29 @@
 			redrawingId = null
 		}
 	}
+
+	function openPicker(slot: EvaluationSlot, questionId: number) {
+		pickerSlot = slot
+		pickerQuestionId = questionId
+	}
+
+	function handlePick(candidate: QuestionPickRow) {
+		if (!pickerSlot || pickerQuestionId === null) return
+		replaceQuestion(pickerSlot.slotId, pickerQuestionId, {
+			id: candidate.id,
+			sectionId: pickerSlot.sectionId,
+			title: candidate.title,
+			questionMd: candidate.questionMd,
+			correctionMd: candidate.correctionMd,
+			applicableSupports: candidate.applicableSupports,
+			answerSize: candidate.answerSize
+		})
+		showToast('Question remplacée')
+	}
+
+	const allQuestionIds = $derived(
+		evaluation ? evaluation.slots.flatMap((s) => s.questions.map((q) => q.id)) : []
+	)
 
 	function printEvaluation() {
 		if (!evaluation) return
@@ -222,17 +248,30 @@
 
 						{#each slot.questions as question}
 							<article class="relative mb-6 break-inside-avoid rounded-lg border border-gray-200 p-5 print:rounded-none print:border-0 print:p-3">
-								<button
-									onclick={() => redrawQuestion(slot.slotId, question.id, slot.sectionId)}
-									disabled={redrawingId !== null}
-									class="absolute -top-3 right-4 rounded-md border border-gray-200 bg-white p-1 text-gray-400 shadow-sm transition-colors hover:border-gray-400 hover:text-gray-700 disabled:opacity-40 print:hidden"
-									aria-label="Re-tirer cette question"
-									title="Re-tirer cette question"
-								>
-									<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 {redrawingId === question.id ? 'animate-spin' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-										<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-									</svg>
-								</button>
+								<div class="absolute -top-3 right-4 flex gap-1 print:hidden">
+									<button
+										onclick={() => redrawQuestion(slot.slotId, question.id, slot.sectionId)}
+										disabled={redrawingId !== null || pickerSlot !== null}
+										class="rounded-md border border-gray-200 bg-white p-1 text-gray-400 shadow-sm transition-colors hover:border-gray-400 hover:text-gray-700 disabled:opacity-40"
+										aria-label="Re-tirer cette question"
+										title="Re-tirer cette question"
+									>
+										<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 {redrawingId === question.id ? 'animate-spin' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+										</svg>
+									</button>
+									<button
+										onclick={() => openPicker(slot, question.id)}
+										disabled={redrawingId !== null || pickerSlot !== null}
+										class="rounded-md border border-gray-200 bg-white p-1 text-gray-400 shadow-sm transition-colors hover:border-gray-400 hover:text-gray-700 disabled:opacity-40"
+										aria-label="Choisir une question"
+										title="Choisir une question"
+									>
+										<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+										</svg>
+									</button>
+								</div>
 								<p class="mb-3 font-medium">{question.title}</p>
 								<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 								<div class="prose prose-sm max-w-none">{@html renderMd(question.questionMd, question.id)}</div>
@@ -331,4 +370,15 @@
 		{/if}
 
 	</div>
+
+	{#if pickerSlot}
+		<QuestionPickerModal
+			open={pickerSlot !== null}
+			slot={pickerSlot}
+			support={evaluation.support}
+			currentQuestionIds={allQuestionIds}
+			onpick={handlePick}
+			onclose={() => { pickerSlot = null; pickerQuestionId = null }}
+		/>
+	{/if}
 {/if}

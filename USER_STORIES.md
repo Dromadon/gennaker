@@ -244,7 +244,7 @@ Les stories suivantes sont identifiées mais hors scope MVP, classées par prior
 
 ---
 
-### US-11 — Interface admin : CRUD questions (sans images)
+### US-11 ✅ — Interface admin : CRUD questions (sans images)
 
 **En tant que** administrateur,  
 **je veux** lister, créer, modifier et supprimer des questions depuis l'interface admin,  
@@ -348,3 +348,39 @@ _Admin : visualisation_
 - Parsing de la source (extraction d'auteur, date) — stockage texte libre uniquement
 - Liens hypertextes dans la source — texte brut seulement
 - Historique des sources modifiées
+
+---
+
+### US-14 — Sélection manuelle d'une question dans la banque
+
+**En tant que** formateur,  
+**je veux** sélectionner manuellement une question spécifique dans la banque pour remplacer une question d'un slot,  
+**afin de** choisir précisément les questions adaptées à mon contexte sans dépendre du hasard du re-tirage.
+
+**Critères d'acceptation**
+
+_Déclenchement_
+- À côté du bouton "Re-tirer cette question" (US-07), un bouton "Choisir une question" ouvre une modale de sélection
+- La modale affiche un formulaire de recherche et filtrage
+
+_Recherche et filtrage_
+- Un champ texte permet de chercher par titre ou énoncé (recherche fulltext)
+- Les questions sont filtrées sur la base de la catégorie et section concernées et du support choisi
+- La liste affiche les questions correspondantes avec : titre, difficulté
+- Les questions actuellement présentes ailleurs dans l'évaluation sont marquées distinctement (ex. icône "déjà utilisée")
+
+_Sélection_
+- Cliquer sur une question la sélectionne et remplace immédiatement la question du slot
+- Un message de confirmation très court s'affiche ("Question remplacée")
+- La modale se ferme automatiquement après la sélection
+- La question tirée aléatoirement est conservée en mémoire (permet un retour arrière via annulation)
+
+_Sauvegarde et état_
+- La modification n'est pas sauvegardée automatiquement — elle ne persiste que dans la session courante
+- L'évaluation reste modifiable normalement après sélection manuelle (re-tirage possible, etc.)
+
+**Hors périmètre**
+- Persistance des sélections manuelles entre sessions (c.-à-d. les modifications ne sont sauvegardées que pendant la session)
+- Historique des sélections manuelles
+- Possibilité de sélectionner des questions d'une autre catégorie ou section
+- Tri ou tri personnalisé de la liste de recherche (tri par défaut : pertinence fulltext)

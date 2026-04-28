@@ -9,7 +9,7 @@ export type TemplateExportRow = {
 	format: string
 	slots: {
 		id: number
-		sectionId: number
+		categorySlug: string
 		sectionSlug: string
 		position: number
 		questionCount: number
@@ -31,7 +31,7 @@ export async function getAllTemplatesForExport(d1: D1Database): Promise<Template
 		const slots = await db
 			.select({
 				id: templateSlots.id,
-				sectionId: templateSlots.sectionId,
+				categorySlug: categories.slug,
 				sectionSlug: sections.slug,
 				position: templateSlots.position,
 				questionCount: templateSlots.questionCount,
@@ -41,6 +41,7 @@ export async function getAllTemplatesForExport(d1: D1Database): Promise<Template
 			})
 			.from(templateSlots)
 			.innerJoin(sections, eq(sections.id, templateSlots.sectionId))
+			.innerJoin(categories, eq(categories.id, sections.categoryId))
 			.where(eq(templateSlots.templateId, t.id))
 			.orderBy(templateSlots.position)
 		result.push({ ...t, slots })

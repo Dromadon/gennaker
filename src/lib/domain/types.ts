@@ -69,6 +69,16 @@ export type QuestionAdminDetail = QuestionListRow & {
 	sourceMd: string | null
 }
 
+export type QuestionPickRow = {
+	id: number
+	title: string
+	difficulty: 'facile' | 'moyen' | 'difficile'
+	applicableSupports: Support[]
+	questionMd: string
+	correctionMd: string
+	answerSize: AnswerSize
+}
+
 export type CategoryWithSections = {
 	id: number
 	slug: string

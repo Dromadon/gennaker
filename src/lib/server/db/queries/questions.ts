@@ -252,6 +252,42 @@ export async function deleteQuestion(d1: D1Database, id: number): Promise<void> 
 	await getDb(d1).delete(questions).where(eq(questions.id, id))
 }
 
+export type QuestionCandidateRow = {
+	id: number
+	sectionId: number
+	title: string
+	difficulty: 'facile' | 'moyen' | 'difficile'
+	applicableSupports: string[]
+	questionMd: string
+	correctionMd: string
+	answerSize: string
+}
+
+export async function getQuestionCandidates(
+	d1: D1Database,
+	sectionId: number
+): Promise<QuestionCandidateRow[]> {
+	const rows = await getDb(d1)
+		.select({
+			id: questions.id,
+			sectionId: questions.sectionId,
+			title: questions.title,
+			difficulty: questions.difficulty,
+			applicableSupports: questions.applicableSupports,
+			questionMd: questions.questionMd,
+			correctionMd: questions.correctionMd,
+			answerSize: questions.answerSize
+		})
+		.from(questions)
+		.where(and(eq(questions.sectionId, sectionId), eq(questions.status, 'publie')))
+
+	return rows.map((r) => ({
+		...r,
+		difficulty: r.difficulty as QuestionCandidateRow['difficulty'],
+		applicableSupports: JSON.parse(r.applicableSupports ?? '[]')
+	}))
+}
+
 export async function getQuestionsBySection(
 	d1: D1Database,
 	sectionIds: number[]

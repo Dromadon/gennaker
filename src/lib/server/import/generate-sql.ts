@@ -68,7 +68,7 @@ export function generateTemplatesSql(templates: TemplateExportRow[]): string {
 				`INSERT INTO template_slots (template_id, section_id, position, question_count, difficulty_filter, pinned_question_id, preferred_question_ids)` +
 				` VALUES (` +
 				`(SELECT id FROM evaluation_templates WHERE support_slug='${escape(t.supportSlug)}' AND format='${escape(t.format)}'),` +
-				`(SELECT id FROM sections WHERE slug='${escape(slot.sectionSlug)}'),` +
+				`(SELECT s.id FROM sections s INNER JOIN categories c ON c.id = s.category_id WHERE s.slug='${escape(slot.sectionSlug)}' AND c.slug='${escape(slot.categorySlug)}'),` +
 				`${slot.position}, ${slot.questionCount}, '${escape(slot.difficultyFilter)}', ${pinnedPart}, '${preferredJson}')` +
 				` ON CONFLICT(template_id, position) DO UPDATE SET section_id=excluded.section_id, question_count=excluded.question_count, difficulty_filter=excluded.difficulty_filter, pinned_question_id=excluded.pinned_question_id, preferred_question_ids=excluded.preferred_question_ids;`
 			)
