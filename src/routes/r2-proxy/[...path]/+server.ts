@@ -10,7 +10,7 @@ export const GET = async ({ params, platform }) => {
 	if (!obj) throw error(404, 'Image introuvable')
 
 	const headers = new Headers()
-	obj.writeHttpMetadata(headers)
+	if (obj.httpMetadata?.contentType) headers.set('content-type', obj.httpMetadata.contentType)
 	headers.set('etag', obj.httpEtag)
 
 	return new Response(obj.body, { headers })

@@ -104,6 +104,7 @@
 	<table class="w-full text-sm">
 		<thead class="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
 			<tr>
+				<th class="px-4 py-3 text-gray-400">ID</th>
 				<th class="px-4 py-3">Titre</th>
 				<th class="px-4 py-3">Catégorie / Section</th>
 				<th class="px-4 py-3">Difficulté</th>
@@ -115,6 +116,7 @@
 		<tbody class="divide-y divide-gray-100">
 			{#each data.rows as q}
 				<tr class="bg-white hover:bg-gray-50">
+					<td class="px-4 py-3 text-gray-400 tabular-nums">{q.id}</td>
 					<td class="px-4 py-3 font-medium text-gray-900 max-w-xs truncate">{q.title}</td>
 					<td class="px-4 py-3 text-gray-500">
 						{q.categoryDisplayName}<span class="mx-1 text-gray-300">/</span>{q.sectionDisplayName}
@@ -141,7 +143,7 @@
 				</tr>
 			{:else}
 				<tr>
-					<td colspan="6" class="px-4 py-8 text-center text-gray-400">Aucune question trouvée</td>
+					<td colspan="7" class="px-4 py-8 text-center text-gray-400">Aucune question trouvée</td>
 				</tr>
 			{/each}
 		</tbody>
