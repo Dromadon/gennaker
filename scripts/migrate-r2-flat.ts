@@ -12,6 +12,7 @@
 import { execSync } from 'child_process'
 
 const R2_BUCKET = 'gennaker-questions'
+const CF_ACCOUNT_ID = 'b77debff8b7c573cbf79ef5b1a833aee'
 
 const flag = process.argv[2]
 if (flag !== '--remote') {
@@ -20,13 +21,49 @@ if (flag !== '--remote') {
 	process.exit(0)
 }
 
-function r2List(cursor?: string): { objects: { key: string }[]; truncated: boolean; cursor?: string } {
-	const cursorFlag = cursor ? ` --start-after "${cursor}"` : ''
-	const raw = execSync(
-		`npx wrangler r2 object list ${R2_BUCKET}${cursorFlag} --remote --json 2>/dev/null`,
-		{ encoding: 'utf-8' }
+function getCfToken(): string {
+	// wrangler stores the token; we can retrieve it via `wrangler auth token`
+	// Fallback: read from CLOUDFLARE_API_TOKEN env var
+	const envToken = process.env.CLOUDFLARE_API_TOKEN
+	if (envToken) return envToken
+	try {
+		const raw = execSync('npx wrangler auth token 2>/dev/null', { encoding: 'utf-8' }).trim()
+		// output is "Token: <value>" or just the token
+		const match = raw.match(/([a-zA-Z0-9_\-.]{40,})/)
+		if (match) return match[1]
+	} catch {}
+	throw new Error(
+		'Impossible de récupérer le token Cloudflare. Définissez CLOUDFLARE_API_TOKEN ou connectez-vous avec `wrangler login`.'
 	)
-	return JSON.parse(raw)
+}
+
+async function r2List(cursor?: string): Promise<{ objects: { key: string }[]; truncated: boolean; cursor?: string }> {
+	const token = getCfToken()
+	const url = new URL(
+		`https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/r2/buckets/${R2_BUCKET}/objects`
+	)
+	if (cursor) url.searchParams.set('cursor', cursor)
+	url.searchParams.set('per_page', '1000')
+
+	const resp = await fetch(url.toString(), {
+		headers: { Authorization: `Bearer ${token}` },
+	})
+	if (!resp.ok) {
+		const text = await resp.text()
+		throw new Error(`CF API error ${resp.status}: ${text}`)
+	}
+	const data = (await resp.json()) as {
+		result: { key: string }[]
+		result_info: { cursor?: string; is_truncated: boolean }
+		success: boolean
+		errors: { message: string }[]
+	}
+	if (!data.success) throw new Error(`CF API: ${data.errors.map((e) => e.message).join(', ')}`)
+	return {
+		objects: data.result ?? [],
+		truncated: data.result_info?.is_truncated ?? false,
+		cursor: data.result_info?.cursor,
+	}
 }
 
 function r2Copy(srcKey: string, dstKey: string, tmpFile: string) {
@@ -64,7 +101,7 @@ console.log('Listage des objets R2...')
 
 try {
 	do {
-		const listed = r2List(cursor)
+		const listed = await r2List(cursor)
 		for (const obj of listed.objects) {
 			total++
 			const parts = obj.key.split('/')
