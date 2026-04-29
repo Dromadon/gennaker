@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { tick } from 'svelte'
+
 	type Props = {
 		open: boolean
 		questionId: number
@@ -26,13 +28,15 @@
 
 	$effect(() => {
 		if (open) {
-			dialog?.showModal()
 			problemType = ''
 			description = ''
 			honeypot = ''
 			errorMsg = ''
+			tick().then(() => {
+				if (!dialog?.open) dialog?.showModal()
+			})
 		} else {
-			dialog?.close()
+			if (dialog?.open) dialog.close()
 		}
 	})
 

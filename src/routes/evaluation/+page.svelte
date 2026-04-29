@@ -391,12 +391,12 @@
 			onpick={handlePick}
 			onclose={() => { pickerSlot = null; pickerQuestionId = null }}
 		/>
-		<ReportModal
-			open={reportQuestionId !== null}
-			questionId={reportQuestionId ?? 0}
-			questionTitle={reportQuestionTitle}
-			onclose={() => { reportQuestionId = null }}
-			onsuccess={() => showToast('Signalement envoyé, merci')}
-		/>
 	{/if}
+	<ReportModal
+		open={reportQuestionId !== null}
+		questionId={reportQuestionId ?? 0}
+		questionTitle={reportQuestionTitle}
+		onclose={() => { reportQuestionId = null }}
+		onsuccess={() => showToast('Signalement envoyé, merci')}
+	/>
 {/if}
