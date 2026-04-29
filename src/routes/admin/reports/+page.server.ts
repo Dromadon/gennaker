@@ -15,17 +15,17 @@ export const load: PageServerLoad = async ({ locals, platform, url }) => {
 	return { rows, total, page, statusFilter }
 }
 
-const updateStatusSchema = z.object({
+const toggleStatusSchema = z.object({
 	id: z.coerce.number().int().positive(),
-	status: z.enum(['nouveau', 'en_cours', 'resolu'])
+	status: z.enum(['nouveau', 'resolu'])
 })
 
 export const actions: Actions = {
-	updateStatus: async ({ request, platform, locals }) => {
+	toggleStatus: async ({ request, platform, locals }) => {
 		if (!locals.isAdmin) error(403, 'Forbidden')
 
 		const data = await request.formData()
-		const parsed = updateStatusSchema.safeParse({
+		const parsed = toggleStatusSchema.safeParse({
 			id: data.get('id'),
 			status: data.get('status')
 		})

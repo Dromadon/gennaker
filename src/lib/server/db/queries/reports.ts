@@ -1,6 +1,6 @@
 import { count, eq } from 'drizzle-orm'
 import { getDb } from '../index'
-import { questionReports, questions } from '../schema'
+import { categories, questionReports, questions, sections } from '../schema'
 
 const PAGE_SIZE = 30
 
@@ -11,14 +11,22 @@ export type ProblemType =
 	| 'mise_en_forme'
 	| 'autre'
 
-export type ReportStatus = 'nouveau' | 'en_cours' | 'resolu'
+export type ReportStatus = 'nouveau' | 'resolu'
 
 export type ReportAdminRow = {
 	id: number
 	questionId: number
 	questionTitle: string
+	questionMd: string
+	correctionMd: string
+	sourceMd: string | null
+	categoryDisplayName: string
+	sectionDisplayName: string
+	difficulty: string
+	applicableSupports: string
 	problemType: ProblemType
 	description: string | null
+	email: string | null
 	status: ReportStatus
 	createdAt: number
 }
@@ -26,7 +34,8 @@ export type ReportAdminRow = {
 export type ReportInput = {
 	questionId: number
 	problemType: ProblemType
-	description: string | null
+	description: string
+	email: string | null
 }
 
 export async function createReport(d1: D1Database, data: ReportInput): Promise<number> {
@@ -37,6 +46,7 @@ export async function createReport(d1: D1Database, data: ReportInput): Promise<n
 			questionId: data.questionId,
 			problemType: data.problemType,
 			description: data.description,
+			email: data.email,
 			status: 'nouveau',
 			createdAt: Math.floor(Date.now() / 1000)
 		})
@@ -59,13 +69,23 @@ export async function getReportsAdmin(
 				id: questionReports.id,
 				questionId: questionReports.questionId,
 				questionTitle: questions.title,
+				questionMd: questions.questionMd,
+				correctionMd: questions.correctionMd,
+				sourceMd: questions.sourceMd,
+				categoryDisplayName: categories.displayName,
+				sectionDisplayName: sections.displayName,
+				difficulty: questions.difficulty,
+				applicableSupports: questions.applicableSupports,
 				problemType: questionReports.problemType,
 				description: questionReports.description,
+				email: questionReports.email,
 				status: questionReports.status,
 				createdAt: questionReports.createdAt
 			})
 			.from(questionReports)
 			.innerJoin(questions, eq(questions.id, questionReports.questionId))
+			.innerJoin(sections, eq(sections.id, questions.sectionId))
+			.innerJoin(categories, eq(categories.id, sections.categoryId))
 			.where(where)
 			.orderBy(questionReports.createdAt)
 			.limit(PAGE_SIZE)

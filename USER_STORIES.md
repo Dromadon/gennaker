@@ -17,6 +17,15 @@ Ces tâches ne sont pas des user stories mais sont des prérequis bloquants.
 | T3 | Écrire et exécuter `scripts/migrate-content.ts` : importer les 146 questions et 9 templates depuis `archive/` vers D1 | ✅ |
 | T4 | Configurer Cloudflare R2 et migrer les images existantes | ✅ |
 | T5 | Mettre en place l'authentification admin : formulaire login, vérification bcryptjs, cookie de session signé (HttpOnly/Secure), guard `admin/+layout.server.ts`, secrets Wrangler (`ADMIN_PASSWORD_HASH`, `ADMIN_SESSION_SECRET`) | |
+| T6 | Tests d'intégration D1 : configurer `@cloudflare/vitest-pool-workers` (miniflare) et écrire 5 scénarios critiques end-to-end contre une vraie base D1 locale (voir détail ci-dessous) | |
+
+**T6 — Détail des 5 scénarios**
+
+1. **Modifier une question** : mettre à jour `question_md` via la query admin, vérifier que la modification est persistée et retournée par `getQuestionById`.
+2. **Écrire un signalement et le résoudre** : appeler `createReport`, vérifier qu'il apparaît dans `getReportsAdmin({ status: 'nouveau' })`, appeler `updateReportStatus('resolu')`, vérifier qu'il n'apparaît plus dans les nouveaux et apparaît dans les résolus.
+3. **Soumettre une question et l'accepter** : créer une `community_submission`, vérifier son statut `en_attente`, la passer en `approuve`, vérifier que la question correspondante est créée (ou le statut mis à jour selon le flux retenu).
+4. **Générer une évaluation** : appeler la logique de tirage pour un support + format donné, vérifier que le résultat contient le bon nombre de questions et qu'elles respectent les filtres de section et de support applicable.
+5. **Compte des signalements en attente** : `countPendingReports` retourne le bon delta après création et résolution de signalements.
 
 ---
 
@@ -420,7 +429,7 @@ _Prévisualisation_
 
 ---
 
-### US-16 — Signalement d'un problème sur une question
+### US-16 ✅ — Signalement d'un problème sur une question
 
 **En tant que** stagiaire ou formateur,
 **je veux** signaler un problème sur une question (erreur dans l'énoncé, correction incorrecte, image manquante…),
@@ -429,26 +438,26 @@ _Prévisualisation_
 **Critères d'acceptation**
 
 _Déclenchement_
-- Sur chaque question affichée dans une évaluation, un bouton discret "Signaler un problème" est accessible (icône ou lien secondaire, non intrusif)
-- Le bouton est également présent dans la prévisualisation de la banque publique (US-15)
+- Sur chaque question affichée dans une évaluation, un lien discret "Signaler un problème" est accessible en bas de la carte (non intrusif)
+- Le lien est également présent dans la prévisualisation de la banque publique (US-15)
 
 _Formulaire de signalement_
-- Cliquer ouvre une modale avec : un menu déroulant de type de problème (erreur factuelle, correction incorrecte, image manquante, formulation ambiguë, autre) et un champ texte libre optionnel (max 500 caractères)
+- Cliquer ouvre une modale avec : un menu déroulant de type de problème (énoncé incorrect, correction incorrecte, doublon, mise en forme, autre), un champ description obligatoire (max 500 caractères) et un champ email de contact optionnel
 - La question concernée est identifiée automatiquement (titre affiché en lecture seule dans la modale)
 - La soumission est possible sans compte (anonyme)
+- Protection anti-spam : champ honeypot + filtrage User-Agent
 
 _Confirmation_
 - Un message de confirmation s'affiche après envoi ("Signalement envoyé, merci")
 - La modale se ferme automatiquement
 
 _Interface admin_
-- La page `/admin/reports` liste les signalements avec : titre de la question, type, message, date, statut (`nouveau` / `en cours` / `résolu`)
-- Un lien direct vers le formulaire d'édition de la question est disponible sur chaque signalement
-- L'admin peut changer le statut d'un signalement
+- La page `/admin/reports` liste les signalements avec : titre de la question, type, email de contact, date, statut (`nouveau` / `résolu`)
+- Cliquer sur une ligne ouvre un panneau latéral avec la description complète et une prévisualisation de la question concernée
+- L'admin dispose d'un bouton "Marquer résolu" (ou "Rouvrir" si déjà résolu)
 - Un badge indique le nombre de signalements non traités dans la navigation admin
 
 **Hors périmètre**
 - Notification par email à l'administrateur
 - Authentification requise pour signaler
-- Limitation du taux de signalement (anti-spam)
 - Réponse à l'auteur du signalement

@@ -8,8 +8,16 @@ vi.mock('$lib/server/db/queries/reports', () => ({
 				id: 1,
 				questionId: 42,
 				questionTitle: 'Ma question',
+				questionMd: '# Énoncé',
+				correctionMd: '# Correction',
+				sourceMd: null,
+				categoryDisplayName: 'Météo',
+				sectionDisplayName: 'Vents',
+				difficulty: 'moyen',
+				applicableSupports: '[]',
 				problemType: 'enonce_incorrect',
 				description: 'Texte erroné',
+				email: null,
 				status: 'nouveau',
 				createdAt: 1700000000
 			}
@@ -52,10 +60,10 @@ describe('load /admin/reports', () => {
 })
 
 // ──────────────────────────────────────────────────────
-// action updateStatus
+// action toggleStatus
 // ──────────────────────────────────────────────────────
 
-describe('action updateStatus /admin/reports', () => {
+describe('action toggleStatus /admin/reports', () => {
 	beforeEach(() => vi.clearAllMocks())
 
 	it('retourne 403 si non authentifié', async () => {
@@ -63,7 +71,7 @@ describe('action updateStatus /admin/reports', () => {
 		formData.append('id', '1')
 		formData.append('status', 'resolu')
 		await expect(
-			actions.updateStatus({
+			actions.toggleStatus({
 				...makeEvent(false),
 				request: { formData: () => Promise.resolve(formData) }
 			} as never)
@@ -73,7 +81,7 @@ describe('action updateStatus /admin/reports', () => {
 	it('retourne 422 si id manquant', async () => {
 		const formData = new FormData()
 		formData.append('status', 'resolu')
-		const result = await actions.updateStatus({
+		const result = await actions.toggleStatus({
 			...makeEvent(true),
 			request: { formData: () => Promise.resolve(formData) }
 		} as never)
@@ -83,24 +91,48 @@ describe('action updateStatus /admin/reports', () => {
 	it('retourne 422 si status invalide', async () => {
 		const formData = new FormData()
 		formData.append('id', '1')
-		formData.append('status', 'inconnu')
-		const result = await actions.updateStatus({
+		formData.append('status', 'en_cours')
+		const result = await actions.toggleStatus({
 			...makeEvent(true),
 			request: { formData: () => Promise.resolve(formData) }
 		} as never)
 		expect((result as { status: number }).status).toBe(422)
 	})
 
-	it('met à jour le statut et retourne { updated: true }', async () => {
+	it('retourne 422 si status inconnu', async () => {
+		const formData = new FormData()
+		formData.append('id', '1')
+		formData.append('status', 'inconnu')
+		const result = await actions.toggleStatus({
+			...makeEvent(true),
+			request: { formData: () => Promise.resolve(formData) }
+		} as never)
+		expect((result as { status: number }).status).toBe(422)
+	})
+
+	it('marque résolu et retourne { updated: true }', async () => {
 		const { updateReportStatus } = await import('$lib/server/db/queries/reports')
 		const formData = new FormData()
 		formData.append('id', '1')
 		formData.append('status', 'resolu')
-		const result = await actions.updateStatus({
+		const result = await actions.toggleStatus({
 			...makeEvent(true),
 			request: { formData: () => Promise.resolve(formData) }
 		} as never)
 		expect(updateReportStatus).toHaveBeenCalledWith({}, 1, 'resolu')
+		expect(result).toEqual({ updated: true })
+	})
+
+	it('rouvre un signalement résolu et retourne { updated: true }', async () => {
+		const { updateReportStatus } = await import('$lib/server/db/queries/reports')
+		const formData = new FormData()
+		formData.append('id', '1')
+		formData.append('status', 'nouveau')
+		const result = await actions.toggleStatus({
+			...makeEvent(true),
+			request: { formData: () => Promise.resolve(formData) }
+		} as never)
+		expect(updateReportStatus).toHaveBeenCalledWith({}, 1, 'nouveau')
 		expect(result).toEqual({ updated: true })
 	})
 })

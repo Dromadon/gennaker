@@ -13,7 +13,8 @@ const schema = z.object({
 		'mise_en_forme',
 		'autre'
 	]),
-	description: z.string().max(500).nullable().optional(),
+	description: z.string().min(1).max(500),
+	email: z.string().email().nullable().optional(),
 	honeypot: z.string().optional()
 })
 
@@ -37,7 +38,8 @@ export const POST = async ({ request, params, platform }) => {
 	await createReport(db, {
 		questionId: id,
 		problemType: parsed.data.problemType,
-		description: parsed.data.description ?? null
+		description: parsed.data.description,
+		email: parsed.data.email ?? null
 	})
 
 	return json({ ok: true }, { status: 201 })

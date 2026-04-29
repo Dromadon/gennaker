@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { page } from '$app/state'
-	import { createMarkdownRenderer } from '$lib/markdown'
 	import type { PageData } from './$types'
 	import type { CategoryWithSections } from '$lib/domain/types'
 	import type { QuestionPublicRow } from '$lib/server/db/queries/questions'
 	import ReportModal from '$lib/components/ReportModal.svelte'
+	import QuestionPreview from '$lib/components/QuestionPreview.svelte'
 
 	let { data }: { data: PageData } = $props()
 
 	let reportQuestionId = $state<number | null>(null)
 	let reportQuestionTitle = $state('')
-	let reportSuccess = $state(false)
+	let reportSuccessId = $state<number | null>(null)
 
 	const PAGE_SIZE = 20
 	const totalPages = $derived(Math.ceil(data.total / PAGE_SIZE))
@@ -35,10 +35,6 @@
 		if (p > 1) params.set('page', String(p))
 		const q = params.toString()
 		return `/questions${q ? '?' + q : ''}`
-	}
-
-	function renderMd(q: QuestionPublicRow, field: 'questionMd' | 'correctionMd') {
-		return createMarkdownRenderer(q.id, page.data.r2BaseUrl)(q[field])
 	}
 
 	const supports = ['deriveur', 'catamaran', 'windsurf', 'croisiere']
@@ -151,40 +147,26 @@
 			<div class="hidden lg:block lg:flex-1 min-w-0">
 				{#if selectedQuestion}
 					<div class="sticky top-4 rounded-lg border border-gray-200 bg-white p-5">
-						<div class="mb-4 flex items-start justify-between gap-2">
-							<h2 class="text-base font-semibold text-gray-900">{selectedQuestion.title}</h2>
-							<button
-								type="button"
-								onclick={() => { selectedQuestion = null }}
-								class="shrink-0 text-gray-400 hover:text-gray-700"
-								aria-label="Fermer"
-							>✕</button>
-						</div>
-						<div class="mb-3 flex flex-wrap gap-2 text-xs text-gray-500">
-							<span>{selectedQuestion.categoryDisplayName} / {selectedQuestion.sectionDisplayName}</span>
-							<span>·</span>
-							<span>{selectedQuestion.difficulty}</span>
-							<span>·</span>
-							<span>{selectedQuestion.applicableSupports.length === 0 ? 'tous supports' : selectedQuestion.applicableSupports.join(', ')}</span>
-						</div>
-						<div class="prose prose-sm max-h-[35vh] overflow-y-auto">
-							{@html renderMd(selectedQuestion, 'questionMd')}
-						</div>
-						<hr class="my-4 border-gray-200" />
-						<p class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Correction</p>
-						<div class="prose prose-sm max-h-[25vh] overflow-y-auto">
-							{@html renderMd(selectedQuestion, 'correctionMd')}
-						</div>
-						{#if selectedQuestion.sourceMd}
-							<p class="mt-4 text-xs text-gray-400">Source : {selectedQuestion.sourceMd}</p>
-						{/if}
+						<QuestionPreview
+							questionId={selectedQuestion.id}
+							title={selectedQuestion.title}
+							categoryDisplayName={selectedQuestion.categoryDisplayName}
+							sectionDisplayName={selectedQuestion.sectionDisplayName}
+							difficulty={selectedQuestion.difficulty}
+							applicableSupports={selectedQuestion.applicableSupports}
+							questionMd={selectedQuestion.questionMd}
+							correctionMd={selectedQuestion.correctionMd}
+							sourceMd={selectedQuestion.sourceMd}
+							r2BaseUrl={page.data.r2BaseUrl}
+							onclose={() => { selectedQuestion = null }}
+						/>
 						<div class="mt-4 border-t border-gray-100 pt-3">
-							{#if reportSuccess}
+							{#if reportSuccessId === selectedQuestion!.id}
 								<p class="text-xs text-green-600">Signalement envoyé, merci.</p>
 							{:else}
 								<button
 									type="button"
-									onclick={() => { reportQuestionId = selectedQuestion!.id; reportQuestionTitle = selectedQuestion!.title; reportSuccess = false }}
+									onclick={() => { reportQuestionId = selectedQuestion!.id; reportQuestionTitle = selectedQuestion!.title }}
 									class="text-xs text-gray-400 hover:text-orange-500 transition-colors"
 								>
 									Signaler un problème
@@ -211,31 +193,25 @@
 			>✕ Fermer</button>
 		</div>
 		<div class="flex-1 overflow-y-auto p-4">
-			<div class="mb-3 flex flex-wrap gap-2 text-xs text-gray-500">
-				<span>{selectedQuestion.categoryDisplayName} / {selectedQuestion.sectionDisplayName}</span>
-				<span>·</span>
-				<span>{selectedQuestion.difficulty}</span>
-				<span>·</span>
-				<span>{selectedQuestion.applicableSupports.length === 0 ? 'tous supports' : selectedQuestion.applicableSupports.join(', ')}</span>
-			</div>
-			<div class="prose prose-sm">
-				{@html renderMd(selectedQuestion, 'questionMd')}
-			</div>
-			<hr class="my-4 border-gray-200" />
-			<p class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Correction</p>
-			<div class="prose prose-sm">
-				{@html renderMd(selectedQuestion, 'correctionMd')}
-			</div>
-			{#if selectedQuestion.sourceMd}
-				<p class="mt-4 text-xs text-gray-400">Source : {selectedQuestion.sourceMd}</p>
-			{/if}
+			<QuestionPreview
+				questionId={selectedQuestion.id}
+				title={selectedQuestion.title}
+				categoryDisplayName={selectedQuestion.categoryDisplayName}
+				sectionDisplayName={selectedQuestion.sectionDisplayName}
+				difficulty={selectedQuestion.difficulty}
+				applicableSupports={selectedQuestion.applicableSupports}
+				questionMd={selectedQuestion.questionMd}
+				correctionMd={selectedQuestion.correctionMd}
+				sourceMd={selectedQuestion.sourceMd}
+				r2BaseUrl={page.data.r2BaseUrl}
+			/>
 			<div class="mt-4 border-t border-gray-100 pt-3">
-				{#if reportSuccess}
+				{#if reportSuccessId === selectedQuestion.id}
 					<p class="text-xs text-green-600">Signalement envoyé, merci.</p>
 				{:else}
 					<button
 						type="button"
-						onclick={() => { reportQuestionId = selectedQuestion!.id; reportQuestionTitle = selectedQuestion!.title; reportSuccess = false }}
+						onclick={() => { reportQuestionId = selectedQuestion!.id; reportQuestionTitle = selectedQuestion!.title }}
 						class="text-xs text-gray-400 hover:text-orange-500 transition-colors"
 					>
 						Signaler un problème
@@ -251,5 +227,5 @@
 	questionId={reportQuestionId ?? 0}
 	questionTitle={reportQuestionTitle}
 	onclose={() => { reportQuestionId = null }}
-	onsuccess={() => { reportSuccess = true; reportQuestionId = null }}
+	onsuccess={() => { reportSuccessId = reportQuestionId; reportQuestionId = null }}
 />

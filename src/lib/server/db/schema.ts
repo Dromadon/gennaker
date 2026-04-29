@@ -86,9 +86,10 @@ export const questionReports = sqliteTable('question_reports', {
 	questionId: integer('question_id').notNull().references(() => questions.id),
 	problemType: text('problem_type').notNull(),
 	// 'enonce_incorrect' | 'correction_incorrecte' | 'question_doublon' | 'mise_en_forme' | 'autre'
-	description: text('description'), // max 500 chars, optionnel
+	description: text('description'), // max 500 chars, obligatoire
+	email: text('email'), // contact email, optionnel
 	status: text('status').notNull().default('nouveau'),
-	// 'nouveau' | 'en_cours' | 'resolu'
+	// 'nouveau' | 'resolu'
 	createdAt: integer('created_at').notNull()
 });
 

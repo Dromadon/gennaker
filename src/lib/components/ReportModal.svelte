@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { tick } from 'svelte'
+
 	type Props = {
 		open: boolean
 		questionId: number
@@ -12,6 +14,7 @@
 	let dialog = $state<HTMLDialogElement | null>(null)
 	let problemType = $state('')
 	let description = $state('')
+	let email = $state('')
 	let honeypot = $state('')
 	let submitting = $state(false)
 	let errorMsg = $state('')
@@ -26,13 +29,16 @@
 
 	$effect(() => {
 		if (open) {
-			dialog?.showModal()
 			problemType = ''
 			description = ''
+			email = ''
 			honeypot = ''
 			errorMsg = ''
+			tick().then(() => {
+				if (!dialog?.open) dialog?.showModal()
+			})
 		} else {
-			dialog?.close()
+			if (dialog?.open) dialog.close()
 		}
 	})
 
@@ -45,6 +51,10 @@
 			errorMsg = 'Veuillez sélectionner un type de problème.'
 			return
 		}
+		if (!description.trim()) {
+			errorMsg = 'Veuillez décrire le problème.'
+			return
+		}
 		submitting = true
 		errorMsg = ''
 		try {
@@ -53,7 +63,8 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					problemType,
-					description: description.trim() || null,
+					description: description.trim(),
+					email: email.trim() || null,
 					honeypot
 				})
 			})
@@ -131,20 +142,34 @@
 			</select>
 		</div>
 
-		<!-- Description optionnelle -->
+		<!-- Description obligatoire -->
 		<div>
 			<label for="report-desc" class="block text-xs font-medium uppercase tracking-wide text-gray-500 mb-1">
-				Description <span class="text-gray-400 font-normal normal-case">(optionnel)</span>
+				Description <span class="text-red-500">*</span>
 			</label>
 			<textarea
 				id="report-desc"
 				bind:value={description}
 				maxlength={500}
 				rows={3}
-				placeholder="Précisez le problème…"
+				placeholder="Décrivez le problème…"
 				class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none resize-none"
 			></textarea>
 			<p class="text-right text-xs text-gray-400 mt-0.5">{description.length}/500</p>
+		</div>
+
+		<!-- Email de contact (optionnel) -->
+		<div>
+			<label for="report-email" class="block text-xs font-medium uppercase tracking-wide text-gray-500 mb-1">
+				Email de contact <span class="text-gray-400 font-normal normal-case">(optionnel)</span>
+			</label>
+			<input
+				id="report-email"
+				type="email"
+				bind:value={email}
+				placeholder="votre@email.com"
+				class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+			/>
 		</div>
 
 		{#if errorMsg}
