@@ -5,6 +5,7 @@
 	import type { EvaluationSlot, QuestionPickRow } from '$lib/domain/types'
 	import { createMarkdownRenderer } from '$lib/markdown'
 	import QuestionPickerModal from '$lib/components/QuestionPickerModal.svelte'
+	import ReportModal from '$lib/components/ReportModal.svelte'
 
 	const evaluation = $derived($evaluationStore)
 
@@ -17,6 +18,8 @@
 	let redrawingId = $state<number | null>(null)
 	let pickerSlot = $state<EvaluationSlot | null>(null)
 	let pickerQuestionId = $state<number | null>(null)
+	let reportQuestionId = $state<number | null>(null)
+	let reportQuestionTitle = $state('')
 	let toastMessage = $state('')
 	let toastVisible = $state(false)
 	let toastTimer: ReturnType<typeof setTimeout> | null = null
@@ -271,6 +274,16 @@
 											<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
 										</svg>
 									</button>
+									<button
+										onclick={() => { reportQuestionId = question.id; reportQuestionTitle = question.title }}
+										class="rounded-md border border-gray-200 bg-white p-1 text-gray-400 shadow-sm transition-colors hover:border-orange-400 hover:text-orange-500"
+										aria-label="Signaler un problème"
+										title="Signaler un problème"
+									>
+										<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M3 21l9-18 9 18M12 9v4m0 4h.01" />
+										</svg>
+									</button>
 								</div>
 								<p class="mb-3 font-medium">{question.title}</p>
 								<!-- eslint-disable-next-line svelte/no-at-html-tags -->
@@ -379,6 +392,13 @@
 			currentQuestionIds={allQuestionIds}
 			onpick={handlePick}
 			onclose={() => { pickerSlot = null; pickerQuestionId = null }}
+		/>
+		<ReportModal
+			open={reportQuestionId !== null}
+			questionId={reportQuestionId ?? 0}
+			questionTitle={reportQuestionTitle}
+			onclose={() => { reportQuestionId = null }}
+			onsuccess={() => showToast('Signalement envoyé, merci')}
 		/>
 	{/if}
 {/if}

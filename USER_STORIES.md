@@ -239,7 +239,7 @@ Les stories suivantes sont identifiées mais hors scope MVP, classées par prior
 | 7 | Questions épinglées et questions par défaut dans les templates |
 | 8 | US-15 : Banque publique de questions (consultation filtrée, voir ci-dessous) |
 | 9 | Soumission communautaire de questions |
-| 10 | Signalement d'un problème sur une question |
+| 10 | US-16 : Signalement d'un problème sur une question (voir ci-dessous) |
 | 11 | Interface admin : modération des soumissions |
 
 ---
@@ -417,3 +417,38 @@ _Prévisualisation_
 - Questions en statut brouillon (non visibles)
 - Recherche fulltext (voir US-14 pour la modale de sélection qui inclut déjà cette fonctionnalité)
 - Export ou impression de la banque
+
+---
+
+### US-16 — Signalement d'un problème sur une question
+
+**En tant que** stagiaire ou formateur,
+**je veux** signaler un problème sur une question (erreur dans l'énoncé, correction incorrecte, image manquante…),
+**afin de** alerter l'administrateur sans avoir à passer par un autre canal.
+
+**Critères d'acceptation**
+
+_Déclenchement_
+- Sur chaque question affichée dans une évaluation, un bouton discret "Signaler un problème" est accessible (icône ou lien secondaire, non intrusif)
+- Le bouton est également présent dans la prévisualisation de la banque publique (US-15)
+
+_Formulaire de signalement_
+- Cliquer ouvre une modale avec : un menu déroulant de type de problème (erreur factuelle, correction incorrecte, image manquante, formulation ambiguë, autre) et un champ texte libre optionnel (max 500 caractères)
+- La question concernée est identifiée automatiquement (titre affiché en lecture seule dans la modale)
+- La soumission est possible sans compte (anonyme)
+
+_Confirmation_
+- Un message de confirmation s'affiche après envoi ("Signalement envoyé, merci")
+- La modale se ferme automatiquement
+
+_Interface admin_
+- La page `/admin/reports` liste les signalements avec : titre de la question, type, message, date, statut (`nouveau` / `en cours` / `résolu`)
+- Un lien direct vers le formulaire d'édition de la question est disponible sur chaque signalement
+- L'admin peut changer le statut d'un signalement
+- Un badge indique le nombre de signalements non traités dans la navigation admin
+
+**Hors périmètre**
+- Notification par email à l'administrateur
+- Authentification requise pour signaler
+- Limitation du taux de signalement (anti-spam)
+- Réponse à l'auteur du signalement

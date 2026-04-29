@@ -4,8 +4,13 @@
 	import type { PageData } from './$types'
 	import type { CategoryWithSections } from '$lib/domain/types'
 	import type { QuestionPublicRow } from '$lib/server/db/queries/questions'
+	import ReportModal from '$lib/components/ReportModal.svelte'
 
 	let { data }: { data: PageData } = $props()
+
+	let reportQuestionId = $state<number | null>(null)
+	let reportQuestionTitle = $state('')
+	let reportSuccess = $state(false)
 
 	const PAGE_SIZE = 20
 	const totalPages = $derived(Math.ceil(data.total / PAGE_SIZE))
@@ -173,6 +178,19 @@
 						{#if selectedQuestion.sourceMd}
 							<p class="mt-4 text-xs text-gray-400">Source : {selectedQuestion.sourceMd}</p>
 						{/if}
+						<div class="mt-4 border-t border-gray-100 pt-3">
+							{#if reportSuccess}
+								<p class="text-xs text-green-600">Signalement envoyé, merci.</p>
+							{:else}
+								<button
+									type="button"
+									onclick={() => { reportQuestionId = selectedQuestion!.id; reportQuestionTitle = selectedQuestion!.title; reportSuccess = false }}
+									class="text-xs text-gray-400 hover:text-orange-500 transition-colors"
+								>
+									Signaler un problème
+								</button>
+							{/if}
+						</div>
 					</div>
 				{/if}
 			</div>
@@ -211,6 +229,27 @@
 			{#if selectedQuestion.sourceMd}
 				<p class="mt-4 text-xs text-gray-400">Source : {selectedQuestion.sourceMd}</p>
 			{/if}
+			<div class="mt-4 border-t border-gray-100 pt-3">
+				{#if reportSuccess}
+					<p class="text-xs text-green-600">Signalement envoyé, merci.</p>
+				{:else}
+					<button
+						type="button"
+						onclick={() => { reportQuestionId = selectedQuestion!.id; reportQuestionTitle = selectedQuestion!.title; reportSuccess = false }}
+						class="text-xs text-gray-400 hover:text-orange-500 transition-colors"
+					>
+						Signaler un problème
+					</button>
+				{/if}
+			</div>
 		</div>
 	</div>
 {/if}
+
+<ReportModal
+	open={reportQuestionId !== null}
+	questionId={reportQuestionId ?? 0}
+	questionTitle={reportQuestionTitle}
+	onclose={() => { reportQuestionId = null }}
+	onsuccess={() => { reportSuccess = true; reportQuestionId = null }}
+/>

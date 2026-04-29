@@ -1,10 +1,15 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { load } from './+layout.server'
+
+vi.mock('$lib/server/db/queries/reports', () => ({
+	countPendingReports: vi.fn().mockResolvedValue(3)
+}))
 
 async function callLoad(isAdmin: boolean, pathname: string) {
 	return load({
 		locals: { isAdmin },
-		url: new URL(`http://localhost${pathname}`)
+		url: new URL(`http://localhost${pathname}`),
+		platform: { env: { DB: {} } }
 	} as Parameters<typeof load>[0])
 }
 
@@ -23,13 +28,13 @@ describe('guard /admin', () => {
 		})
 	})
 
-	it('ne redirige pas si authentifié', async () => {
+	it('retourne pendingReportsCount si authentifié', async () => {
 		const result = await callLoad(true, '/admin')
-		expect(result).toBeUndefined()
+		expect(result).toEqual({ pendingReportsCount: 3 })
 	})
 
-	it('ne redirige pas si déjà sur /admin/login (même sans session)', async () => {
+	it('retourne pendingReportsCount=0 si sur /admin/login sans session', async () => {
 		const result = await callLoad(false, '/admin/login')
-		expect(result).toBeUndefined()
+		expect(result).toEqual({ pendingReportsCount: 0 })
 	})
 })

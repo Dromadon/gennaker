@@ -81,6 +81,17 @@ export const sharedEvaluations = sqliteTable('shared_evaluations', {
 	expiresAt: integer('expires_at').notNull()
 });
 
+export const questionReports = sqliteTable('question_reports', {
+	id: integer('id').primaryKey({ autoIncrement: true }),
+	questionId: integer('question_id').notNull().references(() => questions.id),
+	problemType: text('problem_type').notNull(),
+	// 'enonce_incorrect' | 'correction_incorrecte' | 'question_doublon' | 'mise_en_forme' | 'autre'
+	description: text('description'), // max 500 chars, optionnel
+	status: text('status').notNull().default('nouveau'),
+	// 'nouveau' | 'en_cours' | 'resolu'
+	createdAt: integer('created_at').notNull()
+});
+
 export const communitySubmissions = sqliteTable('community_submissions', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
 	type: text('type').notNull(), // 'nouvelle_question' | 'correction'

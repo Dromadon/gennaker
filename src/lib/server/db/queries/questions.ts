@@ -396,3 +396,15 @@ export async function getQuestionsBySection(
 	}
 	return result
 }
+
+export async function getQuestionById(
+	d1: D1Database,
+	id: number
+): Promise<{ id: number; title: string } | null> {
+	const result = await getDb(d1)
+		.select({ id: questions.id, title: questions.title })
+		.from(questions)
+		.where(eq(questions.id, id))
+		.limit(1)
+	return result[0] ?? null
+}

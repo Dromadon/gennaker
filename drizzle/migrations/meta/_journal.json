@@ -29,6 +29,13 @@
       "when": 1777368170579,
       "tag": "0003_pink_wildside",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1777453522076,
+      "tag": "0004_long_squadron_sinister",
+      "breakpoints": true
     }
   ]
 }
