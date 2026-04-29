@@ -12,7 +12,7 @@
 			<a href="/admin/reports" class="relative text-sm text-gray-500 hover:text-gray-900">
 				Signalements
 				{#if data.pendingReportsCount > 0}
-					<span class="ml-1 inline-flex items-center justify-center rounded-full bg-red-500 px-1.5 py-0.5 text-xs font-bold leading-none text-white">
+					<span class="ml-1 inline-flex items-center justify-center rounded-full bg-yellow-100 px-1.5 py-0.5 text-xs font-bold leading-none text-yellow-700">
 						{data.pendingReportsCount}
 					</span>
 				{/if}

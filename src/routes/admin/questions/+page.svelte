@@ -1,6 +1,9 @@
 <script lang="ts">
+	import { page } from '$app/state'
 	import type { PageData } from './$types'
 	import type { CategoryWithSections } from '$lib/domain/types'
+	import type { QuestionAdminListRow } from '$lib/domain/types'
+	import QuestionPreview from '$lib/components/QuestionPreview.svelte'
 
 	let { data }: { data: PageData } = $props()
 
@@ -17,6 +20,8 @@
 			? (data.categories.find((c: CategoryWithSections) => c.id === Number(selectedCategory))?.sections ?? [])
 			: []
 	)
+
+	let selectedQuestion = $state<QuestionAdminListRow | null>(null)
 
 	let deleteId = $state<number | null>(null)
 	let deleteConfirm = $state('')
@@ -40,6 +45,27 @@
 	}
 
 	const supports = ['deriveur', 'catamaran', 'windsurf', 'croisiere']
+
+	const PROBLEM_LABELS: Record<string, string> = {
+		enonce_incorrect: 'Énoncé incorrect',
+		correction_incorrecte: 'Correction incorrecte',
+		question_doublon: 'Doublon',
+		mise_en_forme: 'Mise en forme',
+		autre: 'Autre'
+	}
+
+	const STATUS_BADGE: Record<string, string> = {
+		nouveau: 'bg-yellow-100 text-yellow-700',
+		resolu: 'bg-green-100 text-green-700'
+	}
+
+	function formatDate(ts: number): string {
+		return new Date(ts * 1000).toLocaleDateString('fr-FR', {
+			day: '2-digit',
+			month: '2-digit',
+			year: 'numeric'
+		})
+	}
 </script>
 
 <div class="mb-6 flex items-center justify-between">
@@ -99,67 +125,243 @@
 	</a>
 </form>
 
-<!-- Tableau -->
-<div class="overflow-x-auto rounded-lg border border-gray-200">
-	<table class="w-full text-sm">
-		<thead class="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-			<tr>
-				<th class="px-4 py-3 text-gray-400">ID</th>
-				<th class="px-4 py-3">Titre</th>
-				<th class="px-4 py-3">Catégorie / Section</th>
-				<th class="px-4 py-3">Difficulté</th>
-				<th class="px-4 py-3">Supports</th>
-				<th class="px-4 py-3">Statut</th>
-				<th class="px-4 py-3"></th>
-			</tr>
-		</thead>
-		<tbody class="divide-y divide-gray-100">
-			{#each data.rows as q}
-				<tr class="bg-white hover:bg-gray-50">
-					<td class="px-4 py-3 text-gray-400 tabular-nums">{q.id}</td>
-					<td class="px-4 py-3 font-medium text-gray-900 max-w-xs truncate">{q.title}</td>
-					<td class="px-4 py-3 text-gray-500">
-						{q.categoryDisplayName}<span class="mx-1 text-gray-300">/</span>{q.sectionDisplayName}
-					</td>
-					<td class="px-4 py-3 text-gray-500">{q.difficulty}</td>
-					<td class="px-4 py-3 text-gray-500">
-						{q.applicableSupports.length === 0 ? 'tous' : q.applicableSupports.join(', ')}
-					</td>
-					<td class="px-4 py-3">
-						<span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {q.status === 'publie' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
-							{q.status === 'publie' ? 'Publié' : 'Brouillon'}
-						</span>
-					</td>
-					<td class="px-4 py-3 flex gap-3 justify-end">
-						<a href="/admin/questions/{q.id}/edit" class="text-blue-600 hover:underline">Modifier</a>
-						<button
-							type="button"
-							onclick={() => openDeleteDialog(q.id)}
-							class="text-red-600 hover:underline"
+<div class="lg:flex lg:gap-6">
+	<!-- Colonne principale -->
+	<div class="min-w-0 transition-all duration-300 {selectedQuestion ? 'lg:w-96 lg:shrink-0' : 'flex-1'} overflow-hidden">
+		<!-- Tableau -->
+		<div class="overflow-x-auto rounded-lg border border-gray-200">
+			<table class="w-full text-sm">
+				<thead class="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+					<tr>
+						<th class="w-10 px-2 py-3 text-gray-400">ID</th>
+						<th class="px-2 py-3">Titre</th>
+						{#if !selectedQuestion}
+							<th class="px-4 py-3">Catégorie / Section</th>
+							<th class="px-4 py-3">Difficulté</th>
+							<th class="px-4 py-3">Supports</th>
+							<th class="px-4 py-3">Statut</th>
+						{/if}
+						<th class="w-8 px-2 py-3"></th>
+					</tr>
+				</thead>
+				<tbody class="divide-y divide-gray-100">
+					{#each data.rows as q}
+						<tr
+							class="cursor-pointer hover:bg-gray-50 {selectedQuestion?.id === q.id ? 'bg-blue-50 hover:bg-blue-50' : 'bg-white'}"
+							onclick={() => { selectedQuestion = q }}
 						>
-							Supprimer
-						</button>
-					</td>
-				</tr>
-			{:else}
-				<tr>
-					<td colspan="7" class="px-4 py-8 text-center text-gray-400">Aucune question trouvée</td>
-				</tr>
-			{/each}
-		</tbody>
-	</table>
+							<td class="w-10 px-2 py-3 text-gray-400 tabular-nums">{q.id}</td>
+							<td class="px-2 py-3 font-medium text-gray-900 truncate {selectedQuestion ? 'max-w-[120px]' : 'max-w-xs'}">{q.title}</td>
+							{#if !selectedQuestion}
+								<td class="px-4 py-3 text-gray-500">
+									{q.categoryDisplayName}<span class="mx-1 text-gray-300">/</span>{q.sectionDisplayName}
+								</td>
+								<td class="px-4 py-3 text-gray-500">{q.difficulty}</td>
+								<td class="px-4 py-3 text-gray-500">
+									{q.applicableSupports.length === 0 ? 'tous' : q.applicableSupports.join(', ')}
+								</td>
+								<td class="px-4 py-3">
+									<span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {q.status === 'publie' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
+										{q.status === 'publie' ? 'Publié' : 'Brouillon'}
+									</span>
+								</td>
+							{/if}
+							<td class="w-8 px-2 py-3 text-center">
+								{#if (data.reportsByQuestionId[q.id] ?? []).length > 0}
+									<span
+										class="inline-flex items-center justify-center rounded-full bg-yellow-100 px-1.5 py-0.5 text-xs font-medium text-yellow-700"
+										title="{data.reportsByQuestionId[q.id].length} signalement{data.reportsByQuestionId[q.id].length > 1 ? 's' : ''}"
+									>{data.reportsByQuestionId[q.id].length}</span>
+								{/if}
+							</td>
+						</tr>
+					{:else}
+						<tr>
+							<td colspan={selectedQuestion ? 3 : 7} class="px-4 py-8 text-center text-gray-400">Aucune question trouvée</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
+
+		<!-- Pagination -->
+		{#if totalPages > 1}
+			<div class="mt-4 flex items-center justify-between text-sm text-gray-600">
+				<span>{data.total} questions — page {data.page} / {totalPages}</span>
+				<div class="flex gap-2">
+					{#if data.page > 1}
+						<a href={buildPageUrl(data.page - 1)} class="rounded-md border px-3 py-1 hover:bg-gray-50">← Précédent</a>
+					{/if}
+					{#if data.page < totalPages}
+						<a href={buildPageUrl(data.page + 1)} class="rounded-md border px-3 py-1 hover:bg-gray-50">Suivant →</a>
+					{/if}
+				</div>
+			</div>
+		{/if}
+	</div>
+
+	<!-- Panneau de prévisualisation desktop -->
+	{#if selectedQuestion}
+		<div class="hidden lg:block lg:min-w-0 lg:flex-1">
+			<div class="sticky top-4 space-y-4 rounded-lg border border-gray-200 bg-white p-5">
+				<!-- En-tête -->
+				<div class="flex items-start justify-between gap-2">
+					<p class="text-xs text-gray-400 tabular-nums">#{selectedQuestion.id}</p>
+					<button
+						type="button"
+						onclick={() => { selectedQuestion = null }}
+						class="shrink-0 text-gray-400 hover:text-gray-700"
+						aria-label="Fermer"
+					>✕</button>
+				</div>
+
+				<!-- Actions -->
+				<div class="flex gap-2">
+					<a
+						href="/admin/questions/{selectedQuestion.id}/edit"
+						class="inline-flex items-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:border-blue-400 hover:bg-blue-100"
+					>
+						Modifier →
+					</a>
+					<button
+						type="button"
+						onclick={() => openDeleteDialog(selectedQuestion!.id)}
+						class="inline-flex items-center gap-1.5 rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:border-red-400 hover:bg-red-100"
+					>
+						Supprimer
+					</button>
+				</div>
+
+				<hr class="border-gray-200" />
+
+				<!-- Prévisualisation de la question -->
+				<QuestionPreview
+					questionId={selectedQuestion.id}
+					title={selectedQuestion.title}
+					categoryDisplayName={selectedQuestion.categoryDisplayName}
+					sectionDisplayName={selectedQuestion.sectionDisplayName}
+					difficulty={selectedQuestion.difficulty}
+					applicableSupports={selectedQuestion.applicableSupports}
+					questionMd={selectedQuestion.questionMd}
+					correctionMd={selectedQuestion.correctionMd}
+					sourceMd={selectedQuestion.sourceMd}
+					r2BaseUrl={page.data.r2BaseUrl}
+				/>
+
+				<!-- Signalements liés -->
+				<hr class="border-gray-200" />
+				{#if (data.reportsByQuestionId[selectedQuestion.id] ?? []).length === 0}
+					<p class="text-sm text-gray-400">Aucun signalement</p>
+				{:else}
+					{@const reports = data.reportsByQuestionId[selectedQuestion.id]}
+					<p class="text-sm font-medium text-gray-700">{reports.length} signalement{reports.length > 1 ? 's' : ''}</p>
+					<div class="space-y-2">
+						{#each reports as report}
+							<details class="group/report rounded-md border border-gray-100">
+								<summary class="flex cursor-pointer list-none items-center justify-between px-3 py-2 text-xs text-gray-600 hover:bg-gray-50">
+									<span class="font-medium">{PROBLEM_LABELS[report.problemType] ?? report.problemType}</span>
+									<div class="flex items-center gap-2">
+										<span class="text-gray-400">{formatDate(report.createdAt)}</span>
+										<span class="inline-block rounded-full px-2 py-0.5 text-xs font-medium {STATUS_BADGE[report.status]}">
+											{report.status === 'nouveau' ? 'Nouveau' : 'Résolu'}
+										</span>
+										<span class="text-gray-300 transition-transform group-open/report:rotate-90">▶</span>
+									</div>
+								</summary>
+								<div class="space-y-2 border-t border-gray-100 px-3 py-2 text-xs text-gray-600">
+									<p class="whitespace-pre-wrap">{report.description ?? '—'}</p>
+									{#if report.email}
+										<p class="text-gray-400">{report.email}</p>
+									{/if}
+								</div>
+							</details>
+						{/each}
+						<a href="/admin/reports" class="mt-1 block text-right text-xs text-blue-600 hover:underline">
+							Voir tous les signalements →
+						</a>
+					</div>
+				{/if}
+			</div>
+		</div>
+	{/if}
 </div>
 
-<!-- Pagination -->
-{#if totalPages > 1}
-	<div class="mt-4 flex items-center justify-between text-sm text-gray-600">
-		<span>{data.total} questions — page {data.page} / {totalPages}</span>
-		<div class="flex gap-2">
-			{#if data.page > 1}
-				<a href={buildPageUrl(data.page - 1)} class="rounded-md border px-3 py-1 hover:bg-gray-50">← Précédent</a>
-			{/if}
-			{#if data.page < totalPages}
-				<a href={buildPageUrl(data.page + 1)} class="rounded-md border px-3 py-1 hover:bg-gray-50">Suivant →</a>
+<!-- Panneau de prévisualisation mobile (plein écran) -->
+{#if selectedQuestion}
+	<div class="fixed inset-0 z-50 flex flex-col bg-white lg:hidden">
+		<div class="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+			<p class="truncate text-xs text-gray-400 tabular-nums">#{selectedQuestion.id}</p>
+			<button
+				type="button"
+				onclick={() => { selectedQuestion = null }}
+				class="ml-2 shrink-0 text-gray-400 hover:text-gray-700"
+				aria-label="Fermer"
+			>✕ Fermer</button>
+		</div>
+		<div class="flex-1 overflow-y-auto p-4 space-y-4">
+			<div class="flex gap-2">
+				<a
+					href="/admin/questions/{selectedQuestion.id}/edit"
+					class="inline-flex items-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:border-blue-400 hover:bg-blue-100"
+				>
+					Modifier →
+				</a>
+				<button
+					type="button"
+					onclick={() => openDeleteDialog(selectedQuestion!.id)}
+					class="inline-flex items-center gap-1.5 rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:border-red-400 hover:bg-red-100"
+				>
+					Supprimer
+				</button>
+			</div>
+
+			<hr class="border-gray-200" />
+
+			<QuestionPreview
+				questionId={selectedQuestion.id}
+				title={selectedQuestion.title}
+				categoryDisplayName={selectedQuestion.categoryDisplayName}
+				sectionDisplayName={selectedQuestion.sectionDisplayName}
+				difficulty={selectedQuestion.difficulty}
+				applicableSupports={selectedQuestion.applicableSupports}
+				questionMd={selectedQuestion.questionMd}
+				correctionMd={selectedQuestion.correctionMd}
+				sourceMd={selectedQuestion.sourceMd}
+				r2BaseUrl={page.data.r2BaseUrl}
+			/>
+
+			<hr class="border-gray-200" />
+
+			{#if (data.reportsByQuestionId[selectedQuestion.id] ?? []).length === 0}
+				<p class="text-sm text-gray-400">Aucun signalement</p>
+			{:else}
+				{@const reports = data.reportsByQuestionId[selectedQuestion.id]}
+				<p class="text-sm font-medium text-gray-700">{reports.length} signalement{reports.length > 1 ? 's' : ''}</p>
+				<div class="space-y-2">
+					{#each reports as report}
+						<details class="group/report rounded-md border border-gray-100">
+							<summary class="flex cursor-pointer list-none items-center justify-between px-3 py-2 text-xs text-gray-600 hover:bg-gray-50">
+								<span class="font-medium">{PROBLEM_LABELS[report.problemType] ?? report.problemType}</span>
+								<div class="flex items-center gap-2">
+									<span class="text-gray-400">{formatDate(report.createdAt)}</span>
+									<span class="inline-block rounded-full px-2 py-0.5 text-xs font-medium {STATUS_BADGE[report.status]}">
+										{report.status === 'nouveau' ? 'Nouveau' : 'Résolu'}
+									</span>
+									<span class="text-gray-300 transition-transform group-open/report:rotate-90">▶</span>
+								</div>
+							</summary>
+							<div class="space-y-2 border-t border-gray-100 px-3 py-2 text-xs text-gray-600">
+								<p class="whitespace-pre-wrap">{report.description ?? '—'}</p>
+								{#if report.email}
+									<p class="text-gray-400">{report.email}</p>
+								{/if}
+							</div>
+						</details>
+					{/each}
+					<a href="/admin/reports" class="mt-1 block text-right text-xs text-blue-600 hover:underline">
+						Voir tous les signalements →
+					</a>
+				</div>
 			{/if}
 		</div>
 	</div>

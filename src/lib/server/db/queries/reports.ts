@@ -1,4 +1,4 @@
-import { count, eq } from 'drizzle-orm'
+import { count, eq, inArray } from 'drizzle-orm'
 import { getDb } from '../index'
 import { categories, questionReports, questions, sections } from '../schema'
 
@@ -31,11 +31,46 @@ export type ReportAdminRow = {
 	createdAt: number
 }
 
+export type QuestionReportSummary = {
+	id: number
+	questionId: number
+	problemType: ProblemType
+	description: string | null
+	email: string | null
+	status: ReportStatus
+	createdAt: number
+}
+
 export type ReportInput = {
 	questionId: number
 	problemType: ProblemType
 	description: string
 	email: string | null
+}
+
+export async function getReportsByQuestionIds(
+	d1: D1Database,
+	questionIds: number[]
+): Promise<QuestionReportSummary[]> {
+	if (questionIds.length === 0) return []
+	const rows = await getDb(d1)
+		.select({
+			id: questionReports.id,
+			questionId: questionReports.questionId,
+			problemType: questionReports.problemType,
+			description: questionReports.description,
+			email: questionReports.email,
+			status: questionReports.status,
+			createdAt: questionReports.createdAt
+		})
+		.from(questionReports)
+		.where(inArray(questionReports.questionId, questionIds))
+		.orderBy(questionReports.createdAt)
+	return rows.map((r) => ({
+		...r,
+		problemType: r.problemType as ProblemType,
+		status: r.status as ReportStatus
+	}))
 }
 
 export async function createReport(d1: D1Database, data: ReportInput): Promise<number> {

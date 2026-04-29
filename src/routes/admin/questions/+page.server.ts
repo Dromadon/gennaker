@@ -2,6 +2,7 @@ import { error, fail, redirect } from '@sveltejs/kit'
 import type { Actions, PageServerLoad } from './$types'
 import { getAllCategoriesWithSections } from '$lib/server/db/queries/categories'
 import { deleteQuestion, getQuestionsAdmin } from '$lib/server/db/queries/questions'
+import { getReportsByQuestionIds, type QuestionReportSummary } from '$lib/server/db/queries/reports'
 
 export const load: PageServerLoad = async ({ url, platform, locals }) => {
 	if (!locals.isAdmin) redirect(302, '/admin/login')
@@ -20,7 +21,14 @@ export const load: PageServerLoad = async ({ url, platform, locals }) => {
 		getAllCategoriesWithSections(d1)
 	])
 
-	return { rows, total, page, categories, filters: { categoryId, sectionId, support, status } }
+	const questionIds = rows.map((r) => r.id)
+	const reportRows = questionIds.length > 0 ? await getReportsByQuestionIds(d1, questionIds) : []
+	const reportsByQuestionId = reportRows.reduce<Record<number, QuestionReportSummary[]>>(
+		(acc, r) => { (acc[r.questionId] ??= []).push(r); return acc },
+		{}
+	)
+
+	return { rows, total, page, categories, filters: { categoryId, sectionId, support, status }, reportsByQuestionId }
 }
 
 export const actions: Actions = {

@@ -62,11 +62,14 @@ export type QuestionListRow = {
 	sectionSlug: string
 }
 
-export type QuestionAdminDetail = QuestionListRow & {
-	sectionId: number
+export type QuestionAdminListRow = QuestionListRow & {
 	questionMd: string
 	correctionMd: string
 	sourceMd: string | null
+}
+
+export type QuestionAdminDetail = QuestionAdminListRow & {
+	sectionId: number
 }
 
 export type QuestionPickRow = {

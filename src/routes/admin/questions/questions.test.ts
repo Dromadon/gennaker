@@ -21,13 +21,30 @@ vi.mock('$lib/server/db/queries/questions', () => ({
 				categoryDisplayName: 'Sécurité',
 				sectionDisplayName: 'Feux',
 				categorySlug: 'securite',
-				sectionSlug: 'feux'
+				sectionSlug: 'feux',
+				questionMd: '# Énoncé',
+				correctionMd: '# Correction',
+				sourceMd: null
 			}
 		],
 		total: 1
 	}),
 	createQuestion: vi.fn().mockResolvedValue(42),
 	deleteQuestion: vi.fn().mockResolvedValue(undefined)
+}))
+
+vi.mock('$lib/server/db/queries/reports', () => ({
+	getReportsByQuestionIds: vi.fn().mockResolvedValue([
+		{
+			id: 10,
+			questionId: 1,
+			problemType: 'enonce_incorrect',
+			description: 'Texte erroné',
+			email: null,
+			status: 'nouveau',
+			createdAt: 1700000000
+		}
+	])
 }))
 
 function makeEvent(isAdmin: boolean, extra: object = {}) {
@@ -58,6 +75,21 @@ describe('load /admin/questions', () => {
 		expect((result.rows as unknown[]).length).toBe(1)
 		expect(result.total).toBe(1)
 		expect((result.categories as unknown[]).length).toBe(1)
+	})
+
+	it('retourne reportsByQuestionId groupés par questionId', async () => {
+		const result = (await listLoad(makeEvent(true))) as Record<string, unknown>
+		const reports = result.reportsByQuestionId as Record<number, unknown[]>
+		expect(reports[1]).toHaveLength(1)
+		expect((reports[1][0] as Record<string, unknown>).problemType).toBe('enonce_incorrect')
+	})
+
+	it('retourne reportsByQuestionId vide si aucun signalement', async () => {
+		const { getReportsByQuestionIds } = await import('$lib/server/db/queries/reports')
+		vi.mocked(getReportsByQuestionIds).mockResolvedValueOnce([])
+		const result = (await listLoad(makeEvent(true))) as Record<string, unknown>
+		const reports = result.reportsByQuestionId as Record<number, unknown[]>
+		expect(Object.keys(reports)).toHaveLength(0)
 	})
 })
 

@@ -1,7 +1,7 @@
 import { and, count, eq, inArray, like, or, sql } from 'drizzle-orm'
 import { getDb } from '../index'
 import { categories, questions, sections, supports } from '../schema'
-import type { Question, QuestionAdminDetail, QuestionListRow, Support } from '$lib/domain/types'
+import type { Question, QuestionAdminDetail, QuestionAdminListRow, QuestionListRow, Support } from '$lib/domain/types'
 
 const PAGE_SIZE = 20
 
@@ -105,7 +105,7 @@ export async function getQuestionsAdmin(
 		status?: string | null
 		page: number
 	}
-): Promise<{ rows: QuestionListRow[]; total: number }> {
+): Promise<{ rows: QuestionAdminListRow[]; total: number }> {
 	const db = getDb(d1)
 
 	const conditions = []
@@ -134,7 +134,10 @@ export async function getQuestionsAdmin(
 			categoryDisplayName: categories.displayName,
 			sectionDisplayName: sections.displayName,
 			categorySlug: categories.slug,
-			sectionSlug: sections.slug
+			sectionSlug: sections.slug,
+			questionMd: questions.questionMd,
+			correctionMd: questions.correctionMd,
+			sourceMd: questions.sourceMd
 		})
 		.from(questions)
 		.innerJoin(sections, eq(sections.id, questions.sectionId))
@@ -157,10 +160,11 @@ export async function getQuestionsAdmin(
 	return {
 		rows: rows.map((r) => ({
 			...r,
-			difficulty: r.difficulty as QuestionListRow['difficulty'],
-			status: r.status as QuestionListRow['status'],
-			answerSize: r.answerSize as QuestionListRow['answerSize'],
-			applicableSupports: JSON.parse(r.applicableSupports ?? '[]')
+			difficulty: r.difficulty as QuestionAdminListRow['difficulty'],
+			status: r.status as QuestionAdminListRow['status'],
+			answerSize: r.answerSize as QuestionAdminListRow['answerSize'],
+			applicableSupports: JSON.parse(r.applicableSupports ?? '[]'),
+			sourceMd: r.sourceMd ?? null
 		})),
 		total
 	}

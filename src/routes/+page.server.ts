@@ -11,7 +11,7 @@ const SUPPORT_LABELS: Record<Support, string> = {
 
 const FORMATS = [
 	{ value: 'standard', label: 'Standard (~16 questions)' },
-	{ value: 'raccourcie', label: 'Raccourcie (~8 questions)' },
+	{ value: 'raccourcie', label: 'Raccourcie (~12 questions)' },
 	{ value: 'positionnement', label: 'Positionnement (~6 questions)' }
 ] as const
 

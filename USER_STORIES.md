@@ -261,11 +261,14 @@ Les stories suivantes sont identifiées mais hors scope MVP, classées par prior
 
 **Critères d'acceptation**
 
-_Liste_
-- La page `/admin/questions` liste toutes les questions avec : titre, catégorie, section, difficulté, status (brouillon / publié), nombre de supports applicables
-- Des filtres permettent de restreindre la liste : catégorie, section, support applicable, status
-- La liste est paginée (20 questions par page) et triée par catégorie → section → id par défaut
-- Chaque ligne propose des liens directs vers modifier et supprimer
+_Liste et prévisualisation_
+- La page `/admin/questions` liste toutes les questions avec filtres (catégorie, section, support, statut) et pagination (20 par page)
+- Cliquer sur une ligne ouvre un panneau de prévisualisation à droite (layout deux colonnes) ; le tableau se réduit à l'ID et au titre
+- Le panneau affiche les boutons **Modifier** (lien vers `/admin/questions/{id}/edit`) et **Supprimer** (dialog de confirmation) au-dessus de la preview de la question
+- La preview réutilise le composant `QuestionPreview` (également utilisé dans `/admin/reports` et la banque publique)
+- Une section dépliable en bas du panneau liste les signalements rattachés à la question (type, date, statut) ; s'il n'y en a pas, un message "Aucun signalement" est affiché
+- Les signalements sont chargés en une seule requête groupée au load (via `getReportsByQuestionIds`), sans N+1
+- Fermer le panneau (bouton ✕) revient au tableau pleine largeur avec toutes les colonnes
 
 _Création_
 - Le formulaire `/admin/questions/new` expose tous les champs éditables : titre, catégorie/section (sélecteurs liés), difficulté, answer_size, supports applicables (checkboxes), status, source

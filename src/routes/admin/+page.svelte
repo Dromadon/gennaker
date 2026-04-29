@@ -23,7 +23,7 @@
 	<div class="mb-1 flex items-center gap-2">
 		<h2 class="text-sm font-semibold text-gray-700">Signalements</h2>
 		{#if data.pendingReportsCount > 0}
-			<span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+			<span class="rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">
 				{data.pendingReportsCount} nouveau{data.pendingReportsCount > 1 ? 'x' : ''}
 			</span>
 		{/if}

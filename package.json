@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
-		"dev:cf": "vite build && (vite build --watch & wrangler dev)",
+		"dev:cf": "npm run build && wrangler dev",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
@@ -17,8 +17,12 @@
 		"db:generate": "drizzle-kit generate",
 		"db:migrate:local": "wrangler d1 migrations apply gennaker --local",
 		"db:migrate:remote": "wrangler d1 migrations apply gennaker --remote",
-		"dev:seed": "tsx scripts/import-export.ts --local --wipe",
-		"prod:seed": "tsx scripts/import-export.ts --remote"
+		"db:seed:generate:local": "tsx scripts/migrate-content.ts --local",
+		"db:seed:generate:remote": "tsx scripts/migrate-content.ts --remote",
+		"db:seed:local": "npm run db:seed:generate:local && wrangler d1 execute gennaker --local --file scripts/seed.sql",
+		"db:seed:remote": "npm run db:seed:generate:remote && wrangler d1 execute gennaker --remote --file scripts/seed.sql",
+		"images:local": "tsx scripts/migrate-images.ts --local",
+		"images:remote": "tsx scripts/migrate-images.ts --remote"
 	},
 	"devDependencies": {
 		"@cloudflare/vitest-pool-workers": "^0.14.9",
@@ -43,7 +47,6 @@
 		"@sveltejs/adapter-cloudflare": "^7.2.8",
 		"bcryptjs": "^3.0.3",
 		"drizzle-orm": "^0.45.2",
-		"fflate": "^0.8.2",
 		"marked": "^18.0.2",
 		"nanoid": "^5.1.9",
 		"zod": "^4.3.6"
