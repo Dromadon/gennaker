@@ -56,6 +56,40 @@ describe('parseQuestionMarkdown', () => {
 		const result = parseQuestionMarkdown(md)
 		expect(result.title).toBe('Titre direct')
 	})
+
+	it('sans frontmatter, retourne les valeurs par défaut', () => {
+		const md = '# Titre\n\nQ\n\n# Correction\n\nC\n'
+		const result = parseQuestionMarkdown(md)
+		expect(result.difficulty).toBe('moyen')
+		expect(result.answerSize).toBe('md')
+		expect(result.applicableSupports).toEqual([])
+	})
+
+	it('parse le frontmatter avec applicableSupports non vide', () => {
+		const md =
+			'---\ndifficulty: facile\nanswerSize: sm\napplicableSupports: [deriveur, catamaran]\n---\n\n# Titre\n\nQ\n\n# Correction\n\nC\n'
+		const result = parseQuestionMarkdown(md)
+		expect(result.difficulty).toBe('facile')
+		expect(result.answerSize).toBe('sm')
+		expect(result.applicableSupports).toEqual(['deriveur', 'catamaran'])
+		expect(result.title).toBe('Titre')
+	})
+
+	it('parse le frontmatter avec applicableSupports vide', () => {
+		const md =
+			'---\ndifficulty: difficile\nanswerSize: lg\napplicableSupports: []\n---\n\n# Titre\n\nQ\n\n# Correction\n\nC\n'
+		const result = parseQuestionMarkdown(md)
+		expect(result.difficulty).toBe('difficile')
+		expect(result.answerSize).toBe('lg')
+		expect(result.applicableSupports).toEqual([])
+	})
+
+	it('frontmatter avec valeur difficulty invalide → valeur par défaut', () => {
+		const md =
+			'---\ndifficulty: ultra\nanswerSize: md\napplicableSupports: []\n---\n\n# Titre\n\nQ\n\n# Correction\n\nC\n'
+		const result = parseQuestionMarkdown(md)
+		expect(result.difficulty).toBe('moyen')
+	})
 })
 
 describe('parseZip', () => {

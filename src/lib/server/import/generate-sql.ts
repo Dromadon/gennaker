@@ -41,10 +41,11 @@ export function generateQuestionsSql(questions: ParsedQuestion[]): string {
 
 	for (const q of questions) {
 		const sourcePart = q.sourceMd ? `'${escape(q.sourceMd)}'` : 'NULL'
+		const supportsJson = escape(JSON.stringify(q.applicableSupports))
 		lines.push(
 			`INSERT INTO questions (id, section_id, title, question_md, correction_md, difficulty, answer_size, applicable_supports, status, source_md, created_at, updated_at)` +
-			` VALUES (${q.id}, (SELECT s.id FROM sections s INNER JOIN categories c ON c.id = s.category_id WHERE s.slug='${escape(q.sectionSlug)}' AND c.slug='${escape(q.categorySlug)}'), '${escape(q.title)}', '${escape(q.questionMd)}', '${escape(q.correctionMd)}', 'moyen', 'md', '[]', 'publie', ${sourcePart}, ${now}, ${now})` +
-			` ON CONFLICT(id) DO UPDATE SET section_id=excluded.section_id, title=excluded.title, question_md=excluded.question_md, correction_md=excluded.correction_md, source_md=excluded.source_md, updated_at=excluded.updated_at;`
+			` VALUES (${q.id}, (SELECT s.id FROM sections s INNER JOIN categories c ON c.id = s.category_id WHERE s.slug='${escape(q.sectionSlug)}' AND c.slug='${escape(q.categorySlug)}'), '${escape(q.title)}', '${escape(q.questionMd)}', '${escape(q.correctionMd)}', '${q.difficulty}', '${q.answerSize}', '${supportsJson}', 'publie', ${sourcePart}, ${now}, ${now})` +
+			` ON CONFLICT(id) DO UPDATE SET section_id=excluded.section_id, title=excluded.title, question_md=excluded.question_md, correction_md=excluded.correction_md, difficulty=excluded.difficulty, answer_size=excluded.answer_size, applicable_supports=excluded.applicable_supports, source_md=excluded.source_md, updated_at=excluded.updated_at;`
 		)
 	}
 
@@ -79,11 +80,13 @@ export function generateTemplatesSql(templates: TemplateExportRow[]): string {
 }
 
 export function generateWipeSql(): string {
+	// Order matters: children before parents to satisfy foreign key constraints
 	return [
 		'DELETE FROM template_slots;',
 		'DELETE FROM evaluation_templates;',
 		'DELETE FROM shared_evaluations;',
 		'DELETE FROM community_submissions;',
+		'DELETE FROM question_reports;',
 		'DELETE FROM questions;',
 		'DELETE FROM sections;',
 		'DELETE FROM categories;',

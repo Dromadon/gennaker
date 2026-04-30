@@ -68,6 +68,9 @@ describe('generateQuestionsSql', () => {
 			title: 'Qu\'est-ce que le vent ?',
 			questionMd: 'Définition du vent',
 			correctionMd: 'Mouvement de l\'air',
+			difficulty: 'facile',
+			answerSize: 'sm',
+			applicableSupports: ['deriveur', 'catamaran'],
 			sourceMd: null
 		},
 		{
@@ -77,6 +80,9 @@ describe('generateQuestionsSql', () => {
 			title: 'Anticyclone',
 			questionMd: 'Qu\'est-ce qu\'un anticyclone ?',
 			correctionMd: 'Zone de haute pression',
+			difficulty: 'difficile',
+			answerSize: 'lg',
+			applicableSupports: [],
 			sourceMd: 'Manuel p.12'
 		}
 	]
@@ -105,6 +111,36 @@ describe('generateQuestionsSql', () => {
 	it('inclut sourceMd quand non null', () => {
 		const sql = generateQuestionsSql([questions[1]])
 		expect(sql).toContain("'Manuel p.12'")
+	})
+
+	it('utilise la vraie difficulty au lieu de la valeur hardcodée', () => {
+		const sql = generateQuestionsSql(questions)
+		expect(sql).toContain("'facile'")
+		expect(sql).toContain("'difficile'")
+		expect(sql).not.toMatch(/'moyen'.*ON CONFLICT/)
+	})
+
+	it('utilise le vrai answerSize au lieu de la valeur hardcodée', () => {
+		const sql = generateQuestionsSql(questions)
+		expect(sql).toContain("'sm'")
+		expect(sql).toContain("'lg'")
+	})
+
+	it('sérialise applicableSupports non vide en JSON', () => {
+		const sql = generateQuestionsSql([questions[0]])
+		expect(sql).toContain('["deriveur","catamaran"]')
+	})
+
+	it('sérialise applicableSupports vide en []', () => {
+		const sql = generateQuestionsSql([questions[1]])
+		expect(sql).toContain("'[]'")
+	})
+
+	it('le ON CONFLICT met aussi à jour difficulty, answer_size et applicable_supports', () => {
+		const sql = generateQuestionsSql(questions)
+		expect(sql).toContain('difficulty=excluded.difficulty')
+		expect(sql).toContain('answer_size=excluded.answer_size')
+		expect(sql).toContain('applicable_supports=excluded.applicable_supports')
 	})
 })
 

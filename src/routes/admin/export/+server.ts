@@ -21,8 +21,11 @@ export const GET = async ({ locals, platform }) => {
 
 	// Questions as markdown files — path: {cat}/{section}/{id}/{title}.md
 	for (const q of questionRows) {
+		const supportsYaml =
+			q.applicableSupports.length > 0 ? `[${q.applicableSupports.join(', ')}]` : '[]'
+		const frontmatter = `---\ndifficulty: ${q.difficulty}\nanswerSize: ${q.answerSize}\napplicableSupports: ${supportsYaml}\n---\n\n`
 		const source = q.sourceMd ? `\n\n<small>${q.sourceMd}</small>` : ''
-		const content = `# ${q.title}\n\n${q.questionMd}\n\n# Correction\n\n${q.correctionMd}${source}\n`
+		const content = `${frontmatter}# ${q.title}\n\n${q.questionMd}\n\n# Correction\n\n${q.correctionMd}${source}\n`
 		const safeName = q.title.replace(/[/\\?%*:|"<>]/g, '-')
 		const path = `${q.categorySlug}/${q.sectionSlug}/${q.id}/${safeName}.md`
 		files[path] = strToU8(content)

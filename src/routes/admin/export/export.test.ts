@@ -11,6 +11,9 @@ vi.mock('$lib/server/db/queries/questions', () => ({
 			title: 'Signaux de détresse',
 			questionMd: 'Quels sont les signaux de détresse ?',
 			correctionMd: 'Fusées, fumigènes...',
+			difficulty: 'facile',
+			answerSize: 'sm',
+			applicableSupports: ['deriveur', 'catamaran'],
 			sourceMd: null
 		},
 		{
@@ -20,6 +23,9 @@ vi.mock('$lib/server/db/queries/questions', () => ({
 			title: 'Question avec source',
 			questionMd: 'Quelle est la question ?',
 			correctionMd: 'La réponse.',
+			difficulty: 'moyen',
+			answerSize: 'md',
+			applicableSupports: [],
 			sourceMd: 'Manuel FFV p.42'
 		}
 	]),
@@ -102,6 +108,27 @@ describe('GET /admin/export', () => {
 		const content = new TextDecoder().decode(zip[qKey])
 		expect(content).toContain('Signaux de détresse')
 		expect(content).toContain('# Correction')
+	})
+
+	it('le frontmatter contient difficulty, answerSize et applicableSupports', async () => {
+		const response = await GET(makeEvent(true))
+		const buf = await response.arrayBuffer()
+		const zip = unzipSync(new Uint8Array(buf))
+		const qKey = Object.keys(zip).find((k) => k.includes('/1/'))!
+		const content = new TextDecoder().decode(zip[qKey])
+		expect(content).toMatch(/^---\n/)
+		expect(content).toContain('difficulty: facile')
+		expect(content).toContain('answerSize: sm')
+		expect(content).toContain('applicableSupports: [deriveur, catamaran]')
+	})
+
+	it('le frontmatter avec applicableSupports vide contient []', async () => {
+		const response = await GET(makeEvent(true))
+		const buf = await response.arrayBuffer()
+		const zip = unzipSync(new Uint8Array(buf))
+		const qKey = Object.keys(zip).find((k) => k.includes('/2/'))!
+		const content = new TextDecoder().decode(zip[qKey])
+		expect(content).toContain('applicableSupports: []')
 	})
 
 	it('le ZIP contient les images dans un sous-dossier images/', async () => {

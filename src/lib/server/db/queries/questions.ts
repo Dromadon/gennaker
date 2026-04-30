@@ -24,6 +24,9 @@ export type QuestionExportRow = {
 	title: string
 	questionMd: string
 	correctionMd: string
+	difficulty: 'facile' | 'moyen' | 'difficile'
+	answerSize: 'xs' | 'sm' | 'md' | 'lg'
+	applicableSupports: Support[]
 	sourceMd: string | null
 }
 
@@ -42,7 +45,7 @@ export type StructureExportRow = {
 }
 
 export async function getAllQuestionsForExport(d1: D1Database): Promise<QuestionExportRow[]> {
-	return getDb(d1)
+	const rows = await getDb(d1)
 		.select({
 			id: questions.id,
 			categorySlug: categories.slug,
@@ -50,12 +53,21 @@ export async function getAllQuestionsForExport(d1: D1Database): Promise<Question
 			title: questions.title,
 			questionMd: questions.questionMd,
 			correctionMd: questions.correctionMd,
+			difficulty: questions.difficulty,
+			answerSize: questions.answerSize,
+			applicableSupports: questions.applicableSupports,
 			sourceMd: questions.sourceMd
 		})
 		.from(questions)
 		.innerJoin(sections, eq(sections.id, questions.sectionId))
 		.innerJoin(categories, eq(categories.id, sections.categoryId))
 		.where(eq(questions.status, 'publie'))
+	return rows.map((r) => ({
+		...r,
+		difficulty: r.difficulty as QuestionExportRow['difficulty'],
+		answerSize: r.answerSize as QuestionExportRow['answerSize'],
+		applicableSupports: JSON.parse(r.applicableSupports ?? '[]') as Support[]
+	}))
 }
 
 export async function getStructureForExport(d1: D1Database): Promise<StructureExportRow> {

@@ -20,6 +20,12 @@ Requiert une session admin active (cookie `admin_session`). Retourne un fichier 
 ### Format des fichiers question
 
 ```markdown
+---
+difficulty: moyen
+answerSize: md
+applicableSupports: [deriveur, catamaran]
+---
+
 # Titre de la question
 
 Énoncé en markdown…
@@ -28,6 +34,16 @@ Requiert une session admin active (cookie `admin_session`). Retourne un fichier 
 
 Correction en markdown…
 ```
+
+Le frontmatter YAML contient les métadonnées pédagogiques de la question :
+
+| Champ | Valeurs possibles | Défaut | Description |
+|---|---|---|---|
+| `difficulty` | `facile`, `moyen`, `difficile` | `moyen` | Niveau de difficulté |
+| `answerSize` | `xs`, `sm`, `md`, `lg` | `md` | Taille de réponse attendue |
+| `applicableSupports` | liste de slugs entre `[]` | `[]` | Supports concernés (`[]` = tous) |
+
+Les exports antérieurs sans frontmatter restent importables : les trois champs prennent alors leur valeur par défaut (`moyen`, `md`, `[]`).
 
 ### Format de `templates.json`
 
@@ -88,6 +104,12 @@ Correction en markdown…
 Quand une question a un champ `sourceMd`, il est inclus après la correction :
 
 ```markdown
+---
+difficulty: moyen
+answerSize: md
+applicableSupports: []
+---
+
 # Titre de la question
 
 Énoncé en markdown…

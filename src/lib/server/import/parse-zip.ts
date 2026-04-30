@@ -22,6 +22,9 @@ export type ParsedQuestion = {
 	title: string
 	questionMd: string
 	correctionMd: string
+	difficulty: 'facile' | 'moyen' | 'difficile'
+	answerSize: 'xs' | 'sm' | 'md' | 'lg'
+	applicableSupports: string[]
 	sourceMd: string | null
 }
 
@@ -42,9 +45,40 @@ export function parseQuestionMarkdown(content: string): {
 	title: string
 	questionMd: string
 	correctionMd: string
+	difficulty: 'facile' | 'moyen' | 'difficile'
+	answerSize: 'xs' | 'sm' | 'md' | 'lg'
+	applicableSupports: string[]
 	sourceMd: string | null
 } {
-	const lines = content.split('\n')
+	let body = content
+	let difficulty: 'facile' | 'moyen' | 'difficile' = 'moyen'
+	let answerSize: 'xs' | 'sm' | 'md' | 'lg' = 'md'
+	let applicableSupports: string[] = []
+
+	// Parse optional YAML frontmatter (--- ... ---)
+	const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n\n?/)
+	if (frontmatterMatch) {
+		const fm = frontmatterMatch[1]
+		body = content.slice(frontmatterMatch[0].length)
+
+		const diffMatch = fm.match(/^difficulty:\s*(.+)$/m)
+		if (diffMatch && ['facile', 'moyen', 'difficile'].includes(diffMatch[1].trim())) {
+			difficulty = diffMatch[1].trim() as 'facile' | 'moyen' | 'difficile'
+		}
+		const sizeMatch = fm.match(/^answerSize:\s*(.+)$/m)
+		if (sizeMatch && ['xs', 'sm', 'md', 'lg'].includes(sizeMatch[1].trim())) {
+			answerSize = sizeMatch[1].trim() as 'xs' | 'sm' | 'md' | 'lg'
+		}
+		const supMatch = fm.match(/^applicableSupports:\s*\[([^\]]*)\]$/m)
+		if (supMatch) {
+			applicableSupports = supMatch[1]
+				.split(',')
+				.map((s) => s.trim())
+				.filter((s) => s.length > 0)
+		}
+	}
+
+	const lines = body.split('\n')
 
 	// First line is "# Title"
 	const title = lines[0].replace(/^#\s+/, '').trim()
@@ -74,7 +108,7 @@ export function parseQuestionMarkdown(content: string): {
 		correctionMd = rest
 	}
 
-	return { title, questionMd, correctionMd, sourceMd }
+	return { title, questionMd, correctionMd, difficulty, answerSize, applicableSupports, sourceMd }
 }
 
 export function parseZip(zipBytes: Uint8Array): ParsedZip {
