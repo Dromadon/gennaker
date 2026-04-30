@@ -17,7 +17,7 @@
 		"db:generate": "drizzle-kit generate",
 		"db:migrate:local": "wrangler d1 migrations apply gennaker --local",
 		"db:migrate:remote": "wrangler d1 migrations apply gennaker --remote",
-		"dev:seed": "tsx scripts/import-export.ts --local --wipe",
+		"dev:seed": "tsx scripts/import-export.ts --local",
 		"prod:seed": "tsx scripts/import-export.ts --remote"
 	},
 	"devDependencies": {
@@ -28,7 +28,9 @@
 		"@sveltejs/vite-plugin-svelte": "^7.0.0",
 		"@tailwindcss/vite": "^4.2.4",
 		"@types/bcryptjs": "^2.4.6",
+		"@types/better-sqlite3": "^7.6.13",
 		"@types/node": "^25.6.0",
+		"better-sqlite3": "^12.9.0",
 		"drizzle-kit": "^0.31.10",
 		"svelte": "^5.55.2",
 		"svelte-check": "^4.4.6",

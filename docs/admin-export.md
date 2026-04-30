@@ -125,18 +125,54 @@ Correction en markdown…
 
 Depuis l'interface admin (`/admin`) → bouton **Télécharger le backup**.
 
+## Import — endpoint
+
+```
+POST /admin/import
+```
+
+Requiert une session admin active (cookie `admin_session`). Reçoit un formulaire multipart :
+
+| Champ | Type | Description |
+|-------|------|-------------|
+| `file` | Fichier ZIP | Le backup à importer |
+| `wipe` | `"true"` / `"false"` | Vider toutes les tables avant l'import (optionnel, défaut `false`) |
+| `only` | `"structure"`, `"questions"`, `"templates"`, `"images"` | Importer une partie seulement (optionnel, défaut : tout) |
+
+Retourne un objet JSON avec les compteurs d'entités importées :
+
+```json
+{
+  "supports": 2,
+  "categories": 5,
+  "sections": 18,
+  "questions": 423,
+  "templates": 6,
+  "templateSlots": 42,
+  "images": 87
+}
+```
+
+L'import est idempotent : relancer avec le même ZIP ne duplique pas les données (upsert sur les clés uniques).
+
 ## Reconstruction depuis un backup
 
-Pour peupler un environnement (dev ou production) depuis un export ZIP :
+Le script CLI `scripts/import-export.ts` appelle l'endpoint `/admin/import` en HTTP. Il nécessite `ADMIN_SESSION_TOKEN` dans `.env.local` (voir [dev-setup.md](dev-setup.md)).
+
+**Le serveur doit être démarré avant de lancer le script (`npm run dev` pour le local).**
 
 ```bash
-# Dev local
+# Dev local (cumule avec l'existant)
 npm run dev:seed -- --file gennaker-backup-YYYY-MM-DD.zip
+
+# Dev local avec wipe complet avant import
+npm run dev:seed -- --file gennaker-backup-YYYY-MM-DD.zip --wipe
 
 # Production (sans wipe — cumule avec l'existant)
 npm run prod:seed -- --file gennaker-backup-YYYY-MM-DD.zip
 
 # Production (wipe complet avant import — pour corriger une corruption)
+# ⚠️ Demande une confirmation interactive (saisir "oui")
 npx tsx scripts/import-export.ts --remote --wipe --file gennaker-backup-YYYY-MM-DD.zip
 ```
 

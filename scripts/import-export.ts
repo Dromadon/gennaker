@@ -7,24 +7,43 @@
  *
  * --wipe   : vide toutes les tables avant l'import (dev uniquement, activé dans dev:seed)
  * --only   : structure | questions | templates | images  (sans --only : tout)
- * --local  : cible D1 locale + R2 local miniflare (défaut)
- * --remote : cible D1 et R2 Cloudflare production
+ * --local  : cible l'app locale sur http://localhost:5173 (défaut)
+ * --remote : cible l'app de production (IMPORT_REMOTE_URL dans .env.local)
+ *
+ * Auth : ADMIN_SESSION_TOKEN dans .env.local (cookie admin_session)
  */
 
-import { readFileSync, writeFileSync, unlinkSync, mkdirSync } from 'fs'
-import { execSync } from 'child_process'
-import { tmpdir } from 'os'
+import { readFileSync } from 'fs'
+import { existsSync } from 'fs'
 import { join } from 'path'
-import { randomUUID } from 'crypto'
-import { parseZip } from '../src/lib/server/import/parse-zip.ts'
-import { generateStructureSql, generateQuestionsSql, generateTemplatesSql, generateWipeSql } from '../src/lib/server/import/generate-sql.ts'
+
+// ── Charger .env.local ────────────────────────────────────────────────────────
+
+function loadEnvLocal(): Record<string, string> {
+	const envPath = join(process.cwd(), '.env.local')
+	if (!existsSync(envPath)) return {}
+	const env: Record<string, string> = {}
+	for (const line of readFileSync(envPath, 'utf-8').split('\n')) {
+		const trimmed = line.trim()
+		if (!trimmed || trimmed.startsWith('#')) continue
+		const eqIdx = trimmed.indexOf('=')
+		if (eqIdx === -1) continue
+		env[trimmed.slice(0, eqIdx).trim()] = trimmed.slice(eqIdx + 1).trim()
+	}
+	return env
+}
+
+const envLocal = loadEnvLocal()
+
+function getEnv(key: string): string | undefined {
+	return process.env[key] ?? envLocal[key]
+}
 
 // ── CLI args ─────────────────────────────────────────────────────────────────
 
 const args = process.argv.slice(2)
 
 function getArg(name: string): string | undefined {
-	// Accept both --name=value and --name value
 	const eqEntry = args.find((a) => a.startsWith(`${name}=`))
 	if (eqEntry) return eqEntry.split('=').slice(1).join('=')
 	const idx = args.indexOf(name)
@@ -40,90 +59,102 @@ if (!filePath) {
 
 const isRemote = args.includes('--remote')
 const doWipe = args.includes('--wipe')
-const only = getArg('--only') as 'structure' | 'questions' | 'templates' | 'images' | undefined
-
-const wranglerTarget = isRemote ? '--remote' : '--local'
-const r2Target = isRemote ? '' : '--local'
+const only = getArg('--only')
 
 const VALID_ONLY = ['structure', 'questions', 'templates', 'images']
 if (only && !VALID_ONLY.includes(only)) {
 	console.error(`Erreur : --only doit être l'une de : ${VALID_ONLY.join(', ')}`)
 	process.exit(1)
 }
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-function run(cmd: string) {
-	console.log(`  $ ${cmd}`)
-	execSync(cmd, { stdio: 'inherit' })
+if (doWipe && only) {
+	console.error('Erreur : --wipe et --only sont incompatibles (wipe vide tout, importer un sous-ensemble ensuite violerait les contraintes FK)')
+	process.exit(1)
 }
 
-function executeSql(sql: string, label: string) {
-	if (!sql.trim()) {
-		console.log(`  (rien à faire pour ${label})`)
-		return
-	}
-	const tmpFile = join(tmpdir(), `gennaker-import-${randomUUID()}.sql`)
-	try {
-		writeFileSync(tmpFile, sql, 'utf-8')
-		run(`wrangler d1 execute gennaker ${wranglerTarget} --file "${tmpFile}"`)
-	} finally {
-		try { unlinkSync(tmpFile) } catch {}
+if (doWipe && isRemote) {
+	process.stdout.write(
+		'\n⚠️  Vous êtes sur le point de vider TOUTES LES TABLES en PRODUCTION.\n' +
+		'Tapez "oui" pour confirmer : '
+	)
+	const answer = await new Promise<string>((resolve) => {
+		let buf = ''
+		process.stdin.setEncoding('utf-8')
+		process.stdin.resume()
+		process.stdin.on('data', (chunk: string) => {
+			buf += chunk
+			if (buf.includes('\n')) {
+				process.stdin.pause()
+				resolve(buf.trim())
+			}
+		})
+	})
+	if (answer !== 'oui') {
+		console.log('Annulé.')
+		process.exit(0)
 	}
 }
 
-function uploadImage(questionId: number, filename: string, data: Uint8Array) {
-	const tmpFile = join(tmpdir(), `gennaker-img-${randomUUID()}-${filename}`)
-	try {
-		writeFileSync(tmpFile, data)
-		const key = `${questionId}/images/${filename}`
-		const locationFlag = isRemote ? '--remote' : '--local'
-		run(`wrangler r2 object put "gennaker-questions/${key}" --file "${tmpFile}" ${locationFlag}`)
-	} finally {
-		try { unlinkSync(tmpFile) } catch {}
-	}
+// ── Config ────────────────────────────────────────────────────────────────────
+
+const sessionToken = getEnv('ADMIN_SESSION_TOKEN')
+if (!sessionToken) {
+	console.error('Erreur : ADMIN_SESSION_TOKEN manquant dans .env.local ou les variables d\'environnement')
+	process.exit(1)
 }
+
+const baseUrl = isRemote
+	? (getEnv('IMPORT_REMOTE_URL') ?? 'https://gennaker.pages.dev')
+	: (getEnv('IMPORT_LOCAL_URL') ?? 'http://localhost:5173')
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 console.log(`\nLecture de ${filePath}...`)
-const zipBytes = new Uint8Array(readFileSync(filePath))
+const zipBytes = readFileSync(filePath)
+console.log(`  ${(zipBytes.length / 1024).toFixed(1)} KB`)
 
-console.log('Parsing du ZIP...')
-const { structure, templates, questions, images } = parseZip(zipBytes)
-console.log(`  ${structure.supports.length} supports, ${structure.categories.length} catégories`)
-console.log(`  ${questions.length} questions, ${images.length} images`)
-console.log(`  ${templates.length} templates`)
+console.log(`\nEnvoi vers ${baseUrl}/admin/import...`)
+if (doWipe) console.log('  ⚠ --wipe activé : toutes les tables seront vidées')
+if (only) console.log(`  --only=${only}`)
 
-const doAll = !only
+const params = new URLSearchParams()
+if (doWipe) params.set('wipe', 'true')
+if (only) params.set('only', only)
+const importUrl = `${baseUrl}/admin/import?${params}`
 
-if (doWipe) {
-	console.log('\n[0/4] Nettoyage de la base...')
-	executeSql(generateWipeSql(), 'wipe')
+let response: Response
+try {
+	response = await fetch(importUrl, {
+		method: 'POST',
+		headers: {
+			Cookie: `admin_session=${sessionToken}`,
+			'Content-Type': 'application/octet-stream'
+		},
+		body: zipBytes
+	})
+} catch (err) {
+	console.error(`\nErreur réseau : ${err}`)
+	console.error(`Vérifiez que l'app tourne sur ${baseUrl}`)
+	process.exit(1)
 }
 
-if (doAll || only === 'structure') {
-	console.log('\n[1/4] Structure (supports, catégories, sections)...')
-	executeSql(generateStructureSql(structure), 'structure')
+if (!response.ok) {
+	const text = await response.text().catch(() => '')
+	console.error(`\nErreur HTTP ${response.status} : ${text}`)
+	process.exit(1)
 }
 
-if (doAll || only === 'questions') {
-	console.log('\n[2/4] Questions...')
-	executeSql(generateQuestionsSql(questions), 'questions')
+const result = await response.json() as {
+	supports: number
+	categories: number
+	sections: number
+	questions: number
+	templates: number
+	templateSlots: number
+	images: number
 }
 
-if (doAll || only === 'templates') {
-	console.log('\n[3/4] Templates...')
-	executeSql(generateTemplatesSql(templates), 'templates')
-}
-
-if (doAll || only === 'images') {
-	console.log(`\n[4/4] Images (${images.length})...`)
-	for (let i = 0; i < images.length; i++) {
-		const img = images[i]
-		process.stdout.write(`  (${i + 1}/${images.length}) ${img.questionId}/images/${img.filename}\n`)
-		uploadImage(img.questionId, img.filename, img.data)
-	}
-}
-
-console.log('\nImport terminé.')
+console.log('\nImport terminé :')
+console.log(`  ${result.supports} supports, ${result.categories} catégories, ${result.sections} sections`)
+console.log(`  ${result.questions} questions`)
+console.log(`  ${result.templates} templates, ${result.templateSlots} slots`)
+console.log(`  ${result.images} images`)
