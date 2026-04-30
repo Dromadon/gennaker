@@ -147,6 +147,26 @@ export async function countPendingReports(d1: D1Database): Promise<number> {
 	return result[0].total
 }
 
+export async function getAllReportsForExport(d1: D1Database): Promise<QuestionReportSummary[]> {
+	const rows = await getDb(d1)
+		.select({
+			id: questionReports.id,
+			questionId: questionReports.questionId,
+			problemType: questionReports.problemType,
+			description: questionReports.description,
+			email: questionReports.email,
+			status: questionReports.status,
+			createdAt: questionReports.createdAt
+		})
+		.from(questionReports)
+		.orderBy(questionReports.id)
+	return rows.map((r) => ({
+		...r,
+		problemType: r.problemType as ProblemType,
+		status: r.status as ReportStatus
+	}))
+}
+
 export async function updateReportStatus(
 	d1: D1Database,
 	id: number,

@@ -14,7 +14,10 @@ vi.mock('$lib/server/db/queries/questions', () => ({
 			difficulty: 'facile',
 			answerSize: 'sm',
 			applicableSupports: ['deriveur', 'catamaran'],
-			sourceMd: null
+			status: 'publie',
+			sourceMd: null,
+			createdAt: 1700000000,
+			updatedAt: 1700000001
 		},
 		{
 			id: 2,
@@ -26,7 +29,10 @@ vi.mock('$lib/server/db/queries/questions', () => ({
 			difficulty: 'moyen',
 			answerSize: 'md',
 			applicableSupports: [],
-			sourceMd: 'Manuel FFV p.42'
+			status: 'brouillon',
+			sourceMd: 'Manuel FFV p.42',
+			createdAt: 1700000042,
+			updatedAt: 1700000099
 		}
 	]),
 	getStructureForExport: vi.fn().mockResolvedValue({
@@ -51,6 +57,20 @@ vi.mock('$lib/server/db/queries/questions', () => ({
 vi.mock('$lib/server/db/queries/templates', () => ({
 	getAllTemplatesForExport: vi.fn().mockResolvedValue([
 		{ id: 1, supportSlug: 'deriveur', format: 'standard', slots: [] }
+	])
+}))
+
+vi.mock('$lib/server/db/queries/reports', () => ({
+	getAllReportsForExport: vi.fn().mockResolvedValue([
+		{
+			id: 1,
+			questionId: 1,
+			problemType: 'enonce_incorrect',
+			description: "Erreur dans l'énoncé",
+			email: null,
+			status: 'nouveau',
+			createdAt: 1700000000
+		}
 	])
 }))
 
@@ -120,6 +140,34 @@ describe('GET /admin/export', () => {
 		expect(content).toContain('difficulty: facile')
 		expect(content).toContain('answerSize: sm')
 		expect(content).toContain('applicableSupports: [deriveur, catamaran]')
+	})
+
+	it('le frontmatter contient status, createdAt et updatedAt', async () => {
+		const response = await GET(makeEvent(true))
+		const buf = await response.arrayBuffer()
+		const zip = unzipSync(new Uint8Array(buf))
+		const qKey = Object.keys(zip).find((k) => k.includes('/1/'))!
+		const content = new TextDecoder().decode(zip[qKey])
+		expect(content).toContain('status: publie')
+		expect(content).toContain('createdAt: 1700000000')
+		expect(content).toContain('updatedAt: 1700000001')
+	})
+
+	it('le ZIP contient reports.json', async () => {
+		const response = await GET(makeEvent(true))
+		const buf = await response.arrayBuffer()
+		const zip = unzipSync(new Uint8Array(buf))
+		expect(Object.keys(zip)).toContain('reports.json')
+	})
+
+	it('reports.json contient les données mockées', async () => {
+		const response = await GET(makeEvent(true))
+		const buf = await response.arrayBuffer()
+		const zip = unzipSync(new Uint8Array(buf))
+		const reports = JSON.parse(new TextDecoder().decode(zip['reports.json']))
+		expect(reports).toHaveLength(1)
+		expect(reports[0].id).toBe(1)
+		expect(reports[0].problemType).toBe('enonce_incorrect')
 	})
 
 	it('le frontmatter avec applicableSupports vide contient []', async () => {

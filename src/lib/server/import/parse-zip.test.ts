@@ -90,6 +90,36 @@ describe('parseQuestionMarkdown', () => {
 		const result = parseQuestionMarkdown(md)
 		expect(result.difficulty).toBe('moyen')
 	})
+
+	it('sans frontmatter, retourne status publie et timestamps null', () => {
+		const md = '# Titre\n\nQ\n\n# Correction\n\nC\n'
+		const result = parseQuestionMarkdown(md)
+		expect(result.status).toBe('publie')
+		expect(result.createdAt).toBeNull()
+		expect(result.updatedAt).toBeNull()
+	})
+
+	it('parse status: brouillon depuis le frontmatter', () => {
+		const md =
+			'---\nstatus: brouillon\ndifficulty: moyen\nanswerSize: md\napplicableSupports: []\ncreatedAt: 1700000000\nupdatedAt: 1700000001\n---\n\n# Titre\n\nQ\n\n# Correction\n\nC\n'
+		const result = parseQuestionMarkdown(md)
+		expect(result.status).toBe('brouillon')
+	})
+
+	it('parse createdAt et updatedAt depuis le frontmatter', () => {
+		const md =
+			'---\nstatus: publie\ndifficulty: moyen\nanswerSize: md\napplicableSupports: []\ncreatedAt: 1700000042\nupdatedAt: 1700000099\n---\n\n# Titre\n\nQ\n\n# Correction\n\nC\n'
+		const result = parseQuestionMarkdown(md)
+		expect(result.createdAt).toBe(1700000042)
+		expect(result.updatedAt).toBe(1700000099)
+	})
+
+	it('frontmatter avec status invalide → valeur par défaut publie', () => {
+		const md =
+			'---\nstatus: inconnu\ndifficulty: moyen\nanswerSize: md\napplicableSupports: []\n---\n\n# Titre\n\nQ\n\n# Correction\n\nC\n'
+		const result = parseQuestionMarkdown(md)
+		expect(result.status).toBe('publie')
+	})
 })
 
 describe('parseZip', () => {
@@ -138,5 +168,32 @@ describe('parseZip', () => {
 		expect(result.structure.supports).toHaveLength(1)
 		expect(result.templates).toHaveLength(1)
 		expect(result.templates[0].supportSlug).toBe('deriveur')
+	})
+
+	it('retourne reports vide si reports.json absent (rétrocompatibilité)', () => {
+		const zip = makeZip()
+		const result = parseZip(zip)
+		expect(result.reports).toEqual([])
+	})
+
+	it('parse reports.json si présent', () => {
+		const reports = [
+			{
+				id: 1,
+				questionId: 42,
+				problemType: 'enonce_incorrect',
+				description: 'Erreur dans l\'énoncé',
+				email: null,
+				status: 'nouveau',
+				createdAt: 1700000000
+			}
+		]
+		const zip = makeZip({ 'reports.json': strToU8(JSON.stringify(reports)) })
+		const result = parseZip(zip)
+		expect(result.reports).toHaveLength(1)
+		expect(result.reports[0].id).toBe(1)
+		expect(result.reports[0].questionId).toBe(42)
+		expect(result.reports[0].problemType).toBe('enonce_incorrect')
+		expect(result.reports[0].status).toBe('nouveau')
 	})
 })

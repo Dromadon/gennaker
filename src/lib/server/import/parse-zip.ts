@@ -25,7 +25,20 @@ export type ParsedQuestion = {
 	difficulty: 'facile' | 'moyen' | 'difficile'
 	answerSize: 'xs' | 'sm' | 'md' | 'lg'
 	applicableSupports: string[]
+	status: 'brouillon' | 'publie'
 	sourceMd: string | null
+	createdAt: number | null
+	updatedAt: number | null
+}
+
+export type ParsedReport = {
+	id: number
+	questionId: number
+	problemType: string
+	description: string | null
+	email: string | null
+	status: string
+	createdAt: number
 }
 
 export type ParsedImage = {
@@ -39,6 +52,7 @@ export type ParsedZip = {
 	templates: TemplateExportRow[]
 	questions: ParsedQuestion[]
 	images: ParsedImage[]
+	reports: ParsedReport[]
 }
 
 export function parseQuestionMarkdown(content: string): {
@@ -48,12 +62,18 @@ export function parseQuestionMarkdown(content: string): {
 	difficulty: 'facile' | 'moyen' | 'difficile'
 	answerSize: 'xs' | 'sm' | 'md' | 'lg'
 	applicableSupports: string[]
+	status: 'brouillon' | 'publie'
 	sourceMd: string | null
+	createdAt: number | null
+	updatedAt: number | null
 } {
 	let body = content
 	let difficulty: 'facile' | 'moyen' | 'difficile' = 'moyen'
 	let answerSize: 'xs' | 'sm' | 'md' | 'lg' = 'md'
 	let applicableSupports: string[] = []
+	let status: 'brouillon' | 'publie' = 'publie'
+	let createdAt: number | null = null
+	let updatedAt: number | null = null
 
 	// Parse optional YAML frontmatter (--- ... ---)
 	const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n\n?/)
@@ -76,6 +96,14 @@ export function parseQuestionMarkdown(content: string): {
 				.map((s) => s.trim())
 				.filter((s) => s.length > 0)
 		}
+		const statusMatch = fm.match(/^status:\s*(.+)$/m)
+		if (statusMatch && ['brouillon', 'publie'].includes(statusMatch[1].trim())) {
+			status = statusMatch[1].trim() as 'brouillon' | 'publie'
+		}
+		const createdAtMatch = fm.match(/^createdAt:\s*(\d+)$/m)
+		if (createdAtMatch) createdAt = parseInt(createdAtMatch[1], 10)
+		const updatedAtMatch = fm.match(/^updatedAt:\s*(\d+)$/m)
+		if (updatedAtMatch) updatedAt = parseInt(updatedAtMatch[1], 10)
 	}
 
 	const lines = body.split('\n')
@@ -108,7 +136,7 @@ export function parseQuestionMarkdown(content: string): {
 		correctionMd = rest
 	}
 
-	return { title, questionMd, correctionMd, difficulty, answerSize, applicableSupports, sourceMd }
+	return { title, questionMd, correctionMd, difficulty, answerSize, applicableSupports, status, sourceMd, createdAt, updatedAt }
 }
 
 export function parseZip(zipBytes: Uint8Array): ParsedZip {
@@ -126,7 +154,7 @@ export function parseZip(zipBytes: Uint8Array): ParsedZip {
 	const images: ParsedImage[] = []
 
 	for (const [path, data] of Object.entries(files)) {
-		if (path === 'structure.json' || path === 'templates.json') continue
+		if (path === 'structure.json' || path === 'templates.json' || path === 'reports.json') continue
 
 		// Expected paths:
 		// {cat}/{sec}/{id}/{title}.md
@@ -146,5 +174,11 @@ export function parseZip(zipBytes: Uint8Array): ParsedZip {
 		}
 	}
 
-	return { structure, templates, questions, images }
+	const reports: ParsedReport[] = []
+	if (files['reports.json']) {
+		const raw = JSON.parse(strFromU8(files['reports.json']))
+		if (Array.isArray(raw)) reports.push(...raw)
+	}
+
+	return { structure, templates, questions, images, reports }
 }

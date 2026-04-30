@@ -15,15 +15,19 @@ Requiert une session admin active (cookie `admin_session`). Retourne un fichier 
 | `{catégorie}/{section}/{id}/{titre}.md` | Énoncé + correction séparés par `# Correction` |
 | `templates.json` | Tous les templates et leurs slots (JSON) |
 | `structure.json` | Catégories et sections avec métadonnées (slugs, displayNames, applicableSupports) |
+| `reports.json` | Tous les signalements de questions (JSON) |
 | `{catégorie}/{section}/{id}/images/{filename}` | Images des questions (depuis R2) |
 
 ### Format des fichiers question
 
 ```markdown
 ---
+status: publie
 difficulty: moyen
 answerSize: md
 applicableSupports: [deriveur, catamaran]
+createdAt: 1700000000
+updatedAt: 1700000001
 ---
 
 # Titre de la question
@@ -35,15 +39,18 @@ applicableSupports: [deriveur, catamaran]
 Correction en markdown…
 ```
 
-Le frontmatter YAML contient les métadonnées pédagogiques de la question :
+Le frontmatter YAML contient les métadonnées de la question :
 
 | Champ | Valeurs possibles | Défaut | Description |
 |---|---|---|---|
+| `status` | `publie`, `brouillon` | `publie` | Statut éditorial |
 | `difficulty` | `facile`, `moyen`, `difficile` | `moyen` | Niveau de difficulté |
 | `answerSize` | `xs`, `sm`, `md`, `lg` | `md` | Taille de réponse attendue |
 | `applicableSupports` | liste de slugs entre `[]` | `[]` | Supports concernés (`[]` = tous) |
+| `createdAt` | timestamp Unix (entier) | `now` à l'import | Date de création originale |
+| `updatedAt` | timestamp Unix (entier) | `now` à l'import | Date de dernière modification |
 
-Les exports antérieurs sans frontmatter restent importables : les trois champs prennent alors leur valeur par défaut (`moyen`, `md`, `[]`).
+Les exports antérieurs sans ces champs restent importables : `status` prend `publie`, `createdAt`/`updatedAt` prennent la date courante de l'import.
 
 ### Format de `templates.json`
 
@@ -105,9 +112,12 @@ Quand une question a un champ `sourceMd`, il est inclus après la correction :
 
 ```markdown
 ---
+status: publie
 difficulty: moyen
 answerSize: md
 applicableSupports: []
+createdAt: 1700000000
+updatedAt: 1700000001
 ---
 
 # Titre de la question
@@ -120,6 +130,34 @@ Correction en markdown…
 
 <small>Manuel FFV p.42</small>
 ```
+
+### Format de `reports.json`
+
+```json
+[
+  {
+    "id": 1,
+    "questionId": 42,
+    "problemType": "enonce_incorrect",
+    "description": "L'énoncé contient une erreur.",
+    "email": "contact@example.com",
+    "status": "nouveau",
+    "createdAt": 1700000000
+  }
+]
+```
+
+| Champ | Description |
+|---|---|
+| `id` | Identifiant du signalement (préservé à l'import pour idempotence) |
+| `questionId` | ID de la question signalée |
+| `problemType` | Type de problème : `enonce_incorrect`, `correction_incorrecte`, `question_doublon`, `mise_en_forme`, `autre` |
+| `description` | Description libre (peut être `null`) |
+| `email` | Email de contact (peut être `null`) |
+| `status` | `nouveau` ou `resolu` |
+| `createdAt` | Timestamp Unix de création |
+
+Les ZIPs antérieurs sans `reports.json` sont importables sans erreur : aucun signalement n'est importé.
 
 ## Utilisation
 
@@ -137,7 +175,7 @@ Requiert une session admin active (cookie `admin_session`). Reçoit un formulair
 |-------|------|-------------|
 | `file` | Fichier ZIP | Le backup à importer |
 | `wipe` | `"true"` / `"false"` | Vider toutes les tables avant l'import (optionnel, défaut `false`) |
-| `only` | `"structure"`, `"questions"`, `"templates"`, `"images"` | Importer une partie seulement (optionnel, défaut : tout) |
+| `only` | `"structure"`, `"questions"`, `"templates"`, `"images"`, `"reports"` | Importer une partie seulement (optionnel, défaut : tout) |
 
 Retourne un objet JSON avec les compteurs d'entités importées :
 
@@ -149,7 +187,8 @@ Retourne un objet JSON avec les compteurs d'entités importées :
   "questions": 423,
   "templates": 6,
   "templateSlots": 42,
-  "images": 87
+  "images": 87,
+  "reports": 47
 }
 ```
 

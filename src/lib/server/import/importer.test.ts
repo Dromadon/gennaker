@@ -12,7 +12,8 @@ import {
 	sections as sectionsTable,
 	questions as questionsTable,
 	evaluationTemplates,
-	templateSlots
+	templateSlots,
+	questionReports as questionReportsTable
 } from '$lib/server/db/schema'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -156,15 +157,23 @@ function makeQuestion(overrides: Partial<QuestionExportRow> = {}): QuestionExpor
 		difficulty: 'facile',
 		answerSize: 'sm',
 		applicableSupports: ['deriveur', 'catamaran'],
+		status: 'publie',
 		sourceMd: null,
+		createdAt: 1700000000,
+		updatedAt: 1700000001,
 		...overrides
 	}
 }
 
-function makeZip(questions: QuestionExportRow[], templates = TEMPLATES) {
+function makeZip(
+	questions: QuestionExportRow[],
+	templates = TEMPLATES,
+	extras: Record<string, Uint8Array> = {}
+) {
 	const files: Record<string, Uint8Array> = {
 		'structure.json': strToU8(JSON.stringify(STRUCTURE)),
-		'templates.json': strToU8(JSON.stringify(templates))
+		'templates.json': strToU8(JSON.stringify(templates)),
+		...extras
 	}
 	for (const q of questions) {
 		files[buildQuestionFilePath(q)] = strToU8(buildQuestionFileContent(q))
@@ -314,6 +323,23 @@ describe('importZip — questions', () => {
 		expect(rows[0].title).toBe('Titre mis à jour')
 	})
 
+	it('préserve status brouillon', async () => {
+		const q = makeQuestion({ status: 'brouillon' })
+		await importZip(db, null, makeZip([q]), { only: ['questions'] })
+
+		const rows = await db.select().from(questionsTable)
+		expect(rows[0].status).toBe('brouillon')
+	})
+
+	it('préserve createdAt et updatedAt', async () => {
+		const q = makeQuestion({ createdAt: 1700000042, updatedAt: 1700000099 })
+		await importZip(db, null, makeZip([q]), { only: ['questions'] })
+
+		const rows = await db.select().from(questionsTable)
+		expect(rows[0].createdAt).toBe(1700000042)
+		expect(rows[0].updatedAt).toBe(1700000099)
+	})
+
 	it('importe plusieurs questions indépendamment', async () => {
 		const questions = [
 			makeQuestion({ id: 10, title: 'Q1', difficulty: 'facile', answerSize: 'xs' }),
@@ -369,6 +395,77 @@ describe('importZip — templates', () => {
 	})
 })
 
+// ── Tests reports ─────────────────────────────────────────────────────────────
+
+describe('importZip — reports', () => {
+	let db: ReturnType<typeof createTestDb>
+
+	const REPORT = {
+		id: 1,
+		questionId: 42,
+		problemType: 'enonce_incorrect',
+		description: "Erreur dans l'énoncé",
+		email: null,
+		status: 'nouveau',
+		createdAt: 1700000000
+	}
+
+	beforeEach(async () => {
+		db = createTestDb()
+		await importZip(db, null, makeZip([makeQuestion()]), { only: ['structure', 'questions'] })
+	})
+
+	it('crée les signalements avec les bons champs', async () => {
+		const zip = makeZip([makeQuestion()], TEMPLATES, {
+			'reports.json': strToU8(JSON.stringify([REPORT]))
+		})
+		await importZip(db, null, zip, { only: ['reports'] })
+
+		const rows = await db.select().from(questionReportsTable)
+		expect(rows).toHaveLength(1)
+		expect(rows[0].id).toBe(1)
+		expect(rows[0].questionId).toBe(42)
+		expect(rows[0].problemType).toBe('enonce_incorrect')
+		expect(rows[0].status).toBe('nouveau')
+		expect(rows[0].createdAt).toBe(1700000000)
+	})
+
+	it('est idempotent : un 2ème import ne duplique pas les signalements', async () => {
+		const zip = makeZip([makeQuestion()], TEMPLATES, {
+			'reports.json': strToU8(JSON.stringify([REPORT]))
+		})
+		await importZip(db, null, zip, { only: ['reports'] })
+		await importZip(db, null, zip, { only: ['reports'] })
+
+		const rows = await db.select().from(questionReportsTable)
+		expect(rows).toHaveLength(1)
+	})
+
+	it('met à jour un signalement existant lors du 2ème import', async () => {
+		const zip1 = makeZip([makeQuestion()], TEMPLATES, {
+			'reports.json': strToU8(JSON.stringify([REPORT]))
+		})
+		await importZip(db, null, zip1, { only: ['reports'] })
+
+		const updated = { ...REPORT, status: 'resolu' }
+		const zip2 = makeZip([makeQuestion()], TEMPLATES, {
+			'reports.json': strToU8(JSON.stringify([updated]))
+		})
+		await importZip(db, null, zip2, { only: ['reports'] })
+
+		const rows = await db.select().from(questionReportsTable)
+		expect(rows).toHaveLength(1)
+		expect(rows[0].status).toBe('resolu')
+	})
+
+	it('rétrocompatibilité : ZIP sans reports.json importe 0 signalements', async () => {
+		await importZip(db, null, makeZip([makeQuestion()]), { only: ['reports'] })
+
+		const rows = await db.select().from(questionReportsTable)
+		expect(rows).toHaveLength(0)
+	})
+})
+
 // ── Test wipe ─────────────────────────────────────────────────────────────────
 
 describe('importZip — wipe', () => {
@@ -401,5 +498,6 @@ describe('importZip — résultat', () => {
 		expect(result.templates).toBe(1)
 		expect(result.templateSlots).toBe(1)
 		expect(result.images).toBe(0)
+		expect(result.reports).toBe(0)
 	})
 })

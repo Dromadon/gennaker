@@ -45,7 +45,10 @@ describe('roundtrip export → parse', () => {
 			difficulty: 'facile' as const,
 			answerSize: 'sm' as const,
 			applicableSupports: ['deriveur', 'catamaran'],
-			sourceMd: null
+			status: 'publie' as const,
+			sourceMd: null,
+			createdAt: 1700000000,
+			updatedAt: 1700000001
 		}
 
 		const result = parseZip(makeZip([q]))
@@ -71,7 +74,10 @@ describe('roundtrip export → parse', () => {
 			difficulty: 'moyen' as const,
 			answerSize: 'md' as const,
 			applicableSupports: [],
-			sourceMd: null
+			status: 'publie' as const,
+			sourceMd: null,
+			createdAt: 1700000000,
+			updatedAt: 1700000000
 		}
 
 		const result = parseZip(makeZip([q]))
@@ -91,7 +97,10 @@ describe('roundtrip export → parse', () => {
 			difficulty: 'difficile' as const,
 			answerSize: 'lg' as const,
 			applicableSupports: ['deriveur'],
-			sourceMd: 'Manuel FFV p.42'
+			status: 'publie' as const,
+			sourceMd: 'Manuel FFV p.42',
+			createdAt: 1700000000,
+			updatedAt: 1700000000
 		}
 
 		const result = parseZip(makeZip([q]))
@@ -113,7 +122,10 @@ describe('roundtrip export → parse', () => {
 			difficulty: 'moyen' as const,
 			answerSize: 'md' as const,
 			applicableSupports: ['catamaran'],
-			sourceMd: null
+			status: 'publie' as const,
+			sourceMd: null,
+			createdAt: 1700000000,
+			updatedAt: 1700000000
 		}
 
 		const result = parseZip(makeZip([q]))
@@ -134,7 +146,10 @@ describe('roundtrip export → parse', () => {
 				difficulty: 'facile' as const,
 				answerSize: 'xs' as const,
 				applicableSupports: ['deriveur'],
-				sourceMd: null
+				status: 'publie' as const,
+				sourceMd: null,
+				createdAt: 1700000000,
+				updatedAt: 1700000000
 			},
 			{
 				id: 11,
@@ -146,7 +161,10 @@ describe('roundtrip export → parse', () => {
 				difficulty: 'difficile' as const,
 				answerSize: 'lg' as const,
 				applicableSupports: [],
-				sourceMd: null
+				status: 'publie' as const,
+				sourceMd: null,
+				createdAt: 1700000000,
+				updatedAt: 1700000000
 			}
 		]
 
@@ -162,5 +180,62 @@ describe('roundtrip export → parse', () => {
 		expect(q11.difficulty).toBe('difficile')
 		expect(q11.answerSize).toBe('lg')
 		expect(q11.applicableSupports).toEqual([])
+	})
+
+	it('préserve status brouillon à travers le cycle', () => {
+		const q: QuestionExportRow = {
+			id: 20,
+			categorySlug: 'meteo',
+			sectionSlug: 'carte_meteo',
+			title: 'Brouillon',
+			questionMd: 'Q',
+			correctionMd: 'R',
+			difficulty: 'moyen' as const,
+			answerSize: 'md' as const,
+			applicableSupports: [],
+			status: 'brouillon' as const,
+			sourceMd: null,
+			createdAt: 1700000000,
+			updatedAt: 1700000001
+		}
+
+		const result = parseZip(makeZip([q]))
+		expect(result.questions[0].status).toBe('brouillon')
+	})
+
+	it('préserve createdAt et updatedAt à travers le cycle', () => {
+		const q: QuestionExportRow = {
+			id: 21,
+			categorySlug: 'meteo',
+			sectionSlug: 'carte_meteo',
+			title: 'Timestamps',
+			questionMd: 'Q',
+			correctionMd: 'R',
+			difficulty: 'moyen' as const,
+			answerSize: 'md' as const,
+			applicableSupports: [],
+			status: 'publie' as const,
+			sourceMd: null,
+			createdAt: 1700000042,
+			updatedAt: 1700000099
+		}
+
+		const result = parseZip(makeZip([q]))
+		expect(result.questions[0].createdAt).toBe(1700000042)
+		expect(result.questions[0].updatedAt).toBe(1700000099)
+	})
+
+	it('rétrocompatibilité : frontmatter sans status/timestamps → defaults', () => {
+		const md =
+			'---\ndifficulty: facile\nanswerSize: sm\napplicableSupports: [deriveur]\n---\n\n# Ancienne question\n\nQ\n\n# Correction\n\nR\n'
+		const rawZip = zipSync({
+			'structure.json': strToU8(JSON.stringify(STRUCTURE)),
+			'templates.json': strToU8(JSON.stringify(TEMPLATES)),
+			'meteo/carte_meteo/99/Ancienne question.md': strToU8(md)
+		})
+		const result = parseZip(rawZip)
+		expect(result.questions[0].status).toBe('publie')
+		expect(result.questions[0].createdAt).toBeNull()
+		expect(result.questions[0].updatedAt).toBeNull()
 	})
 })

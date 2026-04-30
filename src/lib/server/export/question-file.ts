@@ -3,7 +3,7 @@ import type { QuestionExportRow } from '$lib/server/db/queries/questions'
 export function buildQuestionFileContent(q: QuestionExportRow): string {
 	const supportsYaml =
 		q.applicableSupports.length > 0 ? `[${q.applicableSupports.join(', ')}]` : '[]'
-	const frontmatter = `---\ndifficulty: ${q.difficulty}\nanswerSize: ${q.answerSize}\napplicableSupports: ${supportsYaml}\n---\n\n`
+	const frontmatter = `---\nstatus: ${q.status}\ndifficulty: ${q.difficulty}\nanswerSize: ${q.answerSize}\napplicableSupports: ${supportsYaml}\ncreatedAt: ${q.createdAt}\nupdatedAt: ${q.updatedAt}\n---\n\n`
 	const source = q.sourceMd ? `\n\n<small>${q.sourceMd}</small>` : ''
 	return `${frontmatter}# ${q.title}\n\n${q.questionMd}\n\n# Correction\n\n${q.correctionMd}${source}\n`
 }

@@ -27,7 +27,10 @@ export type QuestionExportRow = {
 	difficulty: 'facile' | 'moyen' | 'difficile'
 	answerSize: 'xs' | 'sm' | 'md' | 'lg'
 	applicableSupports: Support[]
+	status: 'brouillon' | 'publie'
 	sourceMd: string | null
+	createdAt: number
+	updatedAt: number
 }
 
 export type StructureExportRow = {
@@ -56,16 +59,19 @@ export async function getAllQuestionsForExport(d1: D1Database): Promise<Question
 			difficulty: questions.difficulty,
 			answerSize: questions.answerSize,
 			applicableSupports: questions.applicableSupports,
-			sourceMd: questions.sourceMd
+			status: questions.status,
+			sourceMd: questions.sourceMd,
+			createdAt: questions.createdAt,
+			updatedAt: questions.updatedAt
 		})
 		.from(questions)
 		.innerJoin(sections, eq(sections.id, questions.sectionId))
 		.innerJoin(categories, eq(categories.id, sections.categoryId))
-		.where(eq(questions.status, 'publie'))
 	return rows.map((r) => ({
 		...r,
 		difficulty: r.difficulty as QuestionExportRow['difficulty'],
 		answerSize: r.answerSize as QuestionExportRow['answerSize'],
+		status: r.status as QuestionExportRow['status'],
 		applicableSupports: JSON.parse(r.applicableSupports ?? '[]') as Support[]
 	}))
 }

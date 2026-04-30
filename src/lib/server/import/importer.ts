@@ -15,10 +15,10 @@ import {
 } from '$lib/server/db/schema'
 import * as schema from '$lib/server/db/schema'
 import { parseZip } from './parse-zip'
-import type { StructureJson, ParsedQuestion } from './parse-zip'
+import type { StructureJson, ParsedQuestion, ParsedReport } from './parse-zip'
 import type { TemplateExportRow } from '$lib/server/db/queries/templates'
 
-export type ImportSubset = 'structure' | 'questions' | 'templates' | 'images'
+export type ImportSubset = 'structure' | 'questions' | 'templates' | 'images' | 'reports'
 
 export type ImportResult = {
 	supports: number
@@ -28,6 +28,7 @@ export type ImportResult = {
 	templates: number
 	templateSlots: number
 	images: number
+	reports: number
 }
 
 type AnyDb = DrizzleD1Database<typeof schema> | BetterSQLite3Database<typeof schema>
@@ -132,10 +133,10 @@ async function importQuestions(db: AnyDb, parsedQuestions: ParsedQuestion[]): Pr
 				difficulty: q.difficulty,
 				answerSize: q.answerSize,
 				applicableSupports: JSON.stringify(q.applicableSupports),
-				status: 'publie',
+				status: q.status,
 				sourceMd: q.sourceMd ?? null,
-				createdAt: now,
-				updatedAt: now
+				createdAt: q.createdAt ?? now,
+				updatedAt: q.updatedAt ?? now
 			})
 			.onConflictDoUpdate({
 				target: questions.id,
@@ -147,8 +148,9 @@ async function importQuestions(db: AnyDb, parsedQuestions: ParsedQuestion[]): Pr
 					difficulty: q.difficulty,
 					answerSize: q.answerSize,
 					applicableSupports: JSON.stringify(q.applicableSupports),
+					status: q.status,
 					sourceMd: q.sourceMd ?? null,
-					updatedAt: now
+					updatedAt: q.updatedAt ?? now
 				}
 			})
 		count++
@@ -223,13 +225,38 @@ async function importTemplates(db: AnyDb, templates: TemplateExportRow[]): Promi
 	return { templates: templateCount, templateSlots: slotCount }
 }
 
+async function importReports(db: AnyDb, reports: ParsedReport[]): Promise<number> {
+	for (const r of reports) {
+		await db.insert(questionReports)
+			.values({
+				id: r.id,
+				questionId: r.questionId,
+				problemType: r.problemType,
+				description: r.description ?? null,
+				email: r.email ?? null,
+				status: r.status,
+				createdAt: r.createdAt
+			})
+			.onConflictDoUpdate({
+				target: questionReports.id,
+				set: {
+					problemType: r.problemType,
+					description: r.description ?? null,
+					email: r.email ?? null,
+					status: r.status
+				}
+			})
+	}
+	return reports.length
+}
+
 export async function importZip(
 	db: AnyDb,
 	r2: R2Bucket | null,
 	zipBytes: Uint8Array,
 	options: { wipe?: boolean; only?: ImportSubset[] } = {}
 ): Promise<ImportResult> {
-	const { structure, templates, questions: parsedQuestions, images } = parseZip(zipBytes)
+	const { structure, templates, questions: parsedQuestions, images, reports: parsedReports } = parseZip(zipBytes)
 	const doAll = !options.only || options.only.length === 0
 	const only = options.only ?? []
 
@@ -240,7 +267,8 @@ export async function importZip(
 		questions: 0,
 		templates: 0,
 		templateSlots: 0,
-		images: 0
+		images: 0,
+		reports: 0
 	}
 
 	if (options.wipe) {
@@ -256,6 +284,10 @@ export async function importZip(
 
 	if (doAll || only.includes('questions')) {
 		result.questions = await importQuestions(db, parsedQuestions)
+	}
+
+	if (doAll || only.includes('reports')) {
+		result.reports = await importReports(db, parsedReports)
 	}
 
 	if (doAll || only.includes('templates')) {
