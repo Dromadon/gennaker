@@ -1,8 +1,9 @@
 import { error } from '@sveltejs/kit'
+import type { RequestHandler } from './$types'
 
 // Proxy local vers le bucket R2 — utilisé uniquement en dev (vite dev + platformProxy).
 // En prod, R2_PUBLIC_URL pointe directement vers le domaine public du bucket.
-export const GET = async ({ params, platform }) => {
+export const GET: RequestHandler = async ({ params, platform }) => {
 	const r2 = platform?.env?.IMAGES
 	if (!r2) throw error(500, 'R2 non disponible')
 

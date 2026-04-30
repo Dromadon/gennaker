@@ -1,11 +1,12 @@
 import { error } from '@sveltejs/kit'
+import type { RequestHandler } from './$types'
 import { zipSync, strToU8 } from 'fflate'
 import { getAllQuestionsForExport, getStructureForExport } from '$lib/server/db/queries/questions'
 import { getAllTemplatesForExport } from '$lib/server/db/queries/templates'
 import { getAllReportsForExport } from '$lib/server/db/queries/reports'
 import { buildQuestionFileContent, buildQuestionFilePath } from '$lib/server/export/question-file'
 
-export const GET = async ({ locals, platform }) => {
+export const GET: RequestHandler = async ({ locals, platform }) => {
 	if (!locals.isAdmin) throw error(403, 'Forbidden')
 
 	const db = platform!.env.DB

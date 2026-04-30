@@ -1,4 +1,5 @@
 import { error, json } from '@sveltejs/kit'
+import type { RequestHandler } from './$types'
 import { z } from 'zod'
 import { createReport } from '$lib/server/db/queries/reports'
 import { getQuestionById } from '$lib/server/db/queries/questions'
@@ -18,7 +19,7 @@ const schema = z.object({
 	honeypot: z.string().optional()
 })
 
-export const POST = async ({ request, params, platform }) => {
+export const POST: RequestHandler = async ({ request, params, platform }) => {
 	const ua = request.headers.get('user-agent') ?? ''
 	if (!ua || BLOCKED_UA.test(ua)) throw error(400, 'Requête invalide')
 

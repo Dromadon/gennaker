@@ -1,4 +1,5 @@
 import { error, json } from '@sveltejs/kit'
+import type { RequestHandler } from './$types'
 import { z } from 'zod'
 import { getQuestionCandidates } from '$lib/server/db/queries/questions'
 import type { QuestionPickRow, Support } from '$lib/domain/types'
@@ -9,7 +10,7 @@ const schema = z.object({
 	search: z.string().optional()
 })
 
-export const POST = async ({ request, platform }) => {
+export const POST: RequestHandler = async ({ request, platform }) => {
 	const body = await request.json()
 	const parsed = schema.safeParse(body)
 	if (!parsed.success) throw error(400, 'Paramètres invalides')

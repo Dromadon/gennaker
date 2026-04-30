@@ -1,4 +1,5 @@
 import { error, json } from '@sveltejs/kit'
+import type { RequestHandler } from './$types'
 import { z } from 'zod'
 import { drawEvaluation } from '$lib/domain/draw'
 import { getQuestionsBySection } from '$lib/server/db/queries/questions'
@@ -9,7 +10,7 @@ const schema = z.object({
 	format: z.enum(['standard', 'raccourcie', 'positionnement'])
 })
 
-export const GET = async ({ url, platform }) => {
+export const GET: RequestHandler = async ({ url, platform }) => {
 	const parsed = schema.safeParse({
 		support: url.searchParams.get('support'),
 		format: url.searchParams.get('format')

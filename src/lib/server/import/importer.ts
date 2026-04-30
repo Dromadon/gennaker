@@ -1,6 +1,6 @@
 import { eq, and } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/d1'
-import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3'
+import type { BaseSQLiteDatabase } from 'drizzle-orm/sqlite-core'
 import type { DrizzleD1Database } from 'drizzle-orm/d1'
 import {
 	supports,
@@ -31,7 +31,7 @@ export type ImportResult = {
 	reports: number
 }
 
-type AnyDb = DrizzleD1Database<typeof schema> | BetterSQLite3Database<typeof schema>
+type AnyDb = BaseSQLiteDatabase<any, any, typeof schema>
 
 export function getDbFromD1(d1: D1Database): DrizzleD1Database<typeof schema> {
 	return drizzle(d1, { schema })
