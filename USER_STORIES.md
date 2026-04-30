@@ -26,6 +26,13 @@ Ces tâches ne sont pas des user stories mais sont des prérequis bloquants.
 3. **Soumettre une question et l'accepter** : créer une `community_submission`, vérifier son statut `en_attente`, la passer en `approuve`, vérifier que la question correspondante est créée (ou le statut mis à jour selon le flux retenu).
 4. **Générer une évaluation** : appeler la logique de tirage pour un support + format donné, vérifier que le résultat contient le bon nombre de questions et qu'elles respectent les filtres de section et de support applicable.
 5. **Compte des signalements en attente** : `countPendingReports` retourne le bon delta après création et résolution de signalements.
+6. **Exporter et importer des données** : appeler la logique d'export, wipe la db puis faire l'import et vérifier que les données ont bien toutes été restaurées.
+
+**Mise en œuvre**
+
+Créer `vitest.int.config.ts` avec `@cloudflare/vitest-pool-workers` (Miniflare) et la config D1 pointant vers les migrations `drizzle/migrations/`. Les tests `*.int.test.ts` sont déjà exclus de `vitest.config.ts` — la convention de nommage est posée. Chaque test doit appliquer les migrations sur une D1 vierge en setup, puis wiper entre chaque cas.
+
+**Pourquoi faire T6 maintenant** : le script d'import one-shot des données manquantes (difficulty, answerSize, applicableSupports) génère du SQL exécuté en production. Avoir une D1 réelle en test avant d'écrire ce script garantit que le SQL est syntaxiquement valide, que les migrations sont cohérentes avec le schéma Drizzle, et que les données relues après import sont identiques aux données exportées. Les tests de roundtrip actuels (`roundtrip.test.ts`) vérifient la sérialisation mais pas l'exécution SQL.
 
 ---
 
