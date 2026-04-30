@@ -190,7 +190,38 @@
 		<div class="flex-1 min-w-0">
 
 			<!-- Top bar sticky mobile -->
-			<div class="lg:hidden sticky top-0 z-30 flex items-center gap-3 border-b border-gray-200 bg-white px-4 py-3 print:hidden">
+			<div class="lg:hidden sticky top-0 z-30 flex items-center gap-1 border-b border-gray-200 bg-white px-2 py-2 print:hidden">
+				<a
+					href="/"
+					class="flex items-center justify-center rounded-md p-1.5 text-gray-500 hover:bg-gray-100 shrink-0"
+					aria-label="Accueil Gennaker"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9" />
+					</svg>
+				</a>
+				<h1 class="flex-1 min-w-0 truncate text-base font-semibold capitalize px-1">
+					{evaluation.support} — {evaluation.format}
+				</h1>
+				<button
+					onclick={() => (showCorrection = !showCorrection)}
+					class="flex items-center justify-center rounded-md p-1.5 transition-colors {showCorrection ? 'bg-gray-800 text-white' : 'text-gray-500 hover:bg-gray-100'}"
+					aria-label="Afficher la correction"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+					</svg>
+				</button>
+				<button
+					disabled
+					class="flex items-center justify-center rounded-md p-1.5 text-gray-300 cursor-not-allowed"
+					aria-label="Partager (bientôt disponible)"
+					title="Partager (bientôt disponible)"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+					</svg>
+				</button>
 				<button
 					onclick={() => (panelOpen = true)}
 					class="flex items-center justify-center rounded-md p-1.5 text-gray-500 hover:bg-gray-100"
@@ -199,19 +230,6 @@
 					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" />
 					</svg>
-				</button>
-				<h1 class="flex-1 truncate text-base font-semibold capitalize">
-					{evaluation.support} — {evaluation.format}
-				</h1>
-				<button
-					onclick={() => (showCorrection = !showCorrection)}
-					class="flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors {showCorrection ? 'border-gray-800 bg-gray-800 text-white' : 'border-gray-200 text-gray-500 hover:bg-gray-50'}"
-					aria-label="Afficher la correction"
-				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-					</svg>
-					<span class="hidden sm:inline">Correction</span>
 				</button>
 			</div>
 
@@ -376,6 +394,14 @@
 							</button>
 						</div>
 					{/if}
+				</div>
+				<div class="border-t border-gray-200 px-4 py-3">
+					<a href="/" class="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900">
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+						</svg>
+						Gennaker
+					</a>
 				</div>
 			</aside>
 		{/if}
