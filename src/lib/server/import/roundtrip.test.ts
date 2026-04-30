@@ -2,23 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { zipSync, strToU8 } from 'fflate'
 import { parseZip } from './parse-zip'
 import type { StructureJson } from './parse-zip'
-
-// Reproduit la logique de +server.ts pour générer le contenu d'un fichier .md exporté
-function buildQuestionMd(q: {
-	title: string
-	questionMd: string
-	correctionMd: string
-	difficulty: string
-	answerSize: string
-	applicableSupports: string[]
-	sourceMd: string | null
-}): string {
-	const supportsYaml =
-		q.applicableSupports.length > 0 ? `[${q.applicableSupports.join(', ')}]` : '[]'
-	const frontmatter = `---\ndifficulty: ${q.difficulty}\nanswerSize: ${q.answerSize}\napplicableSupports: ${supportsYaml}\n---\n\n`
-	const source = q.sourceMd ? `\n\n<small>${q.sourceMd}</small>` : ''
-	return `${frontmatter}# ${q.title}\n\n${q.questionMd}\n\n# Correction\n\n${q.correctionMd}${source}\n`
-}
+import { buildQuestionFileContent } from '$lib/server/export/question-file'
+import type { QuestionExportRow } from '$lib/server/db/queries/questions'
 
 const STRUCTURE: StructureJson = {
 	supports: [
@@ -39,7 +24,7 @@ const TEMPLATES = [{ id: 1, supportSlug: 'deriveur', format: 'standard', slots: 
 
 describe('roundtrip export → parse', () => {
 	it('préserve difficulty, answerSize et applicableSupports non vides', () => {
-		const q = {
+		const q: QuestionExportRow = {
 			id: 42,
 			categorySlug: 'meteo',
 			sectionSlug: 'carte_meteo',
@@ -55,7 +40,7 @@ describe('roundtrip export → parse', () => {
 		const zip = zipSync({
 			'structure.json': strToU8(JSON.stringify(STRUCTURE)),
 			'templates.json': strToU8(JSON.stringify(TEMPLATES)),
-			'meteo/carte_meteo/42/Le vent.md': strToU8(buildQuestionMd(q))
+			'meteo/carte_meteo/42/Le vent.md': strToU8(buildQuestionFileContent(q))
 		})
 
 		const result = parseZip(zip)
@@ -71,7 +56,7 @@ describe('roundtrip export → parse', () => {
 	})
 
 	it('préserve applicableSupports vide (tous supports)', () => {
-		const q = {
+		const q: QuestionExportRow = {
 			id: 1,
 			categorySlug: 'meteo',
 			sectionSlug: 'carte_meteo',
@@ -87,7 +72,7 @@ describe('roundtrip export → parse', () => {
 		const zip = zipSync({
 			'structure.json': strToU8(JSON.stringify(STRUCTURE)),
 			'templates.json': strToU8(JSON.stringify(TEMPLATES)),
-			'meteo/carte_meteo/1/Question générale.md': strToU8(buildQuestionMd(q))
+			'meteo/carte_meteo/1/Question générale.md': strToU8(buildQuestionFileContent(q))
 		})
 
 		const result = parseZip(zip)
@@ -97,7 +82,7 @@ describe('roundtrip export → parse', () => {
 	})
 
 	it('préserve sourceMd à travers le cycle', () => {
-		const q = {
+		const q: QuestionExportRow = {
 			id: 5,
 			categorySlug: 'meteo',
 			sectionSlug: 'carte_meteo',
@@ -113,7 +98,7 @@ describe('roundtrip export → parse', () => {
 		const zip = zipSync({
 			'structure.json': strToU8(JSON.stringify(STRUCTURE)),
 			'templates.json': strToU8(JSON.stringify(TEMPLATES)),
-			'meteo/carte_meteo/5/Anticyclone.md': strToU8(buildQuestionMd(q))
+			'meteo/carte_meteo/5/Anticyclone.md': strToU8(buildQuestionFileContent(q))
 		})
 
 		const result = parseZip(zip)
@@ -125,7 +110,7 @@ describe('roundtrip export → parse', () => {
 	})
 
 	it('gère les apostrophes dans le contenu sans corrompre le parsing', () => {
-		const q = {
+		const q: QuestionExportRow = {
 			id: 7,
 			categorySlug: 'meteo',
 			sectionSlug: 'carte_meteo',
@@ -141,7 +126,7 @@ describe('roundtrip export → parse', () => {
 		const zip = zipSync({
 			'structure.json': strToU8(JSON.stringify(STRUCTURE)),
 			'templates.json': strToU8(JSON.stringify(TEMPLATES)),
-			"meteo/carte_meteo/7/Qu'est-ce que l'isobare ?.md": strToU8(buildQuestionMd(q))
+			"meteo/carte_meteo/7/Qu'est-ce que l'isobare ?.md": strToU8(buildQuestionFileContent(q))
 		})
 
 		const result = parseZip(zip)
@@ -151,7 +136,7 @@ describe('roundtrip export → parse', () => {
 	})
 
 	it('parse plusieurs questions indépendamment', () => {
-		const questions = [
+		const questions: QuestionExportRow[] = [
 			{
 				id: 10,
 				categorySlug: 'meteo',
@@ -183,7 +168,7 @@ describe('roundtrip export → parse', () => {
 			'templates.json': strToU8(JSON.stringify(TEMPLATES))
 		}
 		for (const q of questions) {
-			files[`meteo/carte_meteo/${q.id}/${q.title}.md`] = strToU8(buildQuestionMd(q))
+			files[`meteo/carte_meteo/${q.id}/${q.title}.md`] = strToU8(buildQuestionFileContent(q))
 		}
 
 		const result = parseZip(zipSync(files))

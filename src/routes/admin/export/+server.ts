@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit'
 import { zipSync, strToU8 } from 'fflate'
 import { getAllQuestionsForExport, getStructureForExport } from '$lib/server/db/queries/questions'
 import { getAllTemplatesForExport } from '$lib/server/db/queries/templates'
+import { buildQuestionFileContent, buildQuestionFilePath } from '$lib/server/export/question-file'
 
 export const GET = async ({ locals, platform }) => {
 	if (!locals.isAdmin) throw error(403, 'Forbidden')
@@ -21,14 +22,7 @@ export const GET = async ({ locals, platform }) => {
 
 	// Questions as markdown files — path: {cat}/{section}/{id}/{title}.md
 	for (const q of questionRows) {
-		const supportsYaml =
-			q.applicableSupports.length > 0 ? `[${q.applicableSupports.join(', ')}]` : '[]'
-		const frontmatter = `---\ndifficulty: ${q.difficulty}\nanswerSize: ${q.answerSize}\napplicableSupports: ${supportsYaml}\n---\n\n`
-		const source = q.sourceMd ? `\n\n<small>${q.sourceMd}</small>` : ''
-		const content = `${frontmatter}# ${q.title}\n\n${q.questionMd}\n\n# Correction\n\n${q.correctionMd}${source}\n`
-		const safeName = q.title.replace(/[/\\?%*:|"<>]/g, '-')
-		const path = `${q.categorySlug}/${q.sectionSlug}/${q.id}/${safeName}.md`
-		files[path] = strToU8(content)
+		files[buildQuestionFilePath(q)] = strToU8(buildQuestionFileContent(q))
 	}
 
 	// Templates JSON
