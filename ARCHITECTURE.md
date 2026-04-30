@@ -136,7 +136,7 @@ questions: {
   question_md         text                       -- énoncé en markdown
   correction_md       text                       -- correction en markdown
   difficulty          text                       -- 'facile' | 'moyen' | 'difficile'
-  answer_size         text                       -- 'xs' | 'sm' | 'md' | 'lg'
+  answer_size         text                       -- 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   applicable_supports text                       -- JSON stringifié : '[]' = tous
   status              text                       -- 'brouillon' | 'publie'
   source_md           text
@@ -376,6 +376,7 @@ L'impression est déclenchée par `window.print()` depuis le bouton "Imprimer" d
 | `sm`          | 4 rem   |
 | `md`          | 6 rem   |
 | `lg`          | 10 rem  |
+| `xl`          | 14 rem  |
 
 **Éléments masqués à l'impression** : le header (titre, toggles, bouton imprimer) porte `print:hidden`.
 

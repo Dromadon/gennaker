@@ -35,7 +35,7 @@ export const questions = sqliteTable('questions', {
 	questionMd: text('question_md').notNull(),
 	correctionMd: text('correction_md').notNull(),
 	difficulty: text('difficulty').notNull().default('moyen'), // 'facile' | 'moyen' | 'difficile'
-	answerSize: text('answer_size').notNull().default('md'), // 'xs' | 'sm' | 'md' | 'lg'
+	answerSize: text('answer_size').notNull().default('md'), // 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 	// JSON stringifié : '[]' = tous les supports
 	applicableSupports: text('applicable_supports').notNull().default('[]'),
 	status: text('status').notNull().default('brouillon'), // 'brouillon' | 'publie'

@@ -47,7 +47,7 @@ Unité de contenu de base. Contient :
 - des images optionnelles (référencées dans le markdown)
 - une difficulté : `facile` | `moyen` | `difficile`
 - une liste de supports applicables (vide = tous les supports)
-- une taille de réponse attendue pour l'impression : `xs` | `sm` | `md` | `lg`
+- une taille de réponse attendue pour l'impression : `xs` | `sm` | `md` | `lg` | `xl`
 - un statut : `brouillon` | `publié`
 - une source/attribution (markdown, optionnel)
 

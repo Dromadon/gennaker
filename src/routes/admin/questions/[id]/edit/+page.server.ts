@@ -15,7 +15,7 @@ const QuestionSchema = z.object({
 	questionMd: z.string().min(1),
 	correctionMd: z.string(),
 	difficulty: z.enum(['facile', 'moyen', 'difficile']),
-	answerSize: z.enum(['xs', 'sm', 'md', 'lg']),
+	answerSize: z.enum(['xs', 'sm', 'md', 'lg', 'xl']),
 	applicableSupports: z
 		.array(z.enum(['deriveur', 'catamaran', 'windsurf', 'croisiere']))
 		.default([]),

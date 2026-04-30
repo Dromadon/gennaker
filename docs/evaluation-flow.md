@@ -20,7 +20,7 @@ Question
   id, sectionId, title
   questionMd, correctionMd         -- markdown brut
   applicableSupports: Support[]    -- [] = tous supports
-  answerSize: 'xs'|'sm'|'md'|'lg' -- espace de réponse à l'impression
+  answerSize: 'xs'|'sm'|'md'|'lg'|'xl' -- espace de réponse à l'impression
 ```
 
 Le template source (en base) décrit la *structure* : quelles sections, combien de questions par slot. L'évaluation est la *réalisation* : les questions effectivement tirées, stockées dans un store Svelte côté client.

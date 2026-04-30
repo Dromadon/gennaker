@@ -84,6 +84,13 @@ describe('parseQuestionMarkdown', () => {
 		expect(result.applicableSupports).toEqual([])
 	})
 
+	it('parse le frontmatter avec answerSize xl', () => {
+		const md =
+			'---\ndifficulty: facile\nanswerSize: xl\napplicableSupports: []\n---\n\n# Titre\n\nQ\n\n# Correction\n\nC\n'
+		const result = parseQuestionMarkdown(md)
+		expect(result.answerSize).toBe('xl')
+	})
+
 	it('frontmatter avec valeur difficulty invalide → valeur par défaut', () => {
 		const md =
 			'---\ndifficulty: ultra\nanswerSize: md\napplicableSupports: []\n---\n\n# Titre\n\nQ\n\n# Correction\n\nC\n'

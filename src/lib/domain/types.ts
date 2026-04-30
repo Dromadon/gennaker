@@ -1,7 +1,19 @@
 export type Support = 'deriveur' | 'catamaran' | 'windsurf' | 'croisiere'
 export type Format = 'standard' | 'raccourcie' | 'positionnement'
 
-export type AnswerSize = 'xs' | 'sm' | 'md' | 'lg'
+export type AnswerSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+
+export const ANSWER_SIZE_LABELS: Record<AnswerSize, string> = {
+	xs: 'x-small',
+	sm: 'small',
+	md: 'medium',
+	lg: 'large',
+	xl: 'x-large',
+}
+
+export function formatAnswerSize(code: AnswerSize): string {
+	return ANSWER_SIZE_LABELS[code]
+}
 
 export type Question = {
 	id: number

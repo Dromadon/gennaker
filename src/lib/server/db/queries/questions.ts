@@ -11,7 +11,7 @@ export type QuestionInput = {
 	questionMd: string
 	correctionMd: string
 	difficulty: 'facile' | 'moyen' | 'difficile'
-	answerSize: 'xs' | 'sm' | 'md' | 'lg'
+	answerSize: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 	applicableSupports: Support[]
 	status: 'brouillon' | 'publie'
 	sourceMd?: string | null
@@ -25,7 +25,7 @@ export type QuestionExportRow = {
 	questionMd: string
 	correctionMd: string
 	difficulty: 'facile' | 'moyen' | 'difficile'
-	answerSize: 'xs' | 'sm' | 'md' | 'lg'
+	answerSize: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 	applicableSupports: Support[]
 	status: 'brouillon' | 'publie'
 	sourceMd: string | null

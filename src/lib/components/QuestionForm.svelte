@@ -3,6 +3,7 @@
 	import { page } from '$app/state'
 	import { enhance } from '$app/forms'
 	import type { CategoryWithSections, QuestionAdminDetail } from '$lib/domain/types'
+	import { formatAnswerSize } from '$lib/domain/types'
 	import { createLocalMarkdownRenderer, extractImageRefs } from '$lib/markdown'
 	import ImagePanel from '$lib/components/ImagePanel.svelte'
 
@@ -19,7 +20,7 @@
 
 	const supports = ['deriveur', 'catamaran', 'windsurf', 'croisiere'] as const
 	const difficulties = ['facile', 'moyen', 'difficile'] as const
-	const answerSizes = ['xs', 'sm', 'md', 'lg'] as const
+	const answerSizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 	const statuses = [
 		{ value: 'brouillon', label: 'Brouillon' },
 		{ value: 'publie', label: 'Publié' }
@@ -275,7 +276,7 @@
 				class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm transition {border.answerSize}"
 			>
 				{#each answerSizes as s}
-					<option value={s}>{s}</option>
+					<option value={s}>{formatAnswerSize(s)}</option>
 				{/each}
 			</select>
 		</div>

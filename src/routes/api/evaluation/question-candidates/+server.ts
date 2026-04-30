@@ -34,7 +34,7 @@ export const POST = async ({ request, platform }) => {
 			applicableSupports: q.applicableSupports as Support[],
 			questionMd: q.questionMd,
 			correctionMd: q.correctionMd,
-			answerSize: q.answerSize
+			answerSize: q.answerSize as QuestionPickRow['answerSize']
 		}))
 
 	return json(candidates)

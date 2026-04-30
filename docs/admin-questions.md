@@ -27,7 +27,7 @@ retourne `error(403)` si la vérification échoue.
 | `questionMd` | text | Markdown (min 1 caractère) |
 | `correctionMd` | text | Markdown (peut être vide) |
 | `difficulty` | enum | `facile` \| `moyen` \| `difficile` |
-| `answerSize` | enum | `xs` \| `sm` \| `md` \| `lg` |
+| `answerSize` | enum | `xs` \| `sm` \| `md` \| `lg` \| `xl` |
 | `applicableSupports` | checkbox[] | `deriveur` \| `catamaran` \| `windsurf` \| `croisiere` — vide = tous |
 | `status` | enum | `brouillon` \| `publie` |
 | `sourceMd` | text | Optionnel |

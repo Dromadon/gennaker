@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { POST } from './+server'
+import type { QuestionCandidateRow } from '$lib/server/db/queries/questions'
+import type { QuestionPickRow } from '$lib/domain/types'
 
 vi.mock('$lib/server/db/queries/questions', () => ({
 	getQuestionCandidates: vi.fn()
 }))
 
-const mockCandidates = [
+const mockCandidates: QuestionCandidateRow[] = [
 	{
 		id: 1,
 		sectionId: 10,
@@ -64,7 +66,7 @@ describe('POST /api/evaluation/question-candidates', () => {
 
 	it('retourne les questions compatibles avec le support sans filtre search', async () => {
 		const res = await POST(makeRequest({ sectionId: 10, support: 'deriveur' }))
-		const data = await res.json()
+		const data = await res.json() as QuestionPickRow[]
 		// id 1 (tous supports) et id 2 (deriveur) — pas id 3 (catamaran)
 		const ids = data.map((q: { id: number }) => q.id)
 		expect(ids).toContain(1)
@@ -74,7 +76,7 @@ describe('POST /api/evaluation/question-candidates', () => {
 
 	it('filtre par support catamaran correctement', async () => {
 		const res = await POST(makeRequest({ sectionId: 10, support: 'catamaran' }))
-		const data = await res.json()
+		const data = await res.json() as QuestionPickRow[]
 		const ids = data.map((q: { id: number }) => q.id)
 		expect(ids).toContain(1) // applicableSupports vide = tous
 		expect(ids).toContain(3) // catamaran
@@ -83,20 +85,20 @@ describe('POST /api/evaluation/question-candidates', () => {
 
 	it('filtre par search (insensible à la casse) sur le titre', async () => {
 		const res = await POST(makeRequest({ sectionId: 10, support: 'deriveur', search: 'balisage' }))
-		const data = await res.json()
+		const data = await res.json() as QuestionPickRow[]
 		expect(data).toHaveLength(1)
 		expect(data[0].id).toBe(2)
 	})
 
 	it('retourne un tableau vide si aucun candidat ne correspond', async () => {
 		const res = await POST(makeRequest({ sectionId: 10, support: 'deriveur', search: 'inexistant' }))
-		const data = await res.json()
+		const data = await res.json() as QuestionPickRow[]
 		expect(data).toHaveLength(0)
 	})
 
 	it('retourne les champs QuestionPickRow complets', async () => {
 		const res = await POST(makeRequest({ sectionId: 10, support: 'deriveur' }))
-		const data = await res.json()
+		const data = await res.json() as QuestionPickRow[]
 		const q = data[0]
 		expect(q).toHaveProperty('id')
 		expect(q).toHaveProperty('title')

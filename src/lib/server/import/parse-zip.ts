@@ -23,7 +23,7 @@ export type ParsedQuestion = {
 	questionMd: string
 	correctionMd: string
 	difficulty: 'facile' | 'moyen' | 'difficile'
-	answerSize: 'xs' | 'sm' | 'md' | 'lg'
+	answerSize: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 	applicableSupports: string[]
 	status: 'brouillon' | 'publie'
 	sourceMd: string | null
@@ -60,7 +60,7 @@ export function parseQuestionMarkdown(content: string): {
 	questionMd: string
 	correctionMd: string
 	difficulty: 'facile' | 'moyen' | 'difficile'
-	answerSize: 'xs' | 'sm' | 'md' | 'lg'
+	answerSize: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 	applicableSupports: string[]
 	status: 'brouillon' | 'publie'
 	sourceMd: string | null
@@ -69,7 +69,7 @@ export function parseQuestionMarkdown(content: string): {
 } {
 	let body = content
 	let difficulty: 'facile' | 'moyen' | 'difficile' = 'moyen'
-	let answerSize: 'xs' | 'sm' | 'md' | 'lg' = 'md'
+	let answerSize: 'xs' | 'sm' | 'md' | 'lg' | 'xl' = 'md'
 	let applicableSupports: string[] = []
 	let status: 'brouillon' | 'publie' = 'publie'
 	let createdAt: number | null = null
@@ -86,8 +86,8 @@ export function parseQuestionMarkdown(content: string): {
 			difficulty = diffMatch[1].trim() as 'facile' | 'moyen' | 'difficile'
 		}
 		const sizeMatch = fm.match(/^answerSize:\s*(.+)$/m)
-		if (sizeMatch && ['xs', 'sm', 'md', 'lg'].includes(sizeMatch[1].trim())) {
-			answerSize = sizeMatch[1].trim() as 'xs' | 'sm' | 'md' | 'lg'
+		if (sizeMatch && ['xs', 'sm', 'md', 'lg', 'xl'].includes(sizeMatch[1].trim())) {
+			answerSize = sizeMatch[1].trim() as 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 		}
 		const supMatch = fm.match(/^applicableSupports:\s*\[([^\]]*)\]$/m)
 		if (supMatch) {

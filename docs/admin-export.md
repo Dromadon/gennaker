@@ -45,7 +45,7 @@ Le frontmatter YAML contient les métadonnées de la question :
 |---|---|---|---|
 | `status` | `publie`, `brouillon` | `publie` | Statut éditorial |
 | `difficulty` | `facile`, `moyen`, `difficile` | `moyen` | Niveau de difficulté |
-| `answerSize` | `xs`, `sm`, `md`, `lg` | `md` | Taille de réponse attendue |
+| `answerSize` | `xs`, `sm`, `md`, `lg`, `xl` | `md` | Taille de réponse attendue |
 | `applicableSupports` | liste de slugs entre `[]` | `[]` | Supports concernés (`[]` = tous) |
 | `createdAt` | timestamp Unix (entier) | `now` à l'import | Date de création originale |
 | `updatedAt` | timestamp Unix (entier) | `now` à l'import | Date de dernière modification |

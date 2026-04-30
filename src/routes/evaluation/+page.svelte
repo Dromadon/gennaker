@@ -47,7 +47,8 @@
 		xs: 'height:2rem',
 		sm: 'height:4rem',
 		md: 'height:6rem',
-		lg: 'height:10rem'
+		lg: 'height:10rem',
+		xl: 'height:14rem'
 	}
 
 	function showToast(msg: string) {
