@@ -18,7 +18,17 @@
 	let loading = $state(false)
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null
 	let localSelected = $state<Map<number, QuestionPickRow>>(new Map())
+	// Animation de transition : la question reste visible le temps du slide-out avant que localSelected change.
+	// leavingIds est un Set (pas un scalaire) car lu dans $derived(available) — exitingId est un scalaire
+	// car il ne sert qu'à piloter une classe CSS, sans impact sur le filtre.
+	// Le backgroundColor appliqué en style inline n'est jamais nettoyé : le nœud est détruit à la fin de l'animation.
+	let leavingIds = $state<Set<number>>(new Set())
+	let exitingId = $state<number | null>(null)
 	let justAddedId = $state<number | null>(null)
+	let justReturnedId = $state<number | null>(null)
+
+	const ANIM_DURATION = 300
+	const DEBOUNCE_MS = 300
 
 	$effect(() => {
 		if (open) {
@@ -33,9 +43,8 @@
 
 	$effect(() => {
 		if (candidates.length > 0 && open) {
-			const ids = selectedIds
 			const map = new Map<number, QuestionPickRow>()
-			for (const id of ids) {
+			for (const id of selectedIds) {
 				const found = candidates.find((c) => c.id === id)
 				if (found) map.set(id, found)
 			}
@@ -59,19 +68,32 @@
 
 	function onSearchInput() {
 		if (debounceTimer) clearTimeout(debounceTimer)
-		debounceTimer = setTimeout(() => fetchCandidates(search), 300)
+		debounceTimer = setTimeout(() => fetchCandidates(search), DEBOUNCE_MS)
 	}
 
-	function addQuestion(candidate: QuestionPickRow) {
-		localSelected = new Map(localSelected).set(candidate.id, candidate)
-		justAddedId = candidate.id
-		setTimeout(() => (justAddedId = null), 600)
+	function addQuestion(candidate: QuestionPickRow, el: HTMLElement) {
+		el.style.backgroundColor = '#eff6ff'
+		leavingIds = new Set(leavingIds).add(candidate.id)
+		setTimeout(() => {
+			leavingIds.delete(candidate.id)
+			leavingIds = new Set(leavingIds)
+			localSelected = new Map(localSelected).set(candidate.id, candidate)
+			justAddedId = candidate.id
+			setTimeout(() => (justAddedId = null), ANIM_DURATION)
+		}, ANIM_DURATION)
 	}
 
-	function removeQuestion(id: number) {
-		const next = new Map(localSelected)
-		next.delete(id)
-		localSelected = next
+	function removeQuestion(id: number, el: HTMLElement) {
+		el.style.backgroundColor = '#fef2f2'
+		exitingId = id
+		setTimeout(() => {
+			const next = new Map(localSelected)
+			next.delete(id)
+			localSelected = next
+			exitingId = null
+			justReturnedId = id
+			setTimeout(() => (justReturnedId = null), ANIM_DURATION)
+		}, ANIM_DURATION)
 	}
 
 	function handleApply() {
@@ -83,7 +105,7 @@
 		if (e.target === dialog) onclose()
 	}
 
-	const available = $derived(candidates.filter((c) => !localSelected.has(c.id)))
+	const available = $derived(candidates.filter((c) => !localSelected.has(c.id) || leavingIds.has(c.id)))
 
 	const supportLabels: Record<string, string> = {
 		deriveur: 'DÉR',
@@ -127,11 +149,11 @@
 			<ul>
 				{#each localSelected.values() as q (q.id)}
 					<button
-						onclick={() => removeQuestion(q.id)}
-						class="group w-full text-left flex items-center border-b border-gray-100 transition-colors hover:bg-red-50 {justAddedId === q.id ? 'animate-slide-in' : ''}"
+						onclick={(e) => removeQuestion(q.id, e.currentTarget)}
+						class="group w-full text-left flex items-center border-b border-gray-100 transition-colors hover:bg-red-50 {justAddedId === q.id ? 'animate-slide-in' : ''} {exitingId === q.id ? 'animate-slide-out' : ''}"
 						aria-label="Retirer {q.title}"
 					>
-						<span class="flex w-8 shrink-0 items-center justify-center self-stretch text-transparent transition-colors group-hover:text-red-400">
+						<span class="flex w-8 shrink-0 items-center justify-center self-stretch touch-icon text-transparent transition-colors group-hover:text-red-400">
 							<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" />
 							</svg>
@@ -180,11 +202,11 @@
 				<ul>
 					{#each available as candidate (candidate.id)}
 						<button
-							onclick={() => addQuestion(candidate)}
-							class="group w-full text-left flex items-center border-b border-gray-100 transition-colors hover:bg-blue-50"
+							onclick={(e) => addQuestion(candidate, e.currentTarget)}
+							class="group w-full text-left flex items-center border-b border-gray-100 transition-colors hover:bg-blue-50 {leavingIds.has(candidate.id) ? 'animate-slide-out pointer-events-none' : ''} {justReturnedId === candidate.id ? 'animate-slide-in pointer-events-none' : ''}"
 							aria-label="Ajouter {candidate.title}"
 						>
-							<span class="flex w-8 shrink-0 items-center justify-center self-stretch text-transparent transition-colors group-hover:text-blue-400">
+							<span class="flex w-8 shrink-0 items-center justify-center self-stretch touch-icon text-transparent transition-colors group-hover:text-blue-400">
 								<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
 								</svg>
@@ -225,5 +247,15 @@
 		from { opacity: 0; transform: translateY(-6px); }
 		to   { opacity: 1; transform: translateY(0); }
 	}
-	.animate-slide-in { animation: slide-in 0.25s ease-out; }
+	.animate-slide-in { animation: slide-in 0.3s ease-out; }
+
+	@keyframes slide-out {
+		from { opacity: 1; transform: translateY(0); }
+		to   { opacity: 0; transform: translateY(-6px); }
+	}
+	.animate-slide-out { animation: slide-out 0.3s ease-in forwards; }
+
+	@media (hover: none) {
+		.touch-icon { color: #d1d5db; }
+	}
 </style>

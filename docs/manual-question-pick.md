@@ -1,54 +1,61 @@
-# Sélection manuelle d'une question (US-14)
+# Sélection manuelle des questions par section (US-17)
 
 ## Vue d'ensemble
 
-La sélection manuelle permet au formateur de choisir précisément une question de remplacement dans la banque, en complément du re-tirage aléatoire (US-07).
+Le picker permet au formateur de choisir manuellement toutes les questions d'une section, en complément du re-tirage aléatoire de toute la section.
 
 ## Flux UX
 
 ```
 Page évaluation
-  └── Article question
-        ├── [↺] Re-tirer au hasard  (US-07)
-        └── [🔍] Choisir une question  (US-14)
+  └── En-tête de section
+        ├── [↺] Re-tirer toute la section au hasard
+        └── [🔍] Choisir les questions  →  QuestionPickerModal
                 │
                 ▼
         QuestionPickerModal
-          ├── En-tête : nom de la section (fixe, non modifiable)
+          ├── En-tête : catégorie + nom de la section + compteur
+          ├── Questions actives (fixe, haut de modale)
+          │     └── liste des questions actuellement sélectionnées
+          │           └── clic → retire la question (slide-out)
           ├── Champ recherche (filtre live, debounce 300ms)
-          └── Liste des candidats
+          └── Questions disponibles (scrollable)
                 ├── titre
                 ├── badge difficulté (facile / moyen / difficile)
                 ├── badge(s) support si restriction
-                └── coche bleue + highlight si question déjà présente
+                └── clic → ajoute la question (slide-out puis slide-in dans actives)
                       │
-                      ▼ clic sur une ligne
-                Question remplacée dans l'évaluation
-                Toast "Question remplacée"
+                      ▼ [Appliquer]
+                Slot mis à jour dans l'évaluation
+                Toast "Section mise à jour" ou "Section désactivée"
                 Modale fermée
 ```
 
-## Règles de filtrage
+## Règles de filtrage des candidats
 
-Les candidats proposés dans la modale respectent ces règles, appliquées côté serveur dans `POST /api/evaluation/question-candidates` :
+Appliquées côté serveur dans `POST /api/evaluation/question-candidates` :
 
-1. **Section fixée** — uniquement les questions de la même section que la question remplacée (le formateur ne peut pas changer de section)
-2. **Support respecté** — les questions avec `applicableSupports` non vide n'apparaissent que si le support de l'évaluation y figure ; les questions avec `applicableSupports: []` apparaissent pour tous les supports
-3. **Statut publié** — seules les questions `status = 'publie'` sont proposées
+1. **Section fixée** — uniquement les questions de la section du slot
+2. **Support respecté** — questions avec `applicableSupports` non vide uniquement si le support de l'évaluation y figure ; `[]` = tous supports
+3. **Statut publié** — seules les questions `status = 'publie'`
 4. **Recherche texte** — filtre insensible à la casse sur le titre (paramètre optionnel `search`)
 
-## Différence avec le re-tirage aléatoire (US-07)
+## Cas particulier : section désactivée
 
-| | Re-tirage (US-07) | Sélection manuelle (US-14) |
+Si le formateur retire toutes les questions actives et applique, le slot est désactivé (0 questions). La section n'apparaît plus à l'impression. Un message "Section désactivée" s'affiche à la place.
+
+## Différence avec le re-tirage aléatoire
+
+| | Re-tirage (↺) | Picker (🔍) |
 |---|---|---|
+| Granularité | Toute la section | Question par question |
 | Choix | Aléatoire | Manuel |
-| Déclencheur | Bouton ↺ | Bouton 🔍 → modale |
-| Questions exclues | Toutes celles du slot | Aucune (affichage avec badge si déjà présente) |
-| Retour arrière | Non | Non |
+| Questions exclues | Celles déjà dans le slot | Aucune |
+| Résultat | Nouvelles questions tirées | Exactement les questions choisies |
 
 ## Persistance
 
-La sélection **n'est pas persistée** entre sessions. Elle modifie uniquement le Svelte store `evaluationStore` en mémoire, comme le re-tirage aléatoire. Un rechargement de page remet l'évaluation à zéro.
+Les modifications sont stockées uniquement dans le store Svelte (`evaluationStore`) en mémoire. Un rechargement de page remet l'évaluation à zéro.
 
 ## Fichiers concernés
 
@@ -57,6 +64,7 @@ La sélection **n'est pas persistée** entre sessions. Elle modifie uniquement l
 | `src/routes/api/evaluation/question-candidates/+server.ts` | Endpoint POST — liste les candidats filtrés |
 | `src/routes/api/evaluation/question-candidates/server.test.ts` | Tests unitaires de l'endpoint |
 | `src/lib/components/QuestionPickerModal.svelte` | Composant modale de sélection |
-| `src/lib/domain/types.ts` | Type `QuestionPickRow` |
+| `src/lib/domain/types.ts` | Types `QuestionPickRow`, `EvaluationSlot` |
 | `src/lib/server/db/queries/questions.ts` | Fonction `getQuestionCandidates()` |
-| `src/routes/evaluation/+page.svelte` | Intégration du bouton et de la modale |
+| `src/lib/stores/evaluation.ts` | Fonction `setSlotQuestions()` |
+| `src/routes/evaluation/+page.svelte` | Boutons et intégration de la modale |

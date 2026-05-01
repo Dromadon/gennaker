@@ -13,8 +13,8 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-{#if !isAdmin && !isEvaluation}
-	<nav class="border-b border-gray-200 bg-white px-6 py-3 flex items-center print:hidden">
+{#if !isAdmin}
+	<nav class="border-b border-gray-200 bg-white px-6 py-3 flex items-center print:hidden {isEvaluation ? 'hidden lg:flex' : ''}">
 		<a href="/" class="text-sm font-semibold text-gray-700 hover:text-gray-900">Gennaker</a>
 	</nav>
 {/if}

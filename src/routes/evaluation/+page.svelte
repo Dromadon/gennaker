@@ -127,8 +127,8 @@
 {#if evaluation}
 	<div class="flex min-h-screen print:block">
 
-		<!-- Panel latéral desktop -->
-		<aside class="hidden lg:flex w-56 shrink-0 border-r border-gray-200 sticky top-0 h-screen flex-col print:hidden">
+		<!-- Panel latéral desktop (droite) -->
+		<aside class="hidden lg:flex w-56 shrink-0 border-l border-gray-200 sticky top-0 h-screen flex-col order-last print:hidden">
 			<!-- Onglets -->
 			<div class="flex border-b border-gray-200 px-2">
 				<button
@@ -275,7 +275,7 @@
 									<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
 									</svg>
-									Choisir les questions
+									Choisir
 								</button>
 								<!-- Re-tirer toute la section -->
 								<button
@@ -338,7 +338,7 @@
 				onclick={() => (panelOpen = false)}
 				aria-label="Fermer"
 			></button>
-			<aside class="lg:hidden fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-white shadow-xl print:hidden">
+			<aside class="lg:hidden fixed inset-y-0 right-0 z-50 flex w-72 flex-col bg-white shadow-xl print:hidden">
 				<div class="flex items-center justify-between border-b border-gray-200 px-4 py-3">
 					<div class="flex gap-1">
 						<button
@@ -401,14 +401,6 @@
 							</button>
 						</div>
 					{/if}
-				</div>
-				<div class="border-t border-gray-200 px-4 py-3">
-					<a href="/" class="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-						</svg>
-						Gennaker
-					</a>
 				</div>
 			</aside>
 		{/if}

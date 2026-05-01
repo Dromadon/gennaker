@@ -48,26 +48,49 @@ Requête DB : `src/lib/server/db/queries/questions.ts → getQuestionsBySection(
 
 ---
 
-## Flux — remplacement d'une question individuelle (US-07)
+## Flux — re-tirage aléatoire d'une section (↺)
 
 ```
-Clic ↺ sur une question (vue /evaluation)
+Clic ↺ sur l'en-tête d'une section (vue /evaluation)
   │
-  ├─ POST /api/evaluation/redraw-question
-  │    body: { sectionId, excludeQuestionIds: number[], support }
-  │           excludeQuestionIds = tous les IDs déjà affichés dans le slot
+  ├─ Pour chaque question du slot :
+  │    POST /api/evaluation/redraw-question
+  │         body: { sectionId, excludeQuestionIds: number[], support }
+  │                excludeQuestionIds = IDs déjà dans le slot + déjà re-tirés dans cette passe
   │
-  ├─ Serveur :
-  │    pool = questions publiées de la section (getQuestionsBySection)
-  │    candidats = pool ∖ excludeQuestionIds, filtrés par support
-  │    si vide → 422 { error: "Aucune autre question disponible dans cette section" }
-  │    sinon  → Question aléatoire parmi les candidats → 200
+  ├─ Serveur (par question) :
+  │    pool = questions publiées de la section, filtrées par support
+  │    candidats = pool ∖ excludeQuestionIds
+  │    si vide → 422  (question originale conservée côté client)
+  │    sinon  → Question aléatoire → 200
   │
   └─ Client :
-       200 → replaceQuestion(slotId, oldId, newQuestion) dans evaluationStore
-       422 → toast d'erreur (disparaît après 4s)
+       setSlotQuestions(slotId, newQuestions) dans evaluationStore
+       Toast "Section re-tirée"
 ```
 
-Implémentation côté serveur : `src/lib/domain/draw.ts → pickReplacement()`  
 Endpoint : `src/routes/api/evaluation/redraw-question/+server.ts`  
-Store : `src/lib/stores/evaluation.ts → replaceQuestion()`
+Store : `src/lib/stores/evaluation.ts → setSlotQuestions()`
+
+---
+
+## Flux — sélection manuelle des questions d'une section (🔍)
+
+Voir [docs/manual-question-pick.md](./manual-question-pick.md) pour le détail complet.
+
+```
+Clic 🔍 sur l'en-tête d'une section (vue /evaluation)
+  │
+  └─ Ouvre QuestionPickerModal
+       │
+       ├─ POST /api/evaluation/question-candidates
+       │    body: { sectionId, support, search? }
+       │    → liste des questions publiées compatibles
+       │
+       └─ [Appliquer]
+            setSlotQuestions(slotId, selectedQuestions) dans evaluationStore
+            Toast "Section mise à jour" ou "Section désactivée"
+```
+
+Endpoint : `src/routes/api/evaluation/question-candidates/+server.ts`  
+Store : `src/lib/stores/evaluation.ts → setSlotQuestions()`
