@@ -95,16 +95,16 @@ export const questionReports = sqliteTable('question_reports', {
 
 export const communitySubmissions = sqliteTable('community_submissions', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
-	type: text('type').notNull(), // 'nouvelle_question' | 'correction'
-	sectionId: integer('section_id').references(() => sections.id),
-	questionId: integer('question_id').references(() => questions.id),
-	title: text('title'),
-	questionMd: text('question_md'),
-	correctionMd: text('correction_md'),
-	sourceMd: text('source_md'),
-	problemDescription: text('problem_description'),
-	submitterEmail: text('submitter_email'),
+	sectionId: integer('section_id').notNull().references(() => sections.id),
+	title: text('title').notNull(),
+	questionMd: text('question_md').notNull(),
+	correctionMd: text('correction_md').notNull(),
+	// JSON stringifié : '["deriveur","catamaran"]'
+	applicableSupports: text('applicable_supports').notNull(),
+	submitterName: text('submitter_name').notNull(),
+	submitterEmail: text('submitter_email').notNull(),
 	status: text('status').notNull().default('en_attente'), // 'en_attente' | 'approuve' | 'rejete'
+	rejectionNote: text('rejection_note'),
 	createdAt: integer('created_at').notNull(),
 	reviewedAt: integer('reviewed_at')
 });

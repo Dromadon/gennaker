@@ -84,5 +84,7 @@
 
 	<p class="mt-8 text-center text-sm text-gray-400">
 		<a href="/questions" class="hover:text-gray-600 hover:underline">Consulter la banque de questions</a>
+		<span class="mx-2 text-gray-200">·</span>
+		<a href="/soumettre" class="hover:text-gray-600 hover:underline">Proposer une question</a>
 	</p>
 </main>

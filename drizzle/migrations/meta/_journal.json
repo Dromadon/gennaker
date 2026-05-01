@@ -43,6 +43,13 @@
       "when": 1777466550348,
       "tag": "0005_graceful_roxanne_simpson",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1746057600000,
+      "tag": "0006_community_submissions_v2",
+      "breakpoints": true
     }
   ]
 }

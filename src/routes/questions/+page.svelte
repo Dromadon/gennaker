@@ -41,11 +41,19 @@
 </script>
 
 <div class="min-h-screen bg-gray-50">
-	<div class="mx-auto max-w-screen-xl px-4 py-8">
-		<h1 class="mb-6 text-xl font-semibold text-gray-900">Banque de questions ({data.total})</h1>
+	<div class="mx-auto max-w-6xl px-6 py-8">
+		<div class="mb-6 flex items-center justify-between gap-4">
+			<h1 class="min-w-0 text-xl font-semibold text-gray-900">Banque de questions ({data.total})</h1>
+			<a
+				href="/soumettre"
+				class="inline-flex items-center gap-2 rounded-md bg-yellow-400 hover:bg-yellow-500 px-4 py-2 text-sm font-medium text-gray-900"
+			>
+				+ Proposer une question
+			</a>
+		</div>
 
 		<!-- Filtres -->
-		<form method="GET" class="mb-6 flex flex-wrap gap-3">
+		<form method="GET" class="mb-6 flex flex-wrap items-center gap-3">
 			<select
 				name="category"
 				bind:value={selectedCategory}
@@ -88,7 +96,7 @@
 		<!-- Layout dynamique -->
 		<div class="lg:flex lg:gap-6">
 			<!-- Liste -->
-			<div class="min-w-0 transition-all duration-300 {selectedQuestion ? 'lg:w-2/5' : 'lg:w-full'}">
+			<div class="min-w-0 transition-all duration-300 {selectedQuestion ? 'lg:w-96 lg:shrink-0' : 'flex-1'} overflow-hidden">
 				<div class="overflow-x-auto rounded-lg border border-gray-200">
 					<table class="w-full text-sm">
 						<thead class="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
@@ -144,8 +152,8 @@
 			</div>
 
 			<!-- Panneau de prévisualisation desktop -->
-			<div class="hidden lg:block lg:flex-1 min-w-0">
-				{#if selectedQuestion}
+			{#if selectedQuestion}
+				<div class="hidden lg:block lg:flex-1 min-w-0">
 					<div class="sticky top-4 rounded-lg border border-gray-200 bg-white p-5">
 						<QuestionPreview
 							questionId={selectedQuestion.id}
@@ -174,8 +182,8 @@
 							{/if}
 						</div>
 					</div>
-				{/if}
-			</div>
+				</div>
+			{/if}
 		</div>
 	</div>
 </div>

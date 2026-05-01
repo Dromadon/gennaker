@@ -252,8 +252,8 @@ Les stories suivantes sont identifiées mais hors scope MVP, classées par prior
 | 4c | US-17 : Choisir le nombre de questions par section lors de la création d'une évaluation (voir ci-dessous) |
 | 6 | Gestion de la difficulté des questions (annotation + filtre au tirage) |
 | 7 | Questions épinglées et questions par défaut dans les templates |
-| 9 | Soumission communautaire de questions |
-| 11 | Interface admin : modération des soumissions |
+| 9 | US-18 : Soumission communautaire de questions |
+| 11 | US-19 : Interface admin : modération des soumissions |
 
 ---
 
@@ -471,7 +471,7 @@ _Interface admin_
 
 ---
 
-### US-17 — Ajuster le nombre de questions par section après génération
+### US-17 ✅ — Ajuster le nombre de questions par section après génération
 
 **En tant que** formateur,  
 **je veux** ajouter ou retirer des questions dans une section de l'évaluation générée,  
@@ -501,3 +501,65 @@ _État et cohérence_
 - Persistance du nombre de questions personnalisé entre sessions
 - Ajout de questions issues d'une autre section (voir "Modification de structure" dans le backlog)
 - Configuration du nombre de questions avant génération
+
+---
+
+### US-18 ✅ — Soumettre une question par la communauté
+
+**En tant que** stagiaire ou formateur,
+**je veux** proposer une nouvelle question à inclure dans la banque,
+**afin de** contribuer à enrichir le contenu des évaluations avec des questions issues du terrain.
+
+**Critères d'acceptation**
+
+_Déclenchement_
+- Un lien "Proposer une question" est accessible depuis la banque publique (`/questions`) et la page d'accueil
+- La soumission est possible sans compte (anonyme)
+
+_Formulaire_
+- Le formulaire expose : titre court (obligatoire, max 120 caractères), énoncé en markdown (obligatoire), correction en markdown (obligatoire), catégorie + section (sélecteurs liés, obligatoires), supports applicables (checkboxes, au moins un obligatoire), email de contact (optionnel)
+- L'énoncé et la correction ont chacun une preview markdown en temps réel (rendu via `createMarkdownRenderer`)
+- Protection anti-spam : champ honeypot + filtrage User-Agent
+- En cas d'erreur de validation, les champs sont conservés et les erreurs affichées inline
+
+_Confirmation_
+- Un message de confirmation s'affiche après envoi ("Votre proposition a été transmise, merci")
+- La soumission est enregistrée en D1 dans la table `community_submissions` avec statut `en_attente`
+
+**Hors périmètre**
+- Upload d'images dans la soumission (les images peuvent être décrites textuellement dans le markdown)
+- Notification par email au contributeur
+- Suivi public du statut de sa soumission
+
+---
+
+### US-19 — Interface admin : modération des soumissions
+
+**En tant que** administrateur,
+**je veux** consulter, prévisualiser et accepter ou rejeter les questions soumises par la communauté,
+**afin de** alimenter la banque de questions avec du contenu validé sans intervention SQL.
+
+**Critères d'acceptation**
+
+_Liste_
+- La page `/admin/submissions` liste les soumissions avec filtres : statut (`en_attente`, `approuvé`, `rejeté`), catégorie, section
+- Chaque ligne affiche : titre, catégorie, section, email de contact (si renseigné), date de soumission, statut
+- La liste est paginée (20 par page), triée par date décroissante
+- Un badge indique le nombre de soumissions `en_attente` dans la navigation admin
+
+_Prévisualisation_
+- Cliquer sur une ligne ouvre un panneau latéral avec la prévisualisation complète : titre, énoncé (rendu markdown), correction (rendu markdown), supports applicables, catégorie, section
+- Le panneau réutilise le composant `QuestionPreview`
+
+_Modération_
+- Le panneau expose deux actions : **Approuver** et **Rejeter** (avec champ de note de rejet optionnel, max 300 caractères)
+- Approuver crée directement une question en D1 avec statut `brouillon`, pré-remplie des champs de la soumission, et passe la soumission en `approuvé`
+- Rejeter passe la soumission en `rejeté` sans créer de question
+- Après action, le panneau se ferme et la liste se met à jour
+- Un lien "Voir dans l'admin questions" est disponible pour les soumissions approuvées (lien vers `/admin/questions/{id}/edit`)
+
+**Hors périmètre**
+- Notification par email au contributeur lors de l'approbation ou du rejet
+- Modification du contenu de la soumission avant approbation (l'admin édite ensuite via US-11)
+- Import d'images depuis la soumission vers R2 (US future)
+- Historique des modérations
