@@ -19,3 +19,15 @@ export function replaceQuestion(slotId: number, oldId: number, newQuestion: Ques
 		}
 	})
 }
+
+export function setSlotQuestions(slotId: number, questions: Question[]) {
+	evaluationStore.update((ev) => {
+		if (!ev) return ev
+		return {
+			...ev,
+			slots: ev.slots.map((slot) =>
+				slot.slotId !== slotId ? slot : { ...slot, questions }
+			)
+		}
+	})
+}

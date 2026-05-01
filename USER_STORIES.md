@@ -244,18 +244,15 @@ Les stories suivantes sont identifiées mais hors scope MVP, classées par prior
 | Priorité | Story |
 |----------|-------|
 | 1 | Partage d'une évaluation via lien court (short code, expiration 30 jours) |
-| 2a | US-11 : Interface admin — CRUD questions sans images (voir ci-dessous) |
-| 2b | US-12 : Interface admin — Gestion des images dans le CRUD questions (voir ci-dessous) |
 | 2c | US-13 : Sources des questions — affichage et gestion (voir ci-dessous) |
 | 3 | Interface admin : gestion des templates et slots |
 | 4 | Modification de structure : ajouter / supprimer un slot dans une évaluation |
 | 4b | US-06 : Re-tirer toutes les questions d'un slot (bouton par slot dans le panneau latéral) |
-| 5 | US-14 : Sélection manuelle d'une question dans la banque |
+| 4c | US-17 : Ajuster le nombre de questions par section après génération (voir ci-dessous) |
+| 4c | US-17 : Choisir le nombre de questions par section lors de la création d'une évaluation (voir ci-dessous) |
 | 6 | Gestion de la difficulté des questions (annotation + filtre au tirage) |
 | 7 | Questions épinglées et questions par défaut dans les templates |
-| 8 | US-15 : Banque publique de questions (consultation filtrée, voir ci-dessous) |
 | 9 | Soumission communautaire de questions |
-| 10 | US-16 : Signalement d'un problème sur une question (voir ci-dessous) |
 | 11 | Interface admin : modération des soumissions |
 
 ---
@@ -370,7 +367,7 @@ _Admin : visualisation_
 
 ---
 
-### US-14 — Sélection manuelle d'une question dans la banque
+### US-14 ✅ — Sélection manuelle d'une question dans la banque
 
 **En tant que** formateur,  
 **je veux** sélectionner manuellement une question spécifique dans la banque pour remplacer une question d'un slot,  
@@ -406,7 +403,7 @@ _Sauvegarde et état_
 
 ---
 
-### US-15 — Banque publique de questions (consultation filtrée)
+### US-15 ✅ — Banque publique de questions (consultation filtrée)
 
 **En tant que** stagiaire ou formateur,  
 **je veux** consulter la banque de questions avec les mêmes filtres que l'interface admin,  
@@ -471,3 +468,36 @@ _Interface admin_
 - Notification par email à l'administrateur
 - Authentification requise pour signaler
 - Réponse à l'auteur du signalement
+
+---
+
+### US-17 — Ajuster le nombre de questions par section après génération
+
+**En tant que** formateur,  
+**je veux** ajouter ou retirer des questions dans une section de l'évaluation générée,  
+**afin de** calibrer la durée et le périmètre de l'évaluation sans avoir à tout régénérer.
+
+> **Interface à décider** — Voir [US-17-UI-OPTIONS.md](./US-17-UI-OPTIONS.md) pour les trois propositions (A, B, D) et leurs hybridations.
+
+**Critères d'acceptation**
+
+_Retrait d'une question_
+- Un contrôle "Retirer" est accessible sur chaque question dans la vue principale, à côté des boutons existants "Re-tirer" et "Choisir" (US-07, US-14)
+- Retirer une question la supprime de l'évaluation courante ; les questions restantes conservent leur ordre
+- On peut retirer toutes les questions d'une section : la section devient alors **désactivée** (son titre n'apparaît plus dans la vue principale ni à l'impression)
+
+_Ajout d'une question_
+- Un contrôle "Ajouter" est accessible dans la vue principale (emplacement selon option UI retenue)
+- L'ajout peut se faire par **tirage aléatoire** ou par **sélection manuelle** dans la banque (QuestionPickerModal), en excluant les questions déjà présentes dans l'évaluation
+- Si aucune question supplémentaire n'est disponible (banque épuisée pour cette section), le contrôle est désactivé et un tooltip l'explique
+- La nouvelle question s'ajoute à la fin de la section
+
+_État et cohérence_
+- Le panneau latéral (US-05) met à jour le compteur de questions du slot en temps réel ; un slot désactivé (vide) est signalé visuellement
+- Les modifications ne persistent que dans la session courante (comportement identique à US-07 et US-14)
+- Le re-tirage de toute la section (US-06, si implémentée) réinitialise le nombre de questions à la valeur du template, pas au nombre personnalisé
+
+**Hors périmètre**
+- Persistance du nombre de questions personnalisé entre sessions
+- Ajout de questions issues d'une autre section (voir "Modification de structure" dans le backlog)
+- Configuration du nombre de questions avant génération

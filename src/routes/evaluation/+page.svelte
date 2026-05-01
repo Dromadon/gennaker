@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
 	import { page } from '$app/state'
-	import { evaluationStore, replaceQuestion } from '$lib/stores/evaluation'
-	import type { EvaluationSlot, QuestionPickRow } from '$lib/domain/types'
+	import { evaluationStore, setSlotQuestions } from '$lib/stores/evaluation'
+	import type { EvaluationSlot, Question, QuestionPickRow } from '$lib/domain/types'
 	import { createMarkdownRenderer } from '$lib/markdown'
 	import QuestionPickerModal from '$lib/components/QuestionPickerModal.svelte'
 	import ReportModal from '$lib/components/ReportModal.svelte'
@@ -15,9 +15,8 @@
 	let panelOpen = $state(false)
 	let activeTab = $state<'structure' | 'impression'>('structure')
 	let desktopTab = $state<'structure' | 'impression'>('structure')
-	let redrawingId = $state<number | null>(null)
-	let pickerSlot = $state<EvaluationSlot | null>(null)
-	let pickerQuestionId = $state<number | null>(null)
+	let redrawingSlotId = $state<number | null>(null)
+	let managerSlot = $state<EvaluationSlot | null>(null)
 	let reportQuestionId = $state<number | null>(null)
 	let reportQuestionTitle = $state('')
 	let toastMessage = $state('')
@@ -58,53 +57,51 @@
 		toastTimer = setTimeout(() => (toastVisible = false), 4000)
 	}
 
-	async function redrawQuestion(slotId: number, questionId: number, sectionId: number) {
-		if (!evaluation || redrawingId !== null) return
-		redrawingId = questionId
-		const slot = evaluation.slots.find((s) => s.slotId === slotId)!
-		const excludeQuestionIds = slot.questions.map((q) => q.id)
-		try {
-			const res = await fetch('/api/evaluation/redraw-question', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ sectionId, excludeQuestionIds, support: evaluation.support })
-			})
-			if (res.status === 422) {
-				showToast('Aucune autre question disponible dans cette section')
-			} else if (res.ok) {
-				replaceQuestion(slotId, questionId, await res.json())
-			} else {
-				showToast('Erreur lors du re-tirage')
+	async function redrawSection(slot: EvaluationSlot) {
+		if (!evaluation || redrawingSlotId !== null) return
+		redrawingSlotId = slot.slotId
+		const drawn: Question[] = []
+		// Pour chaque question du slot, on tire un remplacement en excluant toutes les questions déjà tirées + celles du tirage en cours
+		for (const q of slot.questions) {
+			const excludeIds = [...slot.questions.map((x) => x.id), ...drawn.map((x) => x.id)]
+			try {
+				const res = await fetch('/api/evaluation/redraw-question', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ sectionId: slot.sectionId, excludeQuestionIds: excludeIds, support: evaluation.support })
+				})
+				if (res.ok) {
+					drawn.push(await res.json())
+				} else {
+					// Banque épuisée pour cette question : on conserve l'originale
+					drawn.push(q)
+				}
+			} catch {
+				drawn.push(q)
 			}
-		} catch {
-			showToast('Erreur réseau')
-		} finally {
-			redrawingId = null
 		}
+		setSlotQuestions(slot.slotId, drawn)
+		showToast('Section re-tirée')
+		redrawingSlotId = null
 	}
 
-	function openPicker(slot: EvaluationSlot, questionId: number) {
-		pickerSlot = slot
-		pickerQuestionId = questionId
+	function handleManage(selected: QuestionPickRow[]) {
+		if (!managerSlot) return
+		const sectionId = managerSlot.sectionId
+		const slotId = managerSlot.slotId
+		const newQuestions: Question[] = selected.map((c) => ({
+			id: c.id,
+			sectionId,
+			title: c.title,
+			questionMd: c.questionMd,
+			correctionMd: c.correctionMd,
+			applicableSupports: c.applicableSupports,
+			answerSize: c.answerSize
+		}))
+		setSlotQuestions(slotId, newQuestions)
+		showToast(newQuestions.length === 0 ? 'Section désactivée' : 'Section mise à jour')
+		managerSlot = null
 	}
-
-	function handlePick(candidate: QuestionPickRow) {
-		if (!pickerSlot || pickerQuestionId === null) return
-		replaceQuestion(pickerSlot.slotId, pickerQuestionId, {
-			id: candidate.id,
-			sectionId: pickerSlot.sectionId,
-			title: candidate.title,
-			questionMd: candidate.questionMd,
-			correctionMd: candidate.correctionMd,
-			applicableSupports: candidate.applicableSupports,
-			answerSize: candidate.answerSize
-		})
-		showToast('Question remplacée')
-	}
-
-	const allQuestionIds = $derived(
-		evaluation ? evaluation.slots.flatMap((s) => s.questions.map((q) => q.id)) : []
-	)
 
 	function printEvaluation() {
 		if (!evaluation) return
@@ -160,7 +157,7 @@
 							</a>
 							{#each category.slots as slot}
 								<div class="flex items-center justify-between py-0.5 pl-2">
-									<span class="text-sm text-gray-600 leading-snug">{slot.sectionDisplayName}</span>
+									<span class="text-sm leading-snug {slot.questions.length === 0 ? 'text-gray-300 italic' : 'text-gray-600'}">{slot.sectionDisplayName}{slot.questions.length === 0 ? ' (désactivée)' : ''}</span>
 									<span class="ml-2 shrink-0 text-xs text-gray-400">{slot.questions.length} q.</span>
 								</div>
 							{/each}
@@ -263,37 +260,45 @@
 						</h2>
 					{/if}
 
-					<section class="mb-6 print:divide-y print:divide-gray-200">
-						<h3 class="mb-3 text-sm font-semibold text-gray-500 uppercase tracking-wide break-after-avoid print:mb-1 {hideSectionsOnPrint ? 'print:hidden' : ''}">
-							{slot.sectionDisplayName}
-						</h3>
+					<section class="mb-6 print:divide-y print:divide-gray-200 {slot.questions.length === 0 ? 'print:hidden' : ''}">
+						<div class="mb-2 flex items-center justify-between break-after-avoid {hideSectionsOnPrint ? 'print:hidden' : ''}">
+							<h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+								{slot.sectionDisplayName}
+							</h3>
+							<div class="print:hidden flex items-center gap-1">
+								<!-- Choisir les questions -->
+								<button
+									onclick={() => (managerSlot = slot)}
+									disabled={redrawingSlotId !== null || managerSlot !== null}
+									class="flex items-center gap-1 rounded border border-gray-200 bg-white px-1.5 py-0.5 text-xs text-gray-400 transition-colors hover:border-gray-400 hover:text-gray-600 disabled:opacity-40"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+									</svg>
+									Choisir les questions
+								</button>
+								<!-- Re-tirer toute la section -->
+								<button
+									onclick={() => redrawSection(slot)}
+									disabled={redrawingSlotId !== null || managerSlot !== null}
+									class="flex items-center justify-center rounded border border-gray-200 bg-white p-0.5 text-gray-400 transition-colors hover:border-gray-400 hover:text-gray-600 disabled:opacity-40"
+									aria-label="Re-tirer toutes les questions de cette section"
+									title="Re-tirer toutes les questions"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 {redrawingSlotId === slot.slotId ? 'animate-spin' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+									</svg>
+								</button>
+							</div>
+						</div>
 
-						{#each slot.questions as question}
-							<article class="relative mb-6 break-inside-avoid rounded-lg border border-gray-200 p-5 print:rounded-none print:border-0 print:p-3">
-								<div class="absolute -top-3 right-4 flex gap-1 print:hidden">
-									<button
-										onclick={() => redrawQuestion(slot.slotId, question.id, slot.sectionId)}
-										disabled={redrawingId !== null || pickerSlot !== null}
-										class="rounded-md border border-gray-200 bg-white p-1 text-gray-400 shadow-sm transition-colors hover:border-gray-400 hover:text-gray-700 disabled:opacity-40"
-										aria-label="Re-tirer cette question"
-										title="Re-tirer cette question"
-									>
-										<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 {redrawingId === question.id ? 'animate-spin' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-											<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-										</svg>
-									</button>
-									<button
-										onclick={() => openPicker(slot, question.id)}
-										disabled={redrawingId !== null || pickerSlot !== null}
-										class="rounded-md border border-gray-200 bg-white p-1 text-gray-400 shadow-sm transition-colors hover:border-gray-400 hover:text-gray-700 disabled:opacity-40"
-										aria-label="Choisir une question"
-										title="Choisir une question"
-									>
-										<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-											<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
-										</svg>
-									</button>
-								</div>
+						{#if slot.questions.length === 0}
+							<p class="mb-6 rounded-lg border border-dashed border-gray-200 px-5 py-4 text-sm text-gray-400 italic print:hidden">
+								Section désactivée — aucune question
+							</p>
+						{:else}
+							{#each slot.questions as question}
+							<article class="relative mb-4 break-inside-avoid rounded-lg border border-gray-200 px-4 py-3 print:rounded-none print:border-0 print:p-3">
 								<p class="mb-3 font-medium">{question.title}</p>
 								<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 								<div class="prose prose-sm max-w-none">{@html renderMd(question.questionMd, question.id)}</div>
@@ -319,7 +324,8 @@
 									</button>
 								</div>
 							</article>
-						{/each}
+							{/each}
+						{/if}
 					</section>
 				{/each}
 			</div>
@@ -371,7 +377,7 @@
 								</a>
 								{#each category.slots as slot}
 									<div class="flex items-center justify-between py-0.5 pl-2">
-										<span class="text-sm text-gray-600 leading-snug">{slot.sectionDisplayName}</span>
+										<span class="text-sm leading-snug {slot.questions.length === 0 ? 'text-gray-300 italic' : 'text-gray-600'}">{slot.sectionDisplayName}{slot.questions.length === 0 ? ' (désactivée)' : ''}</span>
 										<span class="ml-2 shrink-0 text-xs text-gray-400">{slot.questions.length} q.</span>
 									</div>
 								{/each}
@@ -409,14 +415,14 @@
 
 	</div>
 
-	{#if pickerSlot}
+	{#if managerSlot}
 		<QuestionPickerModal
-			open={pickerSlot !== null}
-			slot={pickerSlot}
+			open={true}
+			slot={managerSlot}
 			support={evaluation.support}
-			currentQuestionIds={allQuestionIds}
-			onpick={handlePick}
-			onclose={() => { pickerSlot = null; pickerQuestionId = null }}
+			selectedIds={managerSlot.questions.map((q) => q.id)}
+			onapply={handleManage}
+			onclose={() => (managerSlot = null)}
 		/>
 	{/if}
 	<ReportModal
