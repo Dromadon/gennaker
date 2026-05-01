@@ -1,6 +1,38 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
+/* Bordures verticales des tableaux (supprimées par défaut par typography) */
+.prose table {
+  border-collapse: collapse;
+}
+.prose :where(td, th):not(:where([class~='not-prose'] *)) {
+  border: 1px solid;
+}
+
+/* Pour les tableaux et avoir des cases homogènes */
+/* Typography supprime le padding sur first/last-child et le padding-top de thead th — on le réinitialise */
+.prose thead th:first-child,
+.prose-sm thead th:first-child { padding-inline-start: 1em; }
+.prose thead th:last-child,
+.prose-sm thead th:last-child  { padding-inline-end: 1em; }
+.prose thead th,
+.prose-sm thead th             { padding-top: 0.5em; }
+.prose tbody td:first-child, .prose tfoot td:first-child,
+.prose-sm tbody td:first-child, .prose-sm tfoot td:first-child { padding-inline-start: 1em; }
+.prose tbody td:last-child, .prose tfoot td:last-child,
+.prose-sm tbody td:last-child, .prose-sm tfoot td:last-child  { padding-inline-end: 1em; }
+
+/* Pour les tableaux et avoir des cases homogènes */
+/* Cellules vides : espace insécable pour maintenir hauteur et largeur */
+.prose :where(td, th):empty::after {
+  content: '\00a0';
+}
+
+/* Support du soulignement via balise <u> dans le rendu markdown */
+.prose u {
+  text-decoration: underline;
+}
+
 /* Headings dans les énoncés/corrections : taille discrète, pas les défauts xxl de typography */
 .prose h1 {
   font-size: 1.1em;
