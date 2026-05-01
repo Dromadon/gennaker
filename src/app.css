@@ -1,1 +1,18 @@
 @import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+/* Headings dans les énoncés/corrections : taille discrète, pas les défauts xxl de typography */
+.prose h1 {
+  font-size: 1.1em;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 0.5em;
+  line-height: 1.4;
+}
+.prose h2 {
+  font-size: 1.05em;
+  font-weight: 600;
+  margin-top: 1em;
+  margin-bottom: 0.4em;
+  line-height: 1.4;
+}

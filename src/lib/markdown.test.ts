@@ -26,6 +26,15 @@ describe('createMarkdownRenderer', () => {
 	it('rend le markdown non-image normalement', () => {
 		expect(render('**gras**')).toContain('<strong>gras</strong>')
 	})
+
+	it('rend les headings markdown', () => {
+		expect(render('# Titre principal')).toContain('<h1>Titre principal</h1>')
+		expect(render('## Sous-titre')).toContain('<h2>Sous-titre</h2>')
+	})
+
+	it('transforme un retour à la ligne simple en <br>', () => {
+		expect(render('ligne 1\nligne 2')).toContain('<br>')
+	})
 })
 
 describe('createLocalMarkdownRenderer', () => {

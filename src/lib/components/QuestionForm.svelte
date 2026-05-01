@@ -6,6 +6,7 @@
 	import { formatAnswerSize } from '$lib/domain/types'
 	import { createLocalMarkdownRenderer, extractImageRefs } from '$lib/markdown'
 	import ImagePanel from '$lib/components/ImagePanel.svelte'
+	import MarkdownHelpDialog from '$lib/components/MarkdownHelpDialog.svelte'
 
 	type Props = {
 		categories: CategoryWithSections[]
@@ -51,6 +52,7 @@
 	const isEditMode = orig.isEditMode
 	let isLocationLocked = $state(orig.isEditMode)
 	let locationDialog = $state<HTMLDialogElement | undefined>()
+	let markdownHelpDialog = $state<HTMLDialogElement | undefined>()
 
 	const visibleSections = $derived(
 		selectedCategoryId
@@ -191,7 +193,8 @@
 <form method="POST" {action} use:enhance={handleEnhance} class="space-y-6">
 	<!-- Titre -->
 	<div class="border-l-2 pl-2 transition {dirty?.title ? BAR : 'border-transparent'}">
-		<label for="title" class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+		<label for="title" class="block text-sm font-medium text-gray-700 mb-1">Titre court</label>
+		<p class="text-xs text-gray-400 mb-1">Identifiant de navigation — n'apparaît pas dans le sujet. Ex. "Définition d'une dépression"</p>
 		<input
 			id="title"
 			name="title"
@@ -324,7 +327,10 @@
 
 	<!-- Éditeur markdown : énoncé -->
 	<div class="border-l-2 pl-2 transition {dirty?.questionMd ? BAR : 'border-transparent'}">
-		<label for="questionMd" class="block text-sm font-medium text-gray-700 mb-1">Énoncé</label>
+		<div class="flex items-center justify-between mb-1">
+			<label for="questionMd" class="block text-sm font-medium text-gray-700">Énoncé</label>
+			<button type="button" onclick={() => markdownHelpDialog?.showModal()} class="text-xs text-gray-400 hover:text-gray-600">? Aide markdown</button>
+		</div>
 		<div class="grid grid-cols-2 gap-0 border border-gray-200 rounded-md transition {errors.questionMd ? 'border-red-400' : ''}">
 			<textarea
 				id="questionMd"
@@ -414,6 +420,9 @@
 		</button>
 	</div>
 </form>
+
+<!-- Dialog aide markdown -->
+<MarkdownHelpDialog bind:dialog={markdownHelpDialog} />
 
 <!-- Dialog changement catégorie/section -->
 {#if isEditMode}

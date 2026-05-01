@@ -299,7 +299,6 @@
 						{:else}
 							{#each slot.questions as question}
 							<article class="relative mb-4 break-inside-avoid rounded-lg border border-gray-200 px-4 py-3 print:rounded-none print:border-0 print:p-3">
-								<p class="mb-3 font-medium">{question.title}</p>
 								<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 								<div class="prose prose-sm max-w-none">{@html renderMd(question.questionMd, question.id)}</div>
 								{#if !showCorrection}

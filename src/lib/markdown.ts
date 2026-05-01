@@ -29,7 +29,7 @@ src = pendingImages.get(filename)?.objectUrl ?? `${r2BaseUrl}/${questionId}/imag
 		const titleAttr = title ? ` title="${esc(title)}"` : ''
 		return `<img src="${src}" alt="${esc(text)}"${titleAttr}>`
 	}
-	return (md: string): string => marked.parse(md, { renderer }) as string
+	return (md: string): string => marked.parse(md, { renderer, breaks: true }) as string
 }
 
 function esc(s: string) {

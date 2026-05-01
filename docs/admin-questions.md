@@ -18,11 +18,50 @@ retourne `error(403)` si la vérification échoue.
 
 ---
 
+## Titre court vs énoncé
+
+Le champ `title` est un **libellé court de navigation** (ex. "Définition d'une dépression").
+Il est affiché dans :
+- La liste admin des questions
+- Le picker de questions (sélection pour une évaluation)
+- La prévisualisation de la banque de questions
+
+Le titre **n'apparaît pas** sur la page d'évaluation. L'énoncé réel de la question doit être
+saisi dans le champ `questionMd`. Il est conseillé de commencer `questionMd` par `# titre`
+pour que l'énoncé s'affiche avec un heading stylisé.
+
+---
+
+## Syntaxe markdown supportée dans l'énoncé et la correction
+
+Le bouton **? Aide markdown** dans le formulaire affiche le tableau complet. En résumé :
+
+| Syntaxe | Résultat |
+|---------|---------|
+| `# Titre` | Heading h1 (recommandé en début d'énoncé) |
+| `## Sous-titre` | Heading h2 |
+| `**gras**` | **gras** |
+| `*italique*` | *italique* |
+| `- item` | liste à puces |
+| `1. item` | liste numérotée |
+| `![alt](images/x.png)` | image (via le panneau images) |
+
+**Sauts de ligne** : un simple retour à la ligne crée un `<br>` (option `breaks: true` de marked).
+Une ligne vide crée un nouveau paragraphe.
+
+Les headings `h1`/`h2` sont volontairement réduits (légèrement plus grands que le corps) via
+des overrides CSS dans `app.css` — ils ne prennent pas les tailles xxl par défaut de typography.
+
+Le rendu utilise la lib `marked` avec le plugin `@tailwindcss/typography` (`prose prose-sm`)
+pour le style.
+
+---
+
 ## Champs éditables
 
 | Champ | Type | Valeurs admises |
 |-------|------|----------------|
-| `title` | text | 1–500 caractères |
+| `title` | text | 1–500 caractères — libellé court de navigation |
 | `sectionId` | integer | ID d'une section existante |
 | `questionMd` | text | Markdown (min 1 caractère) |
 | `correctionMd` | text | Markdown (peut être vide) |
