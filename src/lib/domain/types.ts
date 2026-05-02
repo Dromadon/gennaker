@@ -74,13 +74,13 @@ export type QuestionListRow = {
 	sectionSlug: string
 }
 
-export type QuestionAdminListRow = QuestionListRow & {
+export type QuestionRow = QuestionListRow & {
 	questionMd: string
 	correctionMd: string
 	sourceMd: string | null
 }
 
-export type QuestionAdminDetail = QuestionAdminListRow & {
+export type QuestionAdminDetail = QuestionRow & {
 	sectionId: number
 }
 

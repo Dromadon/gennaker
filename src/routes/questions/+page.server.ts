@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
 import { getAllCategoriesWithSections } from '$lib/server/db/queries/categories'
-import { getQuestionsPublic } from '$lib/server/db/queries/questions'
+import { listQuestions } from '$lib/server/db/queries/questions'
 
 export const load: PageServerLoad = async ({ url, platform }) => {
 	const d1 = platform?.env.DB
@@ -13,7 +13,7 @@ export const load: PageServerLoad = async ({ url, platform }) => {
 	const page = Math.max(1, Number(url.searchParams.get('page') ?? '1'))
 
 	const [{ rows, total }, categories] = await Promise.all([
-		getQuestionsPublic(d1, { categoryId, sectionId, support, page }),
+		listQuestions(d1, { categoryId, sectionId, support, status: 'publie', page }),
 		getAllCategoriesWithSections(d1)
 	])
 

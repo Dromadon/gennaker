@@ -78,6 +78,8 @@ formulaire retourne un `fail(422)` avec les erreurs par champ.
 
 ## Liste et filtres
 
+La liste admin et la liste publique (`/questions`) utilisent la même fonction `listQuestions()`. La version publique passe `status: 'publie'` en dur ; la version admin expose le filtre statut dans l'URL.
+
 **URL params** : `?category={id}&section={id}&support={slug}&status={value}&page={n}`
 
 - Filtres optionnels, combinables
@@ -130,9 +132,9 @@ Deux niveaux :
 
 | Fichier | Rôle |
 |---------|------|
-| `src/lib/domain/types.ts` | `QuestionListRow`, `QuestionAdminDetail`, `CategoryWithSections` |
+| `src/lib/domain/types.ts` | `QuestionRow`, `QuestionAdminDetail`, `CategoryWithSections` |
 | `src/lib/server/db/queries/categories.ts` | `getAllCategoriesWithSections()` |
-| `src/lib/server/db/queries/questions.ts` | `getQuestionsAdmin`, `getQuestionAdminById`, `createQuestion`, `updateQuestion`, `deleteQuestion` |
+| `src/lib/server/db/queries/questions.ts` | `listQuestions`, `getQuestionAdminById`, `createQuestion`, `updateQuestion`, `deleteQuestion` |
 | `src/lib/components/QuestionForm.svelte` | Formulaire réutilisable (create + edit) |
 | `src/routes/admin/questions/+page.server.ts` | Load liste + action delete liste |
 | `src/routes/admin/questions/new/+page.server.ts` | Load + action create |

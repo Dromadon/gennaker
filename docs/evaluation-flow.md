@@ -34,17 +34,21 @@ GET /api/evaluation/generate?support=X&format=Y
   │
   ├─ Charge EvaluationTemplate (support × format) + ses TemplateSlots depuis D1
   │
-  ├─ Pour chaque slot :
-  │    pool = questions de la section (status='publie')
-  │           filtrées : applicableSupports ∋ support (ou tableau vide = tous supports)
-  │    shuffle(pool).slice(0, slot.questionCount)
+  ├─ getQuestionMetaBySection(sectionIds) — charge id + applicableSupports uniquement
   │
-  └─ Retourne Evaluation (JSON)
+  ├─ drawEvaluation(template, metaBySection) → IDs tirés par slot
+  │    Pour chaque slot :
+  │      pool = metas de la section filtrées par support
+  │      shuffle(pool).slice(0, slot.questionCount) → questionIds
+  │
+  ├─ getQuestionsByIds(allIds) — charge le contenu complet des ~5-20 questions tirées
+  │
+  └─ Retourne Evaluation (JSON) assemblée
        └─ stocké dans evaluationStore (Svelte writable)
 ```
 
 Implémentation côté serveur : `src/lib/domain/draw.ts → drawEvaluation()`  
-Requête DB : `src/lib/server/db/queries/questions.ts → getQuestionsBySection()`
+Requêtes DB : `getQuestionMetaBySection()` (pool pour le tirage) puis `getQuestionsByIds()` (contenu des questions tirées)
 
 ---
 
@@ -59,10 +63,10 @@ Clic ↺ sur l'en-tête d'une section (vue /evaluation)
   │                excludeQuestionIds = IDs déjà dans le slot + déjà re-tirés dans cette passe
   │
   ├─ Serveur (par question) :
-  │    pool = questions publiées de la section, filtrées par support
-  │    candidats = pool ∖ excludeQuestionIds
+  │    pool = metas publiées de la section (getQuestionMetaBySection)
+  │    candidats = pool ∖ excludeQuestionIds, filtrés par support
   │    si vide → 422  (question originale conservée côté client)
-  │    sinon  → Question aléatoire → 200
+  │    sinon  → getQuestionsByIds([id]) → Question complète → 200
   │
   └─ Client :
        setSlotQuestions(slotId, newQuestions) dans evaluationStore

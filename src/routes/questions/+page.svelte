@@ -2,7 +2,7 @@
 	import { page } from '$app/state'
 	import type { PageData } from './$types'
 	import type { CategoryWithSections } from '$lib/domain/types'
-	import type { QuestionPublicRow } from '$lib/server/db/queries/questions'
+	import type { QuestionRow } from '$lib/domain/types'
 	import ReportModal from '$lib/components/ReportModal.svelte'
 	import QuestionPreview from '$lib/components/QuestionPreview.svelte'
 
@@ -25,7 +25,7 @@
 			: []
 	)
 
-	let selectedQuestion = $state<QuestionPublicRow | null>(null)
+	let selectedQuestion = $state<QuestionRow | null>(null)
 
 	function buildPageUrl(p: number) {
 		const params = new URLSearchParams()

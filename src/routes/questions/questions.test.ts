@@ -8,7 +8,7 @@ vi.mock('$lib/server/db/queries/categories', () => ({
 }))
 
 vi.mock('$lib/server/db/queries/questions', () => ({
-	getQuestionsPublic: vi.fn().mockResolvedValue({
+	listQuestions: vi.fn().mockResolvedValue({
 		rows: [
 			{
 				id: 1,
@@ -48,20 +48,20 @@ describe('load /questions', () => {
 		expect(result.page).toBe(1)
 	})
 
-	it('passe categoryId et sectionId depuis les searchParams', async () => {
-		const { getQuestionsPublic } = await import('$lib/server/db/queries/questions')
+	it('passe categoryId, sectionId et status publie à listQuestions', async () => {
+		const { listQuestions } = await import('$lib/server/db/queries/questions')
 		await load(makeEvent('http://localhost/questions?category=1&section=2&support=deriveur'))
-		expect(getQuestionsPublic).toHaveBeenCalledWith(
+		expect(listQuestions).toHaveBeenCalledWith(
 			{},
-			{ categoryId: 1, sectionId: 2, support: 'deriveur', page: 1 }
+			{ categoryId: 1, sectionId: 2, support: 'deriveur', status: 'publie', page: 1 }
 		)
 	})
 
-	it('ne passe pas de paramètre status à getQuestionsPublic', async () => {
-		const { getQuestionsPublic } = await import('$lib/server/db/queries/questions')
+	it('impose status publie même si status=brouillon dans l\'URL', async () => {
+		const { listQuestions } = await import('$lib/server/db/queries/questions')
 		await load(makeEvent('http://localhost/questions?status=brouillon'))
-		const callArgs = (getQuestionsPublic as ReturnType<typeof vi.fn>).mock.calls[0][1]
-		expect(callArgs).not.toHaveProperty('status')
+		const callArgs = (listQuestions as ReturnType<typeof vi.fn>).mock.calls[0][1]
+		expect(callArgs.status).toBe('publie')
 	})
 
 	it('retourne filters sans status', async () => {

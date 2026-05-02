@@ -1,7 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit'
 import type { Actions, PageServerLoad } from './$types'
 import { getAllCategoriesWithSections } from '$lib/server/db/queries/categories'
-import { deleteQuestion, getQuestionsAdmin } from '$lib/server/db/queries/questions'
+import { deleteQuestion, listQuestions } from '$lib/server/db/queries/questions'
 import { getReportsByQuestionIds, type QuestionReportSummary } from '$lib/server/db/queries/reports'
 
 export const load: PageServerLoad = async ({ url, platform, locals }) => {
@@ -17,7 +17,7 @@ export const load: PageServerLoad = async ({ url, platform, locals }) => {
 	const page = Math.max(1, Number(url.searchParams.get('page') ?? '1'))
 
 	const [{ rows, total }, categories] = await Promise.all([
-		getQuestionsAdmin(d1, { categoryId, sectionId, support, status, page }),
+		listQuestions(d1, { categoryId, sectionId, support, status, page }),
 		getAllCategoriesWithSections(d1)
 	])
 

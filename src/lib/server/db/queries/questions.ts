@@ -1,7 +1,7 @@
 import { and, count, eq, inArray, like, or, sql } from 'drizzle-orm'
 import { getDb } from '../index'
 import { categories, questions, sections, supports } from '../schema'
-import type { Question, QuestionAdminDetail, QuestionAdminListRow, QuestionListRow, Support } from '$lib/domain/types'
+import type { Question, QuestionAdminDetail, QuestionRow, QuestionListRow, Support, AnswerSize } from '$lib/domain/types'
 
 const PAGE_SIZE = 20
 
@@ -114,7 +114,7 @@ export async function getStructureForExport(d1: D1Database): Promise<StructureEx
 	}
 }
 
-export async function getQuestionsAdmin(
+export async function listQuestions(
 	d1: D1Database,
 	filters: {
 		categoryId?: number | null
@@ -123,7 +123,7 @@ export async function getQuestionsAdmin(
 		status?: string | null
 		page: number
 	}
-): Promise<{ rows: QuestionAdminListRow[]; total: number }> {
+): Promise<{ rows: QuestionRow[]; total: number }> {
 	const db = getDb(d1)
 
 	const conditions = []
@@ -178,9 +178,9 @@ export async function getQuestionsAdmin(
 	return {
 		rows: rows.map((r) => ({
 			...r,
-			difficulty: r.difficulty as QuestionAdminListRow['difficulty'],
-			status: r.status as QuestionAdminListRow['status'],
-			answerSize: r.answerSize as QuestionAdminListRow['answerSize'],
+			difficulty: r.difficulty as QuestionRow['difficulty'],
+			status: r.status as QuestionRow['status'],
+			answerSize: r.answerSize as QuestionRow['answerSize'],
 			applicableSupports: JSON.parse(r.applicableSupports ?? '[]'),
 			sourceMd: r.sourceMd ?? null
 		})),
@@ -274,83 +274,6 @@ export async function deleteQuestion(d1: D1Database, id: number): Promise<void> 
 	await getDb(d1).delete(questions).where(eq(questions.id, id))
 }
 
-export type QuestionPublicRow = QuestionListRow & {
-	questionMd: string
-	correctionMd: string
-	sourceMd: string | null
-}
-
-export async function getQuestionsPublic(
-	d1: D1Database,
-	filters: {
-		categoryId?: number | null
-		sectionId?: number | null
-		support?: string | null
-		page: number
-	}
-): Promise<{ rows: QuestionPublicRow[]; total: number }> {
-	const db = getDb(d1)
-
-	const conditions = [eq(questions.status, 'publie')]
-	if (filters.sectionId) conditions.push(eq(questions.sectionId, filters.sectionId))
-	if (filters.categoryId) conditions.push(eq(sections.categoryId, filters.categoryId))
-	if (filters.support) {
-		conditions.push(
-			or(
-				eq(questions.applicableSupports, '[]'),
-				like(questions.applicableSupports, `%"${filters.support}"%`)
-			)!
-		)
-	}
-
-	const where = and(...conditions)
-
-	const base = db
-		.select({
-			id: questions.id,
-			title: questions.title,
-			difficulty: questions.difficulty,
-			status: questions.status,
-			answerSize: questions.answerSize,
-			applicableSupports: questions.applicableSupports,
-			categoryDisplayName: categories.displayName,
-			sectionDisplayName: sections.displayName,
-			categorySlug: categories.slug,
-			sectionSlug: sections.slug,
-			questionMd: questions.questionMd,
-			correctionMd: questions.correctionMd,
-			sourceMd: questions.sourceMd
-		})
-		.from(questions)
-		.innerJoin(sections, eq(sections.id, questions.sectionId))
-		.innerJoin(categories, eq(categories.id, sections.categoryId))
-
-	const [rows, [{ total }]] = await Promise.all([
-		base
-			.where(where)
-			.orderBy(categories.id, sections.id, questions.id)
-			.limit(PAGE_SIZE)
-			.offset((filters.page - 1) * PAGE_SIZE),
-		db
-			.select({ total: count() })
-			.from(questions)
-			.innerJoin(sections, eq(sections.id, questions.sectionId))
-			.innerJoin(categories, eq(categories.id, sections.categoryId))
-			.where(where)
-	])
-
-	return {
-		rows: rows.map((r) => ({
-			...r,
-			difficulty: r.difficulty as QuestionPublicRow['difficulty'],
-			status: r.status as QuestionPublicRow['status'],
-			answerSize: r.answerSize as QuestionPublicRow['answerSize'],
-			applicableSupports: JSON.parse(r.applicableSupports ?? '[]'),
-			sourceMd: r.sourceMd ?? null
-		})),
-		total
-	}
-}
 
 export type QuestionCandidateRow = {
 	id: number
@@ -388,11 +311,47 @@ export async function getQuestionCandidates(
 	}))
 }
 
-export async function getQuestionsBySection(
+export type QuestionMeta = {
+	id: number
+	sectionId: number
+	applicableSupports: Support[]
+	answerSize: AnswerSize
+}
+
+export async function getQuestionMetaBySection(
 	d1: D1Database,
 	sectionIds: number[]
-): Promise<Record<number, Question[]>> {
+): Promise<Record<number, QuestionMeta[]>> {
 	if (sectionIds.length === 0) return {}
+
+	const rows = await getDb(d1)
+		.select({
+			id: questions.id,
+			sectionId: questions.sectionId,
+			applicableSupports: questions.applicableSupports,
+			answerSize: questions.answerSize
+		})
+		.from(questions)
+		.where(and(inArray(questions.sectionId, sectionIds), eq(questions.status, 'publie')))
+
+	const result: Record<number, QuestionMeta[]> = {}
+	for (const row of rows) {
+		const q: QuestionMeta = {
+			id: row.id,
+			sectionId: row.sectionId,
+			applicableSupports: JSON.parse(row.applicableSupports ?? '[]'),
+			answerSize: (row.answerSize ?? 'md') as AnswerSize
+		}
+		;(result[q.sectionId] ??= []).push(q)
+	}
+	return result
+}
+
+export async function getQuestionsByIds(
+	d1: D1Database,
+	ids: number[]
+): Promise<Question[]> {
+	if (ids.length === 0) return []
 
 	const rows = await getDb(d1)
 		.select({
@@ -405,18 +364,13 @@ export async function getQuestionsBySection(
 			answerSize: questions.answerSize
 		})
 		.from(questions)
-		.where(and(inArray(questions.sectionId, sectionIds), eq(questions.status, 'publie')))
+		.where(inArray(questions.id, ids))
 
-	const result: Record<number, Question[]> = {}
-	for (const row of rows) {
-		const q: Question = {
-			...row,
-			applicableSupports: JSON.parse(row.applicableSupports ?? '[]'),
-			answerSize: (row.answerSize ?? 'md') as Question['answerSize']
-		}
-		;(result[q.sectionId] ??= []).push(q)
-	}
-	return result
+	return rows.map((row) => ({
+		...row,
+		applicableSupports: JSON.parse(row.applicableSupports ?? '[]'),
+		answerSize: (row.answerSize ?? 'md') as Question['answerSize']
+	}))
 }
 
 export async function getQuestionById(

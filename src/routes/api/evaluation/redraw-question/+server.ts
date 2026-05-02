@@ -2,7 +2,7 @@ import { error, json } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
 import { z } from 'zod'
 import { pickReplacement } from '$lib/domain/draw'
-import { getQuestionsBySection } from '$lib/server/db/queries/questions'
+import { getQuestionMetaBySection, getQuestionsByIds } from '$lib/server/db/queries/questions'
 
 const schema = z.object({
 	sectionId: z.number().int().positive(),
@@ -18,11 +18,12 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 	const { sectionId, excludeQuestionIds, support } = parsed.data
 	const db = platform!.env.DB
 
-	const questionsBySection = await getQuestionsBySection(db, [sectionId])
-	const pool = questionsBySection[sectionId] ?? []
+	const metaBySection = await getQuestionMetaBySection(db, [sectionId])
+	const pool = metaBySection[sectionId] ?? []
 
-	const replacement = pickReplacement(pool, excludeQuestionIds, support)
-	if (!replacement) throw error(422, 'Aucune autre question disponible dans cette section')
+	const replacementId = pickReplacement(pool, excludeQuestionIds, support)
+	if (replacementId === null) throw error(422, 'Aucune autre question disponible dans cette section')
 
+	const [replacement] = await getQuestionsByIds(db, [replacementId])
 	return json(replacement)
 }

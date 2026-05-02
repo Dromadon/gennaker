@@ -2,7 +2,7 @@
 	import { page } from '$app/state'
 	import type { PageData } from './$types'
 	import type { CategoryWithSections } from '$lib/domain/types'
-	import type { QuestionAdminListRow } from '$lib/domain/types'
+	import type { QuestionRow } from '$lib/domain/types'
 	import QuestionPreview from '$lib/components/QuestionPreview.svelte'
 
 	let { data }: { data: PageData } = $props()
@@ -21,7 +21,7 @@
 			: []
 	)
 
-	let selectedQuestion = $state<QuestionAdminListRow | null>(null)
+	let selectedQuestion = $state<QuestionRow | null>(null)
 
 	let deleteId = $state<number | null>(null)
 	let deleteConfirm = $state('')
