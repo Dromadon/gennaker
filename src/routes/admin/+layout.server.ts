@@ -1,6 +1,7 @@
 import { redirect } from '@sveltejs/kit'
 import type { LayoutServerLoad } from './$types'
 import { countPendingReports } from '$lib/server/db/queries/reports'
+import { countPendingSubmissions } from '$lib/server/db/queries/submissions'
 
 export const load: LayoutServerLoad = async ({ locals, url, platform }) => {
 	if (!locals.isAdmin && !url.pathname.startsWith('/admin/login')) {
@@ -8,9 +9,12 @@ export const load: LayoutServerLoad = async ({ locals, url, platform }) => {
 	}
 
 	if (locals.isAdmin && platform?.env.DB) {
-		const pendingReportsCount = await countPendingReports(platform.env.DB)
-		return { pendingReportsCount }
+		const [pendingReportsCount, pendingSubmissionsCount] = await Promise.all([
+			countPendingReports(platform.env.DB),
+			countPendingSubmissions(platform.env.DB)
+		])
+		return { pendingReportsCount, pendingSubmissionsCount }
 	}
 
-	return { pendingReportsCount: 0 }
+	return { pendingReportsCount: 0, pendingSubmissionsCount: 0 }
 }

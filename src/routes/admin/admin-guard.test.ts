@@ -5,6 +5,10 @@ vi.mock('$lib/server/db/queries/reports', () => ({
 	countPendingReports: vi.fn().mockResolvedValue(3)
 }))
 
+vi.mock('$lib/server/db/queries/submissions', () => ({
+	countPendingSubmissions: vi.fn().mockResolvedValue(0)
+}))
+
 async function callLoad(isAdmin: boolean, pathname: string) {
 	return load({
 		locals: { isAdmin },
@@ -28,13 +32,13 @@ describe('guard /admin', () => {
 		})
 	})
 
-	it('retourne pendingReportsCount si authentifié', async () => {
+	it('retourne pendingReportsCount et pendingSubmissionsCount si authentifié', async () => {
 		const result = await callLoad(true, '/admin')
-		expect(result).toEqual({ pendingReportsCount: 3 })
+		expect(result).toEqual({ pendingReportsCount: 3, pendingSubmissionsCount: 0 })
 	})
 
-	it('retourne pendingReportsCount=0 si sur /admin/login sans session', async () => {
+	it('retourne les compteurs à 0 si sur /admin/login sans session', async () => {
 		const result = await callLoad(false, '/admin/login')
-		expect(result).toEqual({ pendingReportsCount: 0 })
+		expect(result).toEqual({ pendingReportsCount: 0, pendingSubmissionsCount: 0 })
 	})
 })

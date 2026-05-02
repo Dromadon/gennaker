@@ -105,6 +105,7 @@ export const communitySubmissions = sqliteTable('community_submissions', {
 	submitterEmail: text('submitter_email').notNull(),
 	status: text('status').notNull().default('en_attente'), // 'en_attente' | 'approuve' | 'rejete'
 	rejectionNote: text('rejection_note'),
+	approvedQuestionId: integer('approved_question_id').references(() => questions.id),
 	createdAt: integer('created_at').notNull(),
 	reviewedAt: integer('reviewed_at')
 });

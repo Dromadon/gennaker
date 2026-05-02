@@ -138,6 +138,7 @@ src/
 - **Composants légers** : un composant Svelte gère l'affichage et les interactions locales. La logique métier reste dans `$lib/domain/`.
 - **Props typées** : toujours déclarer les props avec des types TypeScript explicites.
 - **Pas de logique métier dans les composants**. Si un composant fait un calcul complexe, ce calcul appartient à `$lib/domain/` ou à un helper dans `$lib/`.
+- **Préférer `$derived` à `$effect`** : un `$effect` qui lit une valeur réactive et l'écrit dans le même corps crée une boucle infinie que Svelte bride avec un délai. Toute valeur dérivée d'un autre état doit être exprimée avec `$derived`. Réserver `$effect` aux seuls effets de bord sans retour dans l'état Svelte (timers, appels DOM impératifs, logs).
 
 ```svelte
 <script lang="ts">

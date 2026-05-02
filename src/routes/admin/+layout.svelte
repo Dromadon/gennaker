@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte'
-	let { children, data }: { children: Snippet; data: { pendingReportsCount: number } } = $props()
+	let { children, data }: { children: Snippet; data: { pendingReportsCount: number; pendingSubmissionsCount: number } } = $props()
 	let adminMenuOpen = $state(false)
 </script>
 
@@ -16,6 +16,14 @@
 				{#if data.pendingReportsCount > 0}
 					<span class="ml-1 inline-flex items-center justify-center rounded-full bg-yellow-100 px-1.5 py-0.5 text-xs font-bold leading-none text-yellow-700">
 						{data.pendingReportsCount}
+					</span>
+				{/if}
+			</a>
+			<a href="/admin/submissions" class="relative text-sm text-gray-500 hover:text-gray-900">
+				Soumissions
+				{#if data.pendingSubmissionsCount > 0}
+					<span class="ml-1 inline-flex items-center justify-center rounded-full bg-yellow-100 px-1.5 py-0.5 text-xs font-bold leading-none text-yellow-700">
+						{data.pendingSubmissionsCount}
 					</span>
 				{/if}
 			</a>
@@ -79,6 +87,18 @@
 					{#if data.pendingReportsCount > 0}
 						<span class="inline-flex items-center justify-center rounded-full bg-yellow-100 px-1.5 py-0.5 text-xs font-bold leading-none text-yellow-700">
 							{data.pendingReportsCount}
+						</span>
+					{/if}
+				</a>
+				<a
+					href="/admin/submissions"
+					onclick={() => (adminMenuOpen = false)}
+					class="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+				>
+					Soumissions
+					{#if data.pendingSubmissionsCount > 0}
+						<span class="inline-flex items-center justify-center rounded-full bg-yellow-100 px-1.5 py-0.5 text-xs font-bold leading-none text-yellow-700">
+							{data.pendingSubmissionsCount}
 						</span>
 					{/if}
 				</a>
