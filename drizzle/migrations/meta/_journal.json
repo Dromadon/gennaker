@@ -50,6 +50,20 @@
       "when": 1746057600000,
       "tag": "0006_community_submissions_v2",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1777900000000,
+      "tag": "0007_submissions_approved_question",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1777882595962,
+      "tag": "0008_multi_admin",
+      "breakpoints": true
     }
   ]
 }

@@ -6,6 +6,8 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			isAdmin: boolean
+			adminId: number | null
+			adminRole: 'admin' | 'super_admin' | null
 		}
 		// interface PageData {}
 		// interface PageState {}
@@ -16,7 +18,6 @@ declare global {
 				R2_PUBLIC_URL: string
 				ADMIN_EMAIL: string
 				RESEND_API_KEY: string
-				ADMIN_PASSWORD_HASH: string
 				ADMIN_SESSION_SECRET: string
 			}
 		}

@@ -93,6 +93,19 @@ export const questionReports = sqliteTable('question_reports', {
 	createdAt: integer('created_at').notNull()
 });
 
+export const admins = sqliteTable('admins', {
+	id: integer('id').primaryKey({ autoIncrement: true }),
+	email: text('email').notNull().unique(),
+	firstName: text('first_name').notNull(),
+	lastName: text('last_name').notNull(),
+	passwordHash: text('password_hash').notNull(),
+	role: text('role').notNull().default('admin').$type<'admin' | 'super_admin'>(),
+	createdAt: integer('created_at').notNull(),
+	updatedAt: integer('updated_at').notNull(),
+	lastLoginAt: integer('last_login_at'),
+	mustChangePassword: integer('must_change_password').notNull().default(0)
+});
+
 export const communitySubmissions = sqliteTable('community_submissions', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
 	sectionId: integer('section_id').notNull().references(() => sections.id),

@@ -3,6 +3,7 @@ import { hash } from 'bcryptjs'
 import { verifyPassword, createSession, verifySession } from './auth'
 
 const SECRET = 'test-secret-32-chars-long-enough'
+const PAYLOAD = { adminId: 1, role: 'super_admin' as const }
 
 describe('verifyPassword', () => {
 	let HASH: string
@@ -19,37 +20,50 @@ describe('verifyPassword', () => {
 
 describe('createSession / verifySession', () => {
 	it('un token créé est valide immédiatement', async () => {
-		const token = await createSession(SECRET)
-		expect(await verifySession(token, SECRET)).toBe(true)
+		const token = await createSession(SECRET, PAYLOAD)
+		const result = await verifySession(token, SECRET)
+		expect(result).not.toBeNull()
+		expect(result!.adminId).toBe(1)
+		expect(result!.role).toBe('super_admin')
 	})
 
 	it('un token altéré est rejeté', async () => {
-		const token = await createSession(SECRET)
+		const token = await createSession(SECRET, PAYLOAD)
 		const tampered = token.slice(0, -4) + 'xxxx'
-		expect(await verifySession(tampered, SECRET)).toBe(false)
+		expect(await verifySession(tampered, SECRET)).toBeNull()
 	})
 
 	it('un token avec mauvais secret est rejeté', async () => {
-		const token = await createSession(SECRET)
-		expect(await verifySession(token, 'autre-secret')).toBe(false)
+		const token = await createSession(SECRET, PAYLOAD)
+		expect(await verifySession(token, 'autre-secret')).toBeNull()
 	})
 
 	it('un token expiré est rejeté', async () => {
 		// Forger un payload avec iat très ancien (> 7 jours)
 		const oldIat = Date.now() - 8 * 24 * 60 * 60 * 1000
-		const payload = btoa(JSON.stringify({ iat: oldIat }))
-		// Signer avec le bon secret pour que la vérification HMAC passe
-		const token = await createSession(SECRET)
-		// Remplacer uniquement la partie payload (avant le point) par le payload expiré
-		const dot = token.lastIndexOf('.')
-		const sig = token.slice(dot)
+		const expiredPayload = { adminId: 1, role: 'admin' as const, iat: oldIat }
+		const encoded = btoa(JSON.stringify(expiredPayload))
+		// Signer avec le bon secret
+		const goodToken = await createSession(SECRET, PAYLOAD)
+		const dot = goodToken.lastIndexOf('.')
+		const sig = goodToken.slice(dot)
 		// Ce token a un payload expiré mais une signature qui ne correspond pas → rejeté par HMAC
-		const expiredToken = payload + sig
-		expect(await verifySession(expiredToken, SECRET)).toBe(false)
+		const expiredToken = encoded + sig
+		expect(await verifySession(expiredToken, SECRET)).toBeNull()
 	})
 
 	it('un token malformé est rejeté', async () => {
-		expect(await verifySession('pas-un-token', SECRET)).toBe(false)
-		expect(await verifySession('', SECRET)).toBe(false)
+		expect(await verifySession('pas-un-token', SECRET)).toBeNull()
+		expect(await verifySession('', SECRET)).toBeNull()
+	})
+
+	it('un token sans adminId est rejeté', async () => {
+		// Forger un payload sans adminId (format ancien)
+		const oldPayload = { iat: Date.now() }
+		const encoded = btoa(JSON.stringify(oldPayload))
+		const goodToken = await createSession(SECRET, PAYLOAD)
+		const dot = goodToken.lastIndexOf('.')
+		const sig = goodToken.slice(dot)
+		expect(await verifySession(encoded + sig, SECRET)).toBeNull()
 	})
 })

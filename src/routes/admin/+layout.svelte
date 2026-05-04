@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte'
-	let { children, data }: { children: Snippet; data: { pendingReportsCount: number; pendingSubmissionsCount: number } } = $props()
+	let { children, data }: { children: Snippet; data: { pendingReportsCount: number; pendingSubmissionsCount: number; adminRole: string | null } } = $props()
 	let adminMenuOpen = $state(false)
 </script>
 
@@ -39,12 +39,18 @@
 				<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
 			</svg>
 		</button>
-		<!-- Desktop : déconnexion inline -->
-		<form class="hidden lg:block" method="POST" action="/admin/logout">
-			<button type="submit" class="text-sm text-gray-500 hover:text-gray-900">
-				Déconnexion
-			</button>
-		</form>
+		<!-- Desktop : profil + admins + déconnexion inline -->
+		<div class="hidden lg:flex items-center gap-4">
+			{#if data.adminRole === 'super_admin'}
+				<a href="/admin/admins" class="text-sm text-gray-500 hover:text-gray-900">Admins</a>
+			{/if}
+			<a href="/admin/profile" class="text-sm text-gray-500 hover:text-gray-900">Mon profil</a>
+			<form method="POST" action="/admin/logout">
+				<button type="submit" class="text-sm text-gray-500 hover:text-gray-900">
+					Déconnexion
+				</button>
+			</form>
+		</div>
 	</nav>
 
 	<!-- Drawer mobile admin -->
@@ -103,9 +109,25 @@
 					{/if}
 				</a>
 			</nav>
-			<div class="border-t border-gray-200 p-4">
+			<div class="border-t border-gray-200 p-4 space-y-2">
+				{#if data.adminRole === 'super_admin'}
+					<a
+						href="/admin/admins"
+						onclick={() => (adminMenuOpen = false)}
+						class="block rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+					>
+						Admins
+					</a>
+				{/if}
+				<a
+					href="/admin/profile"
+					onclick={() => (adminMenuOpen = false)}
+					class="block rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+				>
+					Mon profil
+				</a>
 				<form method="POST" action="/admin/logout">
-					<button type="submit" class="text-sm text-gray-500 hover:text-gray-900">
+					<button type="submit" class="block w-full rounded-md px-3 py-2 text-left text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900">
 						Déconnexion
 					</button>
 				</form>

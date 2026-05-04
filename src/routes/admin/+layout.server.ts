@@ -13,8 +13,12 @@ export const load: LayoutServerLoad = async ({ locals, url, platform }) => {
 			countPendingReports(platform.env.DB),
 			countPendingSubmissions(platform.env.DB)
 		])
-		return { pendingReportsCount, pendingSubmissionsCount }
+		return {
+			pendingReportsCount,
+			pendingSubmissionsCount,
+			adminRole: locals.adminRole
+		}
 	}
 
-	return { pendingReportsCount: 0, pendingSubmissionsCount: 0 }
+	return { pendingReportsCount: 0, pendingSubmissionsCount: 0, adminRole: null }
 }

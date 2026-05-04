@@ -3,6 +3,12 @@ import { compare } from 'bcryptjs'
 const COOKIE_NAME = 'admin_session'
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000
 
+export type SessionPayload = {
+	adminId: number
+	role: 'admin' | 'super_admin'
+	iat: number
+}
+
 export async function verifyPassword(hash: string, password: string): Promise<boolean> {
 	return compare(password, hash)
 }
@@ -24,30 +30,44 @@ async function hmac(secret: string, data: string): Promise<string> {
 async function verifyHmac(secret: string, data: string, expected: string): Promise<boolean> {
 	const actual = await hmac(secret, data)
 	if (actual.length !== expected.length) return false
-	// timing-safe comparison
+	// Comparaison en temps constant pour éviter les timing attacks
 	let diff = 0
 	for (let i = 0; i < actual.length; i++) diff |= actual.charCodeAt(i) ^ expected.charCodeAt(i)
 	return diff === 0
 }
 
-export async function createSession(secret: string): Promise<string> {
-	const payload = JSON.stringify({ iat: Date.now() })
-	const encoded = btoa(payload)
+export async function createSession(
+	secret: string,
+	payload: Omit<SessionPayload, 'iat'>
+): Promise<string> {
+	const fullPayload: SessionPayload = { ...payload, iat: Date.now() }
+	const encoded = btoa(JSON.stringify(fullPayload))
 	const sig = await hmac(secret, encoded)
 	return `${encoded}.${sig}`
 }
 
-export async function verifySession(token: string, secret: string): Promise<boolean> {
+export async function verifySession(
+	token: string,
+	secret: string
+): Promise<SessionPayload | null> {
 	const dot = token.lastIndexOf('.')
-	if (dot === -1) return false
+	if (dot === -1) return null
 	const encoded = token.slice(0, dot)
 	const sig = token.slice(dot + 1)
-	if (!(await verifyHmac(secret, encoded, sig))) return false
+	if (!(await verifyHmac(secret, encoded, sig))) return null
 	try {
-		const { iat } = JSON.parse(atob(encoded))
-		return typeof iat === 'number' && Date.now() - iat < SESSION_TTL_MS
+		const payload = JSON.parse(atob(encoded))
+		if (
+			typeof payload.iat !== 'number' ||
+			typeof payload.adminId !== 'number' ||
+			(payload.role !== 'admin' && payload.role !== 'super_admin')
+		) {
+			return null
+		}
+		if (Date.now() - payload.iat >= SESSION_TTL_MS) return null
+		return payload as SessionPayload
 	} catch {
-		return false
+		return null
 	}
 }
 

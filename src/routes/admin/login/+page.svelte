@@ -14,12 +14,23 @@
 
 		<form method="POST" use:enhance>
 			<label class="mb-4 block">
+				<span class="mb-1 block text-sm font-medium text-gray-700">Email</span>
+				<input
+					type="email"
+					name="email"
+					required
+					autofocus
+					autocomplete="email"
+					class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-gray-500 focus:outline-none"
+				/>
+			</label>
+			<label class="mb-6 block">
 				<span class="mb-1 block text-sm font-medium text-gray-700">Mot de passe</span>
 				<input
 					type="password"
 					name="password"
 					required
-					autofocus
+					autocomplete="current-password"
 					class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-gray-500 focus:outline-none"
 				/>
 			</label>

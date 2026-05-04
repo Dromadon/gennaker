@@ -23,5 +23,4 @@ ADMIN_EMAIL = ""
 RESEND_API_KEY = ""
 
 # Secrets (via `wrangler secret put`) :
-# ADMIN_PASSWORD_HASH
 # ADMIN_SESSION_SECRET

@@ -1,23 +1,40 @@
 import { fail, redirect } from '@sveltejs/kit'
+import { z } from 'zod'
 import type { Actions, PageServerLoad } from './$types'
-import { verifyPassword, createSession, sessionCookieHeader } from '$lib/server/auth'
+import { verifyPassword, createSession } from '$lib/server/auth'
+import { findAdminByEmail, updateAdminLastLogin } from '$lib/server/db/queries/admins'
 
 export const load: PageServerLoad = ({ locals }) => {
 	if (locals.isAdmin) redirect(302, '/admin')
 }
 
+const loginSchema = z.object({
+	email: z.email(),
+	password: z.string().min(1)
+})
+
 export const actions: Actions = {
 	default: async ({ request, platform, cookies }) => {
 		const data = await request.formData()
-		const password = String(data.get('password') ?? '')
+		const parsed = loginSchema.safeParse({
+			email: data.get('email'),
+			password: data.get('password')
+		})
+		if (!parsed.success) return fail(400, { error: 'Email ou mot de passe invalide' })
 
-		const hash = platform?.env.ADMIN_PASSWORD_HASH ?? ''
+		const { email, password } = parsed.data
+		const db = platform?.env.DB
 		const secret = platform?.env.ADMIN_SESSION_SECRET ?? ''
 
-		const ok = await verifyPassword(hash, password)
-		if (!ok) return fail(401, { error: 'Mot de passe incorrect' })
+		if (!db) return fail(500, { error: 'Erreur serveur' })
 
-		const token = await createSession(secret)
+		const admin = await findAdminByEmail(db, email)
+		if (!admin) return fail(401, { error: 'Identifiants incorrects' })
+
+		const ok = await verifyPassword(admin.passwordHash, password)
+		if (!ok) return fail(401, { error: 'Identifiants incorrects' })
+
+		const token = await createSession(secret, { adminId: admin.id, role: admin.role })
 		cookies.set('admin_session', token, {
 			httpOnly: true,
 			secure: true,
@@ -25,6 +42,10 @@ export const actions: Actions = {
 			path: '/',
 			maxAge: 7 * 24 * 60 * 60
 		})
+
+		await updateAdminLastLogin(db, admin.id)
+
+		if (admin.mustChangePassword) redirect(302, '/admin/profile?force=1')
 		redirect(302, '/admin')
 	}
 }

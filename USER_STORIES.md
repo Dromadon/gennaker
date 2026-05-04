@@ -229,6 +229,7 @@ Créer `vitest.int.config.ts` avec `@cloudflare/vitest-pool-workers` (Miniflare)
 
 ---
 
+
 ## Chores techniques
 
 | ID | Description |
@@ -533,7 +534,7 @@ _Confirmation_
 
 ---
 
-### US-19 — Interface admin : modération des soumissions
+### US-19 ✅ — Interface admin : modération des soumissions
 
 **En tant que** administrateur,
 **je veux** consulter, prévisualiser et accepter ou rejeter les questions soumises par la communauté,
@@ -563,3 +564,127 @@ _Modération_
 - Modification du contenu de la soumission avant approbation (l'admin édite ensuite via US-11)
 - Import d'images depuis la soumission vers R2 (US future)
 - Historique des modérations
+
+---
+
+### US-20 — Gestion multi-administrateurs
+
+**En tant que** super-administrateur,  
+**je veux** créer et gérer plusieurs comptes administrateurs distincts,  
+**afin de** déléguer la gestion du contenu sans partager mes identifiants.
+
+**Contexte**  
+Aujourd'hui l'authentification repose sur un seul hash bcrypt stocké en secret Wrangler (`ADMIN_PASSWORD_HASH`). Cette story remplace ce mécanisme par une table `admins` en D1, avec un modèle de rôles à deux niveaux : `super_admin` et `admin`. Le premier compte créé (lors du bootstrap) est automatiquement super-admin.
+
+**Analyse MFA à faire au plan**  
+Deux pistes à évaluer lors de la conception :
+- **TOTP (Google Authenticator / Authy)** : génération du secret côté serveur, QR code à scanner, vérification à chaque login. Faisable en Worker pur, pas de dépendance externe.
+- **Passkeys (WebAuthn)** : délègue l'authentification au device (Face ID, Touch ID, clé hardware). Plus robuste, plus complexe à implémenter en Worker. À réserver à une US dédiée si retenu.
+La décision sera prise lors du plan de la story.
+
+**Critères d'acceptation**
+
+_Modèle de données_
+- Table `admins` : `id`, `username` (unique), `password_hash` (bcrypt), `role` (`admin` | `super_admin`), `created_at`, `updated_at`, `last_login_at`
+- Le login actuel (secret `ADMIN_PASSWORD_HASH`) est retiré au profit de cette table
+- Un script de bootstrap (`scripts/seed-admin.ts`) crée le premier super-admin depuis la ligne de commande (username + password en arguments, jamais committé)
+
+_Authentification_
+- Le formulaire de login (`/admin/login`) accepte username + password
+- Le cookie de session identifie l'admin connecté (id + role) — signé, HttpOnly, Secure
+- Un admin déconnecté ou dont la session a expiré est redirigé vers `/admin/login`
+- Le guard `admin/+layout.server.ts` vérifie la session à chaque requête
+
+_Changement de mot de passe_
+- Chaque admin peut changer son propre mot de passe depuis `/admin/profile`
+- L'ancien mot de passe est demandé avant validation du nouveau (confirmation requise)
+- Le nouveau mot de passe est soumis à une règle minimale : ≥ 12 caractères
+
+_Gestion des comptes (super-admin uniquement)_
+- La page `/admin/admins` liste tous les comptes : username, rôle, date de création, dernière connexion
+- Le super-admin peut créer un compte admin (username + mot de passe temporaire) ; l'admin nouvellement créé est invité à changer son mot de passe à la première connexion
+- Le super-admin peut supprimer un compte admin (pas de suppression de compte super-admin via l'interface — protection explicite)
+- Un admin ne peut pas supprimer un autre admin (ni le sien propre), quelle que soit son action dans l'UI
+- Le super-admin peut reset le pwd d'un admin, dans ce cas l'utilisateur sera invité à re-modifier son pwd à la prochaine connexion
+
+_Restrictions_
+- Il doit toujours exister au moins un super-admin en base : la suppression est bloquée si c'est le dernier
+- Un admin standard n'a pas accès à `/admin/admins`
+- Un admin ne peut pas modifier le rôle d'un autre compte (réservé à une évolution future)
+
+**Hors périmètre**
+- MFA (TOTP ou Passkeys) — analysé au plan, implémenté dans une US dédiée (US-20b)
+- Piste d'audit des actions par compte — US-20c
+- Réinitialisation de mot de passe par email
+- SSO / OAuth
+- Droits fins par section ou catégorie (tous les admins ont accès à l'ensemble du contenu)
+
+---
+
+### US-20b — Authentification à deux facteurs (MFA) pour les admins
+
+**En tant que** super-administrateur,  
+**je veux** activer une vérification en deux étapes pour les comptes administrateurs,  
+**afin de** protéger l'interface admin même en cas de vol de mot de passe.
+
+> **Dépend de** US-20 (multi-admins). À concevoir après validation de l'analyse MFA.
+
+**Critères d'acceptation**
+
+_Activation (par compte)_
+- Depuis `/admin/profile`, un admin peut activer le TOTP : un QR code est affiché pour le scanner avec une app d'authentification (Google Authenticator, Authy, etc.)
+- L'activation est confirmée en saisissant un code TOTP valide avant d'être effective
+- Un ensemble de codes de secours à usage unique est généré et affiché une seule fois ; l'admin est invité à les conserver
+
+_Connexion avec MFA active_
+- Après validation username + password, une seconde étape demande le code TOTP (ou un code de secours)
+- 5 tentatives incorrectes consécutives bloquent le compte pour 15 minutes
+
+_Désactivation_
+- Un admin peut désactiver le TOTP depuis `/admin/profile` (confirmation mot de passe + code TOTP actuel requis)
+- Le super-admin peut réinitialiser le TOTP d'un autre compte (en cas de perte du device) sans connaître le code
+
+_MFA obligatoire (optionnel, configuration globale)_
+- Un réglage global (super-admin) peut rendre la MFA obligatoire pour tous les comptes
+- Un admin sans MFA active face à cette règle est forcé de l'activer à la prochaine connexion
+
+**Hors périmètre**
+- Passkeys / WebAuthn (analysé comme alternative dans US-20, implémenté séparément si retenu)
+- Notification par email lors d'une connexion depuis un nouveau device
+- MFA pour les utilisateurs publics (pas de compte public dans l'application)
+
+---
+
+### US-20c — Piste d'audit des actions administrateurs
+
+**En tant que** super-administrateur,  
+**je veux** consulter un journal des actions effectuées par chaque administrateur,  
+**afin de** tracer les modifications importantes et identifier d'éventuelles erreurs ou usages anormaux.
+
+> **Dépend de** US-20 (multi-admins).
+
+**Critères d'acceptation**
+
+_Événements tracés_
+- Connexion réussie et échec de connexion (avec username et IP)
+- Création, modification et suppression de questions
+- Approbation et rejet de soumissions communautaires
+- Résolution et réouverture de signalements
+- Création et suppression de comptes admins
+- Activation / désactivation MFA
+
+_Stockage_
+- Table `audit_logs` : `id`, `admin_id` (nullable si action anonyme), `action` (slug), `target_type` (ex. `question`), `target_id`, `metadata` (JSON, détails libres), `ip_address`, `created_at`
+- Rétention : 12 mois glissants (les entrées plus anciennes sont purgées par un Cron Trigger hebdomadaire)
+
+_Interface_
+- La page `/admin/audit` (super-admin uniquement) liste les événements avec filtres : admin, type d'action, période
+- Chaque ligne affiche : date/heure, admin, action, cible (lien vers la ressource si elle existe encore)
+- Export CSV de la période filtrée
+
+**Hors périmètre**
+- Alertes en temps réel sur des patterns suspects
+- Intégration avec un SIEM externe
+- Audit des accès en lecture (trop verbeux — uniquement les écritures)
+
+---

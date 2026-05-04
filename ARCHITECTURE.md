@@ -34,7 +34,7 @@ Tout l'hébergement est chez **Cloudflare**. Le coût est nul dans les limites d
 | Hébergement | Cloudflare Pages + Workers | SSR + API, déploiement via `wrangler` |
 | Emails | Resend | Notifications admin (free tier : 3 000/mois) |
 | IDs courts | nanoid | Codes des liens de partage |
-| Auth | bcryptjs | Hash mot de passe admin (pure JS, compatible Workers) |
+| Auth | bcryptjs + HMAC-SHA256 | Hachage mdp + sessions multi-admin signées (table `admins` en D1) |
 
 ---
 
@@ -69,7 +69,9 @@ gennaker/
 │       │   └── +page.svelte         -- formulaire soumission/signalement
 │       ├── admin/
 │       │   ├── +layout.server.ts    -- garde d'authentification admin
-│       │   ├── login/
+│       │   ├── login/               -- formulaire email + mot de passe
+│       │   ├── profile/             -- changement de mot de passe
+│       │   ├── admins/              -- gestion des comptes (super_admin uniquement)
 │       │   ├── questions/           -- CRUD questions
 │       │   ├── templates/           -- gestion des templates d'évaluation
 │       │   └── moderation/          -- file soumissions + signalements
@@ -95,9 +97,36 @@ gennaker/
 
 ---
 
-## 4. Modèle de données
+## 4. Authentification
+
+L'interface admin utilise une authentification par email + mot de passe (bcrypt, coût 10), avec sessions signées en cookie HTTP-only (HMAC-SHA256, TTL 7 jours). Les admins sont stockés dans la table `admins` en D1.
+
+Deux rôles : `admin` (contenu) et `super_admin` (contenu + gestion des comptes). À chaque requête, un SELECT par PK vérifie que l'admin existe encore — un admin supprimé voit sa session invalidée immédiatement.
+
+Voir [`docs/auth.md`](docs/auth.md) pour le détail de l'implémentation, le bootstrap et les procédures d'urgence.
+
+---
+
+## 5. Modèle de données
 
 Le schéma complet est défini dans `src/lib/server/db/schema.ts` avec le dialect SQLite de Drizzle. Les types D1-spécifiques : `integer` avec autoincrement (au lieu de `serial`), `text` pour les JSON stockés (au lieu de `jsonb`), `text` pour les tableaux sérialisés en JSON (au lieu de `text[]`).
+
+### Administrateurs
+
+```typescript
+admins: {
+  id                   integer PK autoincrement
+  email                text unique              -- identifiant de login
+  first_name           text
+  last_name            text
+  password_hash        text                     -- bcrypt coût 10
+  role                 text                     -- 'admin' | 'super_admin'
+  created_at           integer                  -- timestamp Unix
+  updated_at           integer
+  last_login_at        integer nullable
+  must_change_password integer                  -- 0/1, forcé à la première connexion
+}
+```
 
 ### Supports
 
