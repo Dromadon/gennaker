@@ -133,12 +133,14 @@
 									Réinit. mdp
 								</button>
 								<!-- Suppression -->
-								<button
-									type="button"
-									onclick={() => { deleteConfirmValue = ''; confirmDeleteId = admin.id; deleteDialog?.showModal() }}
-									class="rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50 hover:text-red-700">
-									Supprimer
-								</button>
+								{#if admin.id !== data.currentAdminId}
+									<button
+										type="button"
+										onclick={() => { deleteConfirmValue = ''; confirmDeleteId = admin.id; deleteDialog?.showModal() }}
+										class="rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50 hover:text-red-700">
+										Supprimer
+									</button>
+								{/if}
 							</div>
 						</td>
 					</tr>

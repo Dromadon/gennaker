@@ -17,7 +17,7 @@ export const load: PageServerLoad = async ({ locals, platform }) => {
 	if (!db) error(500, 'Erreur serveur')
 
 	const admins = await listAdmins(db)
-	return { admins }
+	return { admins, currentAdminId: locals.adminId }
 }
 
 function generateTempPassword(): string {
