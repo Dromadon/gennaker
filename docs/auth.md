@@ -30,15 +30,15 @@ Il doit toujours exister au moins un `super_admin` en base. La suppression du de
 ```sql
 CREATE TABLE admins (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  email TEXT NOT NULL UNIQUE,         -- identifiant de login
+  email TEXT NOT NULL UNIQUE,
   first_name TEXT NOT NULL,
   last_name TEXT NOT NULL,
-  password_hash TEXT NOT NULL,        -- bcrypt, coût 10
-  role TEXT NOT NULL DEFAULT 'admin', -- 'admin' | 'super_admin'
+  password_hash TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'admin',
   created_at INTEGER NOT NULL,
   updated_at INTEGER NOT NULL,
   last_login_at INTEGER,
-  must_change_password INTEGER NOT NULL DEFAULT 0  -- 0/1
+  must_change_password INTEGER NOT NULL DEFAULT 0
 );
 ```
 
@@ -51,7 +51,7 @@ npx tsx scripts/seed-admin.ts \
   --email admin@example.com \
   --first-name Alice \
   --last-name Martin \
-  --password <mot_de_passe_min_12_chars> \
+  --password <mot_de_passe_min_8_chars> \
   [--local|--remote]
 ```
 
@@ -65,8 +65,10 @@ En cas de perte d'accès (mot de passe oublié, admin supprimé par erreur) :
 # Vérifier les admins existants
 npx wrangler d1 execute gennaker --local --command "SELECT id, email, role FROM admins;"
 
+# Générer un hash bcrypt
+node -e "require('bcryptjs').hash('nouveaumotdepasse', 10).then(h => console.log(h))"
+
 # Réinitialiser le mot de passe d'un admin directement en SQL
-# (générer un hash bcrypt préalablement avec htpasswd ou un script)
 npx wrangler d1 execute gennaker --local \
   --command "UPDATE admins SET password_hash='<hash>', must_change_password=1 WHERE email='admin@example.com';"
 ```
