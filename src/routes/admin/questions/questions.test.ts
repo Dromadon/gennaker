@@ -9,7 +9,7 @@ vi.mock('$lib/server/db/queries/categories', () => ({
 }))
 
 vi.mock('$lib/server/db/queries/questions', () => ({
-	getQuestionsAdmin: vi.fn().mockResolvedValue({
+	listQuestions: vi.fn().mockResolvedValue({
 		rows: [
 			{
 				id: 1,
