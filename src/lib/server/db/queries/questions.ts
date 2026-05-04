@@ -1,6 +1,6 @@
 import { and, count, eq, inArray, like, or, sql } from 'drizzle-orm'
 import { getDb } from '../index'
-import { categories, questions, sections, supports } from '../schema'
+import { categories, communitySubmissions, questionReports, questions, sections, supports, templateSlots } from '../schema'
 import type { Question, QuestionAdminDetail, QuestionRow, QuestionListRow, Support, AnswerSize } from '$lib/domain/types'
 
 const PAGE_SIZE = 20
@@ -271,7 +271,13 @@ export async function updateQuestion(
 }
 
 export async function deleteQuestion(d1: D1Database, id: number): Promise<void> {
-	await getDb(d1).delete(questions).where(eq(questions.id, id))
+	const db = getDb(d1)
+	await db.batch([
+		db.delete(questionReports).where(eq(questionReports.questionId, id)),
+		db.update(templateSlots).set({ pinnedQuestionId: null }).where(eq(templateSlots.pinnedQuestionId, id)),
+		db.update(communitySubmissions).set({ approvedQuestionId: null }).where(eq(communitySubmissions.approvedQuestionId, id)),
+		db.delete(questions).where(eq(questions.id, id)),
+	])
 }
 
 
