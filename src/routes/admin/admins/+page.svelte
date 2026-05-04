@@ -1,10 +1,14 @@
 <script lang="ts">
 	import { enhance } from '$app/forms'
+	import { invalidateAll } from '$app/navigation'
 	import type { ActionData, PageData } from './$types'
 	let { data, form }: { data: PageData; form: ActionData } = $props()
 
 	let showCreateForm = $state(false)
 	let confirmDeleteId = $state<number | null>(null)
+	let confirmResetId = $state<number | null>(null)
+	let resetConfirmValue = $state('')
+	let resetDialog = $state<HTMLDialogElement | null>(null)
 </script>
 
 <div>
@@ -46,8 +50,12 @@
 		<div class="mb-6 rounded-md border border-gray-200 bg-white p-6">
 			<h2 class="mb-4 text-base font-medium text-gray-900">Créer un compte administrateur</h2>
 			<form method="POST" action="?/create" use:enhance={() => {
-				return ({ result }) => {
-					if (result.type === 'success') showCreateForm = false
+				return async ({ result, update }) => {
+					if (result.type === 'success') {
+						showCreateForm = false
+						await invalidateAll()
+					}
+					await update()
 				}
 			}}>
 				<div class="grid grid-cols-2 gap-4">
@@ -116,13 +124,12 @@
 						<td class="px-4 py-3 text-right">
 							<div class="flex items-center justify-end gap-2">
 								<!-- Reset mot de passe -->
-								<form method="POST" action="?/resetPassword" use:enhance>
-									<input type="hidden" name="targetId" value={admin.id} />
-									<button type="submit"
-										class="rounded px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-900">
-										Réinit. mdp
-									</button>
-								</form>
+								<button
+									type="button"
+									onclick={() => { resetConfirmValue = ''; confirmResetId = admin.id; resetDialog?.showModal() }}
+									class="rounded px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-900">
+									Réinit. mdp
+								</button>
 								<!-- Suppression -->
 								{#if confirmDeleteId === admin.id}
 									<form method="POST" action="?/delete" use:enhance>
@@ -150,3 +157,45 @@
 		</table>
 	</div>
 </div>
+
+<!-- Dialog reset mot de passe -->
+<dialog bind:this={resetDialog} class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg p-6 shadow-xl backdrop:bg-black/40 w-full max-w-sm">
+	{#if confirmResetId !== null}
+		{@const target = data.admins.find(a => a.id === confirmResetId)}
+		<h2 class="mb-2 text-base font-semibold text-gray-900">Réinitialiser le mot de passe ?</h2>
+		<p class="mb-4 text-sm text-gray-500">
+			Le mot de passe de <strong class="text-gray-700">{target?.firstName} {target?.lastName}</strong> sera réinitialisé. Tape <strong class="text-gray-700">reset</strong> pour confirmer.
+		</p>
+		<input
+			type="text"
+			bind:value={resetConfirmValue}
+			placeholder="reset"
+			class="mb-4 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none"
+		/>
+		<div class="flex justify-end gap-3">
+			<button
+				type="button"
+				onclick={() => { resetDialog?.close(); confirmResetId = null }}
+				class="rounded-md border px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+			>
+				Annuler
+			</button>
+			<form method="POST" action="?/resetPassword" use:enhance={() => {
+				return async ({ result, update }) => {
+					resetDialog?.close()
+					confirmResetId = null
+					await update()
+				}
+			}}>
+				<input type="hidden" name="targetId" value={confirmResetId} />
+				<button
+					type="submit"
+					disabled={resetConfirmValue !== 'reset'}
+					class="rounded-md px-4 py-2 text-sm font-medium text-white transition {resetConfirmValue === 'reset' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-200 cursor-not-allowed'}"
+				>
+					Réinitialiser
+				</button>
+			</form>
+		</div>
+	{/if}
+</dialog>

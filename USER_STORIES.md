@@ -621,6 +621,17 @@ _Restrictions_
 
 ---
 
+### US-20a-fix ✅ — Corrections post-livraison US-20a
+
+Corrections de bugs et UX issues découverts après la livraison de US-20a :
+
+- **Première connexion** : le champ "mot de passe actuel" était demandé inutilement (l'admin venait de se connecter). Il est désormais masqué quand `mustChangePassword === true`, et le bouton affiche "Définir mon mot de passe". La vérification est également ignorée côté serveur dans ce cas.
+- **Redirection post-changement** : après avoir défini ou changé son mot de passe, l'admin est redirigé vers `/admin` (au lieu de rester sur la page profil avec un message de succès qui ne s'affiche jamais).
+- **Confirmation reset mdp** : le bouton "Réinit. mdp" ouvrait immédiatement le reset sans confirmation. Une `<dialog>` de confirmation demande désormais de taper `reset` avant d'exécuter l'action (même pattern que la suppression de question).
+- **Rafraîchissement de la liste** : après la création d'un admin, `invalidateAll()` est appelé pour recharger les données sans reload manuel de la page.
+
+---
+
 ### US-20b — Authentification à deux facteurs (MFA) pour les admins
 
 **En tant que** super-administrateur,  
@@ -686,5 +697,48 @@ _Interface_
 - Alertes en temps réel sur des patterns suspects
 - Intégration avec un SIEM externe
 - Audit des accès en lecture (trop verbeux — uniquement les écritures)
+
+---
+
+### US-20d — Invitation par lien de 1ère connexion
+
+**En tant que** super-administrateur,  
+**je veux** que les nouveaux admins reçoivent un lien d'invitation par email pour créer leur propre mot de passe,  
+**afin de** ne jamais avoir à communiquer un mot de passe temporaire manuellement.
+
+**Critères d'acceptation**
+- À la création d'un compte admin, un email contenant un lien unique (`/admin/setup?token=…`) est envoyé automatiquement
+- Le token est à usage unique, valable 48 heures, stocké haché en D1 (table `admin_setup_tokens`)
+- La page `/admin/setup` permet à l'admin de saisir et confirmer son mot de passe (≥ 8 caractères)
+- Après validation, le token est invalidé, `mustChangePassword` passe à `false`, session créée → redirect `/admin`
+- Si le token est expiré ou invalide, un message d'erreur s'affiche avec une option de renvoi (par le super-admin)
+- Le super-admin peut révoquer ou renvoyer un lien depuis `/admin/admins`
+
+**Hors périmètre**
+- Envoi automatique du lien lors d'un reset de mot de passe (à évaluer séparément)
+- Personnalisation du template email
+
+**Dépend de** : mise en place de Resend (ou équivalent) comme service email du projet.
+
+---
+
+### US-20e — Authentification passwordless (liens magiques)
+
+**En tant que** administrateur,  
+**je veux** me connecter via un lien magique envoyé par email, sans mot de passe,  
+**afin de** ne pas avoir à gérer ni mémoriser de mot de passe.
+
+**Critères d'acceptation**
+- La page `/admin/login` n'expose qu'un champ email ; après soumission, un email avec un lien de connexion unique est envoyé
+- Le lien est à usage unique, valable 15 minutes, stocké haché en D1 (table `admin_magic_links`)
+- Cliquer sur le lien crée la session admin et redirige vers `/admin`
+- Si le lien est expiré ou déjà utilisé, un message d'erreur s'affiche
+- Les mécanismes mot de passe (bcrypt, `password_hash`) sont entièrement supprimés de la table `admins` et des routes
+
+**Hors périmètre**
+- Conservation d'un accès mot de passe en fallback (refonte totale)
+- MFA supplémentaire sur le lien magique
+
+**Dépend de** : US-20d (infrastructure email déjà en place) ou mise en place directe de Resend.
 
 ---

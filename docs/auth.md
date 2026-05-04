@@ -73,6 +73,17 @@ npx wrangler d1 execute gennaker --local \
   --command "UPDATE admins SET password_hash='<hash>', must_change_password=1 WHERE email='admin@example.com';"
 ```
 
+## Première connexion d'un nouvel admin
+
+Quand un super-admin crée un compte, `must_change_password` est positionné à `1`. À la connexion suivante, `hooks.server.ts` redirige vers `/admin/profile?force=1`.
+
+Sur cette page :
+- Le champ "mot de passe actuel" est **absent** — l'admin vient de s'authentifier, le redemander est inutile.
+- Le bouton affiche "Définir mon mot de passe" au lieu de "Changer le mot de passe".
+- Après validation du nouveau mot de passe, `must_change_password` passe à `0` et l'admin est redirigé vers `/admin`.
+
+Tant que `must_change_password = 1`, la vérification du mot de passe actuel est également ignorée côté serveur (action `changePassword` dans `+page.server.ts`).
+
 ## Hors périmètre
 
 - SSO / OAuth — pas prévu

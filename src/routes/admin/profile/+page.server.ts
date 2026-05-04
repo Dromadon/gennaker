@@ -23,7 +23,6 @@ export const load: PageServerLoad = async ({ locals, platform }) => {
 
 const changePasswordSchema = z
 	.object({
-		currentPassword: z.string().min(1, 'Mot de passe actuel requis'),
 		newPassword: z.string().min(8, 'Le nouveau mot de passe doit faire au moins 8 caractères'),
 		confirmPassword: z.string()
 	})
@@ -38,9 +37,11 @@ export const actions: Actions = {
 		const db = platform?.env.DB
 		if (!db) return fail(500, { error: 'Erreur serveur' })
 
+		const admin = await findAdminById(db, locals.adminId)
+		if (!admin) return fail(404, { error: 'Compte introuvable' })
+
 		const data = await request.formData()
 		const parsed = changePasswordSchema.safeParse({
-			currentPassword: data.get('currentPassword'),
 			newPassword: data.get('newPassword'),
 			confirmPassword: data.get('confirmPassword')
 		})
@@ -49,20 +50,23 @@ export const actions: Actions = {
 			return fail(422, { error: firstError })
 		}
 
-		const admin = await findAdminById(db, locals.adminId)
-		if (!admin) return fail(404, { error: 'Compte introuvable' })
+		if (!admin.mustChangePassword) {
+			const currentPassword = data.get('currentPassword')
+			if (!currentPassword || typeof currentPassword !== 'string') {
+				return fail(422, { error: 'Mot de passe actuel requis' })
+			}
+			// Charger le hash pour vérification — findAdminById ne l'expose pas, on re-query via email
+			const { findAdminByEmail } = await import('$lib/server/db/queries/admins')
+			const adminWithHash = await findAdminByEmail(db, admin.email)
+			if (!adminWithHash) return fail(404, { error: 'Compte introuvable' })
 
-		// Charger le hash pour vérification — findAdminById ne l'expose pas, on re-query via email
-		const { findAdminByEmail } = await import('$lib/server/db/queries/admins')
-		const adminWithHash = await findAdminByEmail(db, admin.email)
-		if (!adminWithHash) return fail(404, { error: 'Compte introuvable' })
-
-		const ok = await verifyPassword(adminWithHash.passwordHash, parsed.data.currentPassword)
-		if (!ok) return fail(401, { error: 'Mot de passe actuel incorrect' })
+			const ok = await verifyPassword(adminWithHash.passwordHash, currentPassword)
+			if (!ok) return fail(401, { error: 'Mot de passe actuel incorrect' })
+		}
 
 		const newHash = await hash(parsed.data.newPassword, 10)
 		await updateAdminPassword(db, locals.adminId, newHash, false)
 
-		return { success: true }
+		redirect(302, '/admin')
 	}
 }
