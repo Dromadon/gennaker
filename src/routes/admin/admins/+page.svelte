@@ -5,10 +5,12 @@
 	let { data, form }: { data: PageData; form: ActionData } = $props()
 
 	let showCreateForm = $state(false)
-	let confirmDeleteId = $state<number | null>(null)
 	let confirmResetId = $state<number | null>(null)
 	let resetConfirmValue = $state('')
 	let resetDialog = $state<HTMLDialogElement | null>(null)
+	let confirmDeleteId = $state<number | null>(null)
+	let deleteConfirmValue = $state('')
+	let deleteDialog = $state<HTMLDialogElement | null>(null)
 </script>
 
 <div>
@@ -131,24 +133,12 @@
 									Réinit. mdp
 								</button>
 								<!-- Suppression -->
-								{#if confirmDeleteId === admin.id}
-									<form method="POST" action="?/delete" use:enhance>
-										<input type="hidden" name="targetId" value={admin.id} />
-										<button type="submit"
-											class="rounded px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50">
-											Confirmer
-										</button>
-									</form>
-									<button onclick={() => (confirmDeleteId = null)}
-										class="rounded px-2 py-1 text-xs text-gray-500 hover:bg-gray-100">
-										Annuler
-									</button>
-								{:else}
-									<button onclick={() => (confirmDeleteId = admin.id)}
-										class="rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50 hover:text-red-700">
-										Supprimer
-									</button>
-								{/if}
+								<button
+									type="button"
+									onclick={() => { deleteConfirmValue = ''; confirmDeleteId = admin.id; deleteDialog?.showModal() }}
+									class="rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50 hover:text-red-700">
+									Supprimer
+								</button>
 							</div>
 						</td>
 					</tr>
@@ -157,6 +147,48 @@
 		</table>
 	</div>
 </div>
+
+<!-- Dialog suppression -->
+<dialog bind:this={deleteDialog} class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg p-6 shadow-xl backdrop:bg-black/40 w-full max-w-sm">
+	{#if confirmDeleteId !== null}
+		{@const target = data.admins.find(a => a.id === confirmDeleteId)}
+		<h2 class="mb-2 text-base font-semibold text-gray-900">Supprimer ce compte ?</h2>
+		<p class="mb-4 text-sm text-gray-500">
+			Le compte de <strong class="text-gray-700">{target?.firstName} {target?.lastName}</strong> sera définitivement supprimé. Tape <strong class="text-gray-700">suppression</strong> pour confirmer.
+		</p>
+		<input
+			type="text"
+			bind:value={deleteConfirmValue}
+			placeholder="suppression"
+			class="mb-4 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none"
+		/>
+		<div class="flex justify-end gap-3">
+			<button
+				type="button"
+				onclick={() => { deleteDialog?.close(); confirmDeleteId = null }}
+				class="rounded-md border px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+			>
+				Annuler
+			</button>
+			<form method="POST" action="?/delete" use:enhance={() => {
+				return async ({ result, update }) => {
+					deleteDialog?.close()
+					confirmDeleteId = null
+					await update()
+				}
+			}}>
+				<input type="hidden" name="targetId" value={confirmDeleteId} />
+				<button
+					type="submit"
+					disabled={deleteConfirmValue !== 'suppression'}
+					class="rounded-md px-4 py-2 text-sm font-medium text-white transition {deleteConfirmValue === 'suppression' ? 'bg-red-600 hover:bg-red-700' : 'bg-red-200 cursor-not-allowed'}"
+				>
+					Supprimer
+				</button>
+			</form>
+		</div>
+	{/if}
+</dialog>
 
 <!-- Dialog reset mot de passe -->
 <dialog bind:this={resetDialog} class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg p-6 shadow-xl backdrop:bg-black/40 w-full max-w-sm">
