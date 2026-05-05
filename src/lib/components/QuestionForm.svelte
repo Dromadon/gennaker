@@ -148,7 +148,41 @@
 
 		return async ({ result, update }: { result: import('@sveltejs/kit').ActionResult; update: () => Promise<void> }) => {
 			if (result.type === 'redirect') {
-				// Création : le serveur redirige vers /edit — on laisse SvelteKit suivre
+				// Création : extraire l'ID depuis l'URL de redirection pour uploader les images avant de suivre
+				const match = result.location.match(/\/admin\/questions\/(\d+)\/edit/)
+				const newId = match ? Number(match[1]) : null
+
+				if (newId && pendingImages.size > 0) {
+					const refs = new Set([...extractImageRefs(questionMd), ...extractImageRefs(correctionMd)])
+					const uploadErrors: string[] = []
+					await Promise.all(
+						[...pendingImages.entries()]
+							.filter(([filename]) => refs.has(filename))
+							.map(async ([filename, { file, objectUrl }]) => {
+								const fd = new FormData()
+								fd.append('file', file)
+								const res = await fetch(`/admin/questions/${newId}/images`, { method: 'POST', body: fd })
+								if (!res.ok) {
+									uploadErrors.push(filename)
+								} else {
+									URL.revokeObjectURL(objectUrl)
+								}
+							})
+					)
+					if (uploadErrors.length > 0) {
+						submitError = `Question créée, mais ${uploadErrors.length} image(s) n'ont pas pu être uploadées : ${uploadErrors.join(', ')}`
+						isSubmitting = false
+						await update()
+						return
+					}
+				} else if (newId === null && pendingImages.size > 0) {
+					const refs = new Set([...extractImageRefs(questionMd), ...extractImageRefs(correctionMd)])
+					const hasInsertedImages = [...pendingImages.keys()].some((f) => refs.has(f))
+					if (hasInsertedImages) {
+						alert("Question créée, mais impossible d'identifier l'ID pour uploader les images. Veuillez les ré-ajouter depuis la page d'édition.")
+					}
+				}
+
 				await update()
 				return
 			}
