@@ -54,14 +54,14 @@
 	<span>{applicableSupports.length === 0 ? 'tous supports' : applicableSupports.join(', ')}</span>
 </div>
 
-<div class="prose prose-sm max-h-[35vh] overflow-y-auto">
+<div class="prose prose-sm">
 	{@html renderMd(questionMd)}
 </div>
 
 <hr class="my-4 border-gray-200" />
 
 <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Correction</p>
-<div class="prose prose-sm max-h-[25vh] overflow-y-auto">
+<div class="prose prose-sm">
 	{@html renderMd(correctionMd)}
 </div>
 

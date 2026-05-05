@@ -141,6 +141,14 @@
 	// Submit via enhance : SvelteKit gère D1, on enchaîne les uploads R2 après succès
 	let submitError = $state('')
 	let isSubmitting = $state(false)
+	let savedToast = $state(false)
+	let toastTimer: ReturnType<typeof setTimeout> | undefined
+
+	function showSavedToast() {
+		savedToast = true
+		clearTimeout(toastTimer)
+		toastTimer = setTimeout(() => { savedToast = false }, 3000)
+	}
 
 	function handleEnhance() {
 		isSubmitting = true
@@ -218,6 +226,7 @@
 			}
 
 			isSubmitting = false
+			showSavedToast()
 			window.location.reload()
 		}
 	}
@@ -365,20 +374,28 @@
 			<label for="questionMd" class="block text-sm font-medium text-gray-700">Énoncé</label>
 			<button type="button" onclick={() => markdownHelpDialog?.showModal()} class="text-xs text-gray-400 hover:text-gray-600">? Aide markdown</button>
 		</div>
-		<div class="grid grid-cols-2 gap-0 border border-gray-200 rounded-md transition {errors.questionMd ? 'border-red-400' : ''}">
-			<textarea
-				id="questionMd"
-				bind:this={questionTextarea}
-				name="questionMd"
-				bind:value={questionMd}
-				rows="12"
-				onfocus={() => (lastFocusedField = 'question')}
-				class="w-full resize-none border-0 border-r border-gray-200 p-3 font-mono text-sm focus:outline-none rounded-l-md"
-				placeholder="Énoncé en markdown…"
-			></textarea>
-			<div class="prose prose-sm max-w-none p-3 overflow-y-auto text-sm">
-				{@html questionPreview}
+		<div class="border border-gray-200 rounded-md transition {errors.questionMd ? 'border-red-400' : ''}">
+			<div class="lg:grid lg:grid-cols-2 lg:gap-0">
+				<textarea
+					id="questionMd"
+					bind:this={questionTextarea}
+					name="questionMd"
+					bind:value={questionMd}
+					rows="12"
+					onfocus={() => (lastFocusedField = 'question')}
+					class="w-full resize-none border-0 lg:border-r border-gray-200 p-3 font-mono text-sm focus:outline-none rounded-l-md"
+					placeholder="Énoncé en markdown…"
+				></textarea>
+				<div class="hidden lg:block prose prose-sm max-w-none p-3 text-sm">
+					{@html questionPreview}
+				</div>
 			</div>
+			<details class="lg:hidden border-t border-gray-200">
+				<summary class="cursor-pointer px-3 py-2 text-xs text-gray-400 hover:text-gray-600 select-none">Aperçu</summary>
+				<div class="prose prose-sm max-w-none p-3 text-sm">
+					{@html questionPreview}
+				</div>
+			</details>
 		</div>
 		{#if errors.questionMd}<p class="mt-1 text-xs text-red-600">{errors.questionMd[0]}</p>{/if}
 	</div>
@@ -386,20 +403,28 @@
 	<!-- Éditeur markdown : correction -->
 	<div class="border-l-2 pl-2 transition {dirty?.correctionMd ? BAR : 'border-transparent'}">
 		<label for="correctionMd" class="block text-sm font-medium text-gray-700 mb-1">Correction</label>
-		<div class="grid grid-cols-2 gap-0 border border-gray-200 rounded-md transition {errors.correctionMd ? 'border-red-400' : ''}">
-			<textarea
-				id="correctionMd"
-				bind:this={correctionTextarea}
-				name="correctionMd"
-				bind:value={correctionMd}
-				rows="12"
-				onfocus={() => (lastFocusedField = 'correction')}
-				class="w-full resize-none border-0 border-r border-gray-200 p-3 font-mono text-sm focus:outline-none rounded-l-md"
-				placeholder="Correction en markdown…"
-			></textarea>
-			<div class="prose prose-sm max-w-none p-3 overflow-y-auto text-sm">
-				{@html correctionPreview}
+		<div class="border border-gray-200 rounded-md transition {errors.correctionMd ? 'border-red-400' : ''}">
+			<div class="lg:grid lg:grid-cols-2 lg:gap-0">
+				<textarea
+					id="correctionMd"
+					bind:this={correctionTextarea}
+					name="correctionMd"
+					bind:value={correctionMd}
+					rows="12"
+					onfocus={() => (lastFocusedField = 'correction')}
+					class="w-full resize-none border-0 lg:border-r border-gray-200 p-3 font-mono text-sm focus:outline-none rounded-l-md"
+					placeholder="Correction en markdown…"
+				></textarea>
+				<div class="hidden lg:block prose prose-sm max-w-none p-3 text-sm">
+					{@html correctionPreview}
+				</div>
 			</div>
+			<details class="lg:hidden border-t border-gray-200">
+				<summary class="cursor-pointer px-3 py-2 text-xs text-gray-400 hover:text-gray-600 select-none">Aperçu</summary>
+				<div class="prose prose-sm max-w-none p-3 text-sm">
+					{@html correctionPreview}
+				</div>
+			</details>
 		</div>
 		{#if errors.correctionMd}<p class="mt-1 text-xs text-red-600">{errors.correctionMd[0]}</p>{/if}
 	</div>
@@ -448,12 +473,18 @@
 		<button
 			type="submit"
 			disabled={isSubmitting}
-			class="rounded-md bg-gray-900 px-5 py-2 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-50"
+			class="rounded-md bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
 		>
 			{isSubmitting ? 'Enregistrement…' : 'Enregistrer'}
 		</button>
 	</div>
 </form>
+
+{#if savedToast}
+	<div class="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-lg bg-green-600 px-4 py-3 text-sm font-medium text-white shadow-lg transition-opacity">
+		✓ Question enregistrée
+	</div>
+{/if}
 
 <!-- Dialog aide markdown -->
 <MarkdownHelpDialog bind:dialog={markdownHelpDialog} />

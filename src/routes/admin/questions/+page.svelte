@@ -72,7 +72,7 @@
 	<h1 class="text-xl font-semibold text-gray-900">Questions ({data.total})</h1>
 	<a
 		href="/admin/questions/new"
-		class="inline-flex items-center gap-2 rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+		class="inline-flex items-center gap-2 rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
 	>
 		+ Nouvelle question
 	</a>

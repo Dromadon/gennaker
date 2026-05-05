@@ -161,18 +161,26 @@
 					</label>
 					<button type="button" onclick={() => markdownHelpDialog?.showModal()} class="text-xs text-gray-400 hover:text-gray-600">? Aide markdown</button>
 				</div>
-				<div class="grid grid-cols-2 gap-0 border rounded-md {errors.questionMd ? 'border-red-400' : 'border-gray-200'}">
-					<textarea
-						id="questionMd"
-						name="questionMd"
-						bind:value={questionMd}
-						rows="10"
-						class="w-full resize-none border-0 border-r border-gray-200 p-3 font-mono text-sm focus:outline-none rounded-l-md"
-						placeholder="Énoncé en markdown…"
-					></textarea>
-					<div class="prose prose-sm max-w-none p-3 overflow-y-auto text-sm">
-						{@html questionPreview}
+				<div class="border rounded-md {errors.questionMd ? 'border-red-400' : 'border-gray-200'}">
+					<div class="lg:grid lg:grid-cols-2 lg:gap-0">
+						<textarea
+							id="questionMd"
+							name="questionMd"
+							bind:value={questionMd}
+							rows="10"
+							class="w-full resize-none border-0 lg:border-r border-gray-200 p-3 font-mono text-sm focus:outline-none rounded-l-md"
+							placeholder="Énoncé en markdown…"
+						></textarea>
+						<div class="hidden lg:block prose prose-sm max-w-none p-3 text-sm">
+							{@html questionPreview}
+						</div>
 					</div>
+					<details class="lg:hidden border-t border-gray-200">
+						<summary class="cursor-pointer px-3 py-2 text-xs text-gray-400 hover:text-gray-600 select-none">Aperçu</summary>
+						<div class="prose prose-sm max-w-none p-3 text-sm">
+							{@html questionPreview}
+						</div>
+					</details>
 				</div>
 				{#if errors.questionMd}<p class="mt-1 text-xs text-red-600">{errors.questionMd[0]}</p>{/if}
 			</div>
@@ -185,18 +193,26 @@
 					</label>
 					<button type="button" onclick={() => markdownHelpDialog?.showModal()} class="text-xs text-gray-400 hover:text-gray-600">? Aide markdown</button>
 				</div>
-				<div class="grid grid-cols-2 gap-0 border rounded-md {errors.correctionMd ? 'border-red-400' : 'border-gray-200'}">
-					<textarea
-						id="correctionMd"
-						name="correctionMd"
-						bind:value={correctionMd}
-						rows="10"
-						class="w-full resize-none border-0 border-r border-gray-200 p-3 font-mono text-sm focus:outline-none rounded-l-md"
-						placeholder="Correction en markdown…"
-					></textarea>
-					<div class="prose prose-sm max-w-none p-3 overflow-y-auto text-sm">
-						{@html correctionPreview}
+				<div class="border rounded-md {errors.correctionMd ? 'border-red-400' : 'border-gray-200'}">
+					<div class="lg:grid lg:grid-cols-2 lg:gap-0">
+						<textarea
+							id="correctionMd"
+							name="correctionMd"
+							bind:value={correctionMd}
+							rows="10"
+							class="w-full resize-none border-0 lg:border-r border-gray-200 p-3 font-mono text-sm focus:outline-none rounded-l-md"
+							placeholder="Correction en markdown…"
+						></textarea>
+						<div class="hidden lg:block prose prose-sm max-w-none p-3 text-sm">
+							{@html correctionPreview}
+						</div>
 					</div>
+					<details class="lg:hidden border-t border-gray-200">
+						<summary class="cursor-pointer px-3 py-2 text-xs text-gray-400 hover:text-gray-600 select-none">Aperçu</summary>
+						<div class="prose prose-sm max-w-none p-3 text-sm">
+							{@html correctionPreview}
+						</div>
+					</details>
 				</div>
 				{#if errors.correctionMd}<p class="mt-1 text-xs text-red-600">{errors.correctionMd[0]}</p>{/if}
 			</div>
