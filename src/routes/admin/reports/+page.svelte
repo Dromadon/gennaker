@@ -142,6 +142,7 @@
 							<td class="px-4 py-3" onclick={(e) => e.stopPropagation()}>
 								<form method="POST" action="?/toggleStatus">
 									<input type="hidden" name="id" value={report.id} />
+									<input type="hidden" name="questionId" value={report.questionId} />
 									{#if report.status === 'nouveau'}
 										<button
 											type="submit"

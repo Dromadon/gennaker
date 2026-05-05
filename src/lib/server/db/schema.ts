@@ -106,6 +106,17 @@ export const admins = sqliteTable('admins', {
 	mustChangePassword: integer('must_change_password').notNull().default(0)
 });
 
+export const auditLogs = sqliteTable('audit_logs', {
+	id: integer('id').primaryKey({ autoIncrement: true }),
+	adminId: integer('admin_id').references(() => admins.id, { onDelete: 'set null' }),
+	action: text('action').notNull(),
+	targetType: text('target_type').notNull(), // 'question' | 'submission' | 'report'
+	targetId: integer('target_id'),
+	metadata: text('metadata').notNull().default('{}'), // JSON : { before, after } ou { context }
+	ipAddress: text('ip_address'),
+	createdAt: integer('created_at').notNull()
+});
+
 export const communitySubmissions = sqliteTable('community_submissions', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
 	sectionId: integer('section_id').notNull().references(() => sections.id),

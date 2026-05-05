@@ -614,7 +614,7 @@ _Restrictions_
 
 **Hors périmètre**
 - MFA (TOTP ou Passkeys) — analysé au plan, implémenté dans une US dédiée (US-20b)
-- Piste d'audit des actions par compte — US-20c
+- Piste d'audit des actions par compte — US-20c ✅
 - Réinitialisation de mot de passe par email
 - SSO / OAuth
 - Droits fins par section ou catégorie (tous les admins ont accès à l'ensemble du contenu)
@@ -666,9 +666,9 @@ _MFA obligatoire (optionnel, configuration globale)_
 
 ---
 
-### US-20c — Piste d'audit des actions administrateurs
+### US-20c ✅ — Piste d'audit des actions administrateurs
 
-**En tant que** super-administrateur,  
+**En tant que** administrateur,  
 **je veux** consulter un journal des actions effectuées par chaque administrateur,  
 **afin de** tracer les modifications importantes et identifier d'éventuelles erreurs ou usages anormaux.
 
@@ -677,26 +677,28 @@ _MFA obligatoire (optionnel, configuration globale)_
 **Critères d'acceptation**
 
 _Événements tracés_
-- Connexion réussie et échec de connexion (avec username et IP)
-- Création, modification et suppression de questions
-- Approbation et rejet de soumissions communautaires
-- Résolution et réouverture de signalements
-- Création et suppression de comptes admins
-- Activation / désactivation MFA
+- Création, modification et suppression de questions ✅
+- Approbation et rejet de soumissions communautaires ✅
+- Résolution et réouverture de signalements ✅
 
 _Stockage_
-- Table `audit_logs` : `id`, `admin_id` (nullable si action anonyme), `action` (slug), `target_type` (ex. `question`), `target_id`, `metadata` (JSON, détails libres), `ip_address`, `created_at`
-- Rétention : 12 mois glissants (les entrées plus anciennes sont purgées par un Cron Trigger hebdomadaire)
+- Table `audit_logs` : `id`, `admin_id` (nullable, SET NULL si admin supprimé), `action` (slug), `target_type` (`question` | `submission` | `report`), `target_id`, `metadata` (JSON `{ before, after }` ou contexte), `ip_address`, `created_at`
+- Snapshot before/after complet pour les questions ; contexte minimal pour soumissions et signalements
+- Rétention : 12 mois glissants (à implémenter via Cron Trigger)
 
 _Interface_
-- La page `/admin/audit` (super-admin uniquement) liste les événements avec filtres : admin, type d'action, période
-- Chaque ligne affiche : date/heure, admin, action, cible (lien vers la ressource si elle existe encore)
-- Export CSV de la période filtrée
+- La page `/admin/audit` (accessible à tous les admins) liste les événements avec filtres : admin, type, période
+- Chaque ligne affiche : date/heure, admin, action (badge coloré), cible (lien si ressource encore existante)
+- Bouton « Voir » → modal JSON avec metadata before/after
+- Export CSV de la période filtrée (`/admin/audit/export`)
 
 **Hors périmètre**
+- Audit des connexions (réussies et échouées) — non implémenté
+- Audit des actions sur les comptes admins — non implémenté
 - Alertes en temps réel sur des patterns suspects
 - Intégration avec un SIEM externe
 - Audit des accès en lecture (trop verbeux — uniquement les écritures)
+- Purge automatique des 12 mois (Cron Trigger à faire)
 
 ---
 

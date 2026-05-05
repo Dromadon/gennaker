@@ -214,6 +214,25 @@ shared_evaluations: {
 }
 ```
 
+### Journal d'audit
+
+```typescript
+audit_logs: {
+  id           integer PK autoincrement
+  admin_id     FK → admins (nullable, SET NULL si admin supprimé)
+  action       text      -- 'question.create' | 'question.update' | 'question.delete'
+               --           'submission.approve' | 'submission.reject'
+               --           'report.resolve' | 'report.reopen'
+  target_type  text      -- 'question' | 'submission' | 'report'
+  target_id    integer   -- nullable
+  metadata     text      -- JSON : { before, after } pour questions ; { context } pour les autres
+  ip_address   text      -- nullable
+  created_at   integer
+}
+```
+
+Index : `admin_id`, `created_at`.
+
 ### Soumissions communautaires
 
 ```typescript

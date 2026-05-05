@@ -32,6 +32,14 @@ vi.mock('$lib/server/r2-images', () => ({
 	deleteImagesForQuestion: vi.fn().mockResolvedValue({ deleted: [], errors: [] })
 }))
 
+vi.mock('$lib/server/db/queries/audit', () => ({
+	insertAuditLog: vi.fn().mockResolvedValue(undefined)
+}))
+
+vi.mock('$lib/server/audit', () => ({
+	buildQuestionAuditMetadata: vi.fn().mockReturnValue({})
+}))
+
 const mockR2 = {
 	list: vi.fn().mockResolvedValue({
 		objects: [{ key: '5/images/schema.png' }, { key: '5/images/carte.jpg' }],
@@ -40,11 +48,18 @@ const mockR2 = {
 	delete: vi.fn().mockResolvedValue(undefined)
 }
 
+const mockHeaders = { get: vi.fn().mockReturnValue(null) }
+
+function makeRequest(formData: FormData) {
+	return { formData: () => Promise.resolve(formData), headers: mockHeaders }
+}
+
 function makeEvent(isAdmin: boolean, params = { id: '5' }, r2?: object, extra: object = {}) {
 	return {
-		locals: { isAdmin },
+		locals: { isAdmin, adminId: 1 },
 		platform: { env: { DB: {}, ...(r2 ? { IMAGES: r2 } : {}) } },
 		params,
+		request: { headers: mockHeaders },
 		...extra
 	} as unknown as Parameters<typeof load>[0]
 }
@@ -97,7 +112,7 @@ describe('action update /admin/questions/[id]/edit', () => {
 		await expect(
 			actions.update({
 				...makeEvent(false),
-				request: { formData: () => Promise.resolve(formData) }
+				request: makeRequest(formData)
 			} as never)
 		).rejects.toMatchObject({ status: 403 })
 	})
@@ -107,7 +122,7 @@ describe('action update /admin/questions/[id]/edit', () => {
 		formData.append('title', '')
 		const result = await actions.update({
 			...makeEvent(true),
-			request: { formData: () => Promise.resolve(formData) }
+			request: makeRequest(formData)
 		} as never)
 		expect((result as { status: number }).status).toBe(422)
 	})
@@ -124,7 +139,7 @@ describe('action update /admin/questions/[id]/edit', () => {
 		formData.append('status', 'publie')
 		const result = await actions.update({
 			...makeEvent(true),
-			request: { formData: () => Promise.resolve(formData) }
+			request: makeRequest(formData)
 		} as never)
 		expect(updateQuestion).toHaveBeenCalledWith(
 			{},
@@ -149,7 +164,7 @@ describe('action update /admin/questions/[id]/edit', () => {
 		formData.append('status', 'publie')
 		await actions.update({
 			...makeEvent(true, { id: '5' }, mockR2),
-			request: { formData: () => Promise.resolve(formData) }
+			request: makeRequest(formData)
 		} as never)
 		expect(deleteOrphanImages).toHaveBeenCalledWith(
 			mockR2,

@@ -58,6 +58,21 @@ vi.mock('$lib/server/db/queries/submissions', () => ({
 	rejectSubmission: vi.fn().mockResolvedValue(undefined)
 }))
 
+vi.mock('$lib/server/db/queries/questions', () => ({
+	getQuestionAdminById: vi.fn().mockResolvedValue(null)
+}))
+
+vi.mock('$lib/server/db/queries/audit', () => ({
+	insertAuditLog: vi.fn().mockResolvedValue(undefined)
+}))
+
+vi.mock('$lib/server/audit', () => ({
+	buildQuestionAuditMetadata: vi.fn().mockReturnValue({}),
+	buildSubmissionAuditMetadata: vi.fn().mockReturnValue({})
+}))
+
+const mockHeaders = { get: vi.fn().mockReturnValue(null) }
+
 function makeFormData(fields: Record<string, string>) {
 	const fd = new FormData()
 	for (const [key, value] of Object.entries(fields)) fd.append(key, value)
@@ -66,9 +81,9 @@ function makeFormData(fields: Record<string, string>) {
 
 function makeEvent(fields: Record<string, string>, isAdmin = true) {
 	return {
-		request: { formData: () => Promise.resolve(makeFormData(fields)) },
+		request: { formData: () => Promise.resolve(makeFormData(fields)), headers: mockHeaders },
 		platform: { env: { DB: {} } },
-		locals: { isAdmin }
+		locals: { isAdmin, adminId: 1 }
 	} as unknown as Parameters<typeof actions.approve>[0]
 }
 

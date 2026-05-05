@@ -1,8 +1,10 @@
 import { error, fail, redirect } from '@sveltejs/kit'
 import type { Actions, PageServerLoad } from './$types'
 import { getAllCategoriesWithSections } from '$lib/server/db/queries/categories'
-import { deleteQuestion, listQuestions } from '$lib/server/db/queries/questions'
+import { deleteQuestion, getQuestionAdminById, listQuestions } from '$lib/server/db/queries/questions'
 import { getReportsByQuestionIds, type QuestionReportSummary } from '$lib/server/db/queries/reports'
+import { insertAuditLog } from '$lib/server/db/queries/audit'
+import { buildQuestionAuditMetadata } from '$lib/server/audit'
 
 export const load: PageServerLoad = async ({ url, platform, locals }) => {
 	if (!locals.isAdmin) redirect(302, '/admin/login')
@@ -42,7 +44,18 @@ export const actions: Actions = {
 		const id = Number(data.get('id'))
 		if (!id || isNaN(id)) return fail(400, { error: 'ID invalide' })
 
+		const before = await getQuestionAdminById(d1, id)
 		await deleteQuestion(d1, id)
+
+		await insertAuditLog(d1, {
+			adminId: locals.adminId,
+			action: 'question.delete',
+			targetType: 'question',
+			targetId: id,
+			metadata: buildQuestionAuditMetadata(before, null),
+			ipAddress: request.headers.get('cf-connecting-ip') ?? request.headers.get('x-forwarded-for') ?? null
+		})
+
 		return { deleted: true }
 	}
 }

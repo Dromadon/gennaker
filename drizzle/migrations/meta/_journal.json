@@ -64,6 +64,13 @@
       "when": 1777882595962,
       "tag": "0008_multi_admin",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1746489600000,
+      "tag": "0009_audit_logs",
+      "breakpoints": true
     }
   ]
 }

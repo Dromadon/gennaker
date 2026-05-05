@@ -2,7 +2,9 @@ import { error, fail, redirect } from '@sveltejs/kit'
 import { z } from 'zod'
 import type { Actions, PageServerLoad } from './$types'
 import { getAllCategoriesWithSections } from '$lib/server/db/queries/categories'
-import { createQuestion } from '$lib/server/db/queries/questions'
+import { createQuestion, getQuestionAdminById } from '$lib/server/db/queries/questions'
+import { insertAuditLog } from '$lib/server/db/queries/audit'
+import { buildQuestionAuditMetadata } from '$lib/server/audit'
 
 const QuestionSchema = z.object({
 	title: z.string().min(1).max(500),
@@ -54,6 +56,17 @@ export const actions: Actions = {
 		}
 
 		const id = await createQuestion(d1, parsed.data)
+
+		const after = await getQuestionAdminById(d1, id)
+		await insertAuditLog(d1, {
+			adminId: locals.adminId,
+			action: 'question.create',
+			targetType: 'question',
+			targetId: id,
+			metadata: buildQuestionAuditMetadata(null, after),
+			ipAddress: request.headers.get('cf-connecting-ip') ?? request.headers.get('x-forwarded-for') ?? null
+		})
+
 		redirect(302, `/admin/questions/${id}/edit?created=1`)
 	}
 }

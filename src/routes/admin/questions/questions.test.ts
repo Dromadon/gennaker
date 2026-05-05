@@ -30,7 +30,16 @@ vi.mock('$lib/server/db/queries/questions', () => ({
 		total: 1
 	}),
 	createQuestion: vi.fn().mockResolvedValue(42),
-	deleteQuestion: vi.fn().mockResolvedValue(undefined)
+	deleteQuestion: vi.fn().mockResolvedValue(undefined),
+	getQuestionAdminById: vi.fn().mockResolvedValue(null)
+}))
+
+vi.mock('$lib/server/db/queries/audit', () => ({
+	insertAuditLog: vi.fn().mockResolvedValue(undefined)
+}))
+
+vi.mock('$lib/server/audit', () => ({
+	buildQuestionAuditMetadata: vi.fn().mockReturnValue({})
 }))
 
 vi.mock('$lib/server/db/queries/reports', () => ({
@@ -47,11 +56,18 @@ vi.mock('$lib/server/db/queries/reports', () => ({
 	])
 }))
 
+const mockHeaders = { get: vi.fn().mockReturnValue(null) }
+
+function makeRequest(formData: FormData) {
+	return { formData: () => Promise.resolve(formData), headers: mockHeaders }
+}
+
 function makeEvent(isAdmin: boolean, extra: object = {}) {
 	return {
-		locals: { isAdmin },
+		locals: { isAdmin, adminId: 1 },
 		platform: { env: { DB: {} } },
 		url: new URL('http://localhost/admin/questions'),
+		request: { headers: mockHeaders },
 		...extra
 	} as unknown as Parameters<typeof listLoad>[0]
 }
@@ -102,7 +118,7 @@ describe('action delete /admin/questions', () => {
 		await expect(
 			listActions.delete({
 				...makeEvent(false),
-				request: { formData: () => Promise.resolve(formData) }
+				request: makeRequest(formData)
 			} as never)
 		).rejects.toMatchObject({ status: 403 })
 	})
@@ -113,7 +129,7 @@ describe('action delete /admin/questions', () => {
 		formData.append('id', '1')
 		const result = await listActions.delete({
 			...makeEvent(true),
-			request: { formData: () => Promise.resolve(formData) }
+			request: makeRequest(formData)
 		} as never)
 		expect(deleteQuestion).toHaveBeenCalledWith({}, 1)
 		expect(result).toEqual({ deleted: true })
@@ -148,7 +164,7 @@ describe('action create /admin/questions/new', () => {
 		await expect(
 			newActions.create({
 				...makeEvent(false),
-				request: { formData: () => Promise.resolve(formData) }
+				request: makeRequest(formData)
 			} as never)
 		).rejects.toMatchObject({ status: 403 })
 	})
@@ -158,7 +174,7 @@ describe('action create /admin/questions/new', () => {
 		formData.append('title', '')
 		const result = await newActions.create({
 			...makeEvent(true),
-			request: { formData: () => Promise.resolve(formData) }
+			request: makeRequest(formData)
 		} as never)
 		expect((result as { status: number }).status).toBe(422)
 	})
@@ -176,7 +192,7 @@ describe('action create /admin/questions/new', () => {
 		await expect(
 			newActions.create({
 				...makeEvent(true),
-				request: { formData: () => Promise.resolve(formData) }
+				request: makeRequest(formData)
 			} as never)
 		).rejects.toMatchObject({ status: 302 })
 		expect(createQuestion).toHaveBeenCalled()

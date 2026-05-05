@@ -8,6 +8,8 @@ import {
 	updateQuestion
 } from '$lib/server/db/queries/questions'
 import { extractImageRefs, deleteOrphanImages, deleteImagesForQuestion } from '$lib/server/r2-images'
+import { insertAuditLog } from '$lib/server/db/queries/audit'
+import { buildQuestionAuditMetadata } from '$lib/server/audit'
 
 const QuestionSchema = z.object({
 	title: z.string().min(1).max(500),
@@ -77,7 +79,18 @@ export const actions: Actions = {
 			return fail(422, { errors: parsed.error.flatten().fieldErrors, values: raw })
 		}
 
+		const before = await getQuestionAdminById(d1, id)
 		await updateQuestion(d1, id, parsed.data)
+		const after = await getQuestionAdminById(d1, id)
+
+		await insertAuditLog(d1, {
+			adminId: locals.adminId,
+			action: 'question.update',
+			targetType: 'question',
+			targetId: id,
+			metadata: buildQuestionAuditMetadata(before, after),
+			ipAddress: request.headers.get('cf-connecting-ip') ?? request.headers.get('x-forwarded-for') ?? null
+		})
 
 		// Supprimer toutes les images R2 non référencées dans le nouveau markdown (orphelines incluses)
 		if (r2) {
@@ -92,7 +105,7 @@ export const actions: Actions = {
 		return { updated: true }
 	},
 
-	delete: async ({ params, platform, locals }) => {
+	delete: async ({ params, platform, locals, request }) => {
 		if (!locals.isAdmin) error(403, 'Forbidden')
 
 		const d1 = platform?.env.DB
@@ -100,6 +113,8 @@ export const actions: Actions = {
 
 		const r2 = platform?.env.IMAGES
 		const id = Number(params.id)
+
+		const before = await getQuestionAdminById(d1, id)
 
 		if (r2) {
 			const { errors } = await deleteImagesForQuestion(r2, id)
@@ -111,6 +126,16 @@ export const actions: Actions = {
 		}
 
 		await deleteQuestion(d1, id)
+
+		await insertAuditLog(d1, {
+			adminId: locals.adminId,
+			action: 'question.delete',
+			targetType: 'question',
+			targetId: id,
+			metadata: buildQuestionAuditMetadata(before, null),
+			ipAddress: request.headers.get('cf-connecting-ip') ?? request.headers.get('x-forwarded-for') ?? null
+		})
+
 		redirect(302, '/admin/questions')
 	}
 }

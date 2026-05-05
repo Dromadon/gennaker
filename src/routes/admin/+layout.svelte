@@ -27,6 +27,7 @@
 					</span>
 				{/if}
 			</a>
+			<a href="/admin/audit" class="text-sm text-gray-500 hover:text-gray-900">Journal</a>
 		</div>
 		<!-- Mobile : titre + hamburger -->
 		<span class="lg:hidden text-sm font-semibold text-gray-700">Gennaker — Admin</span>
@@ -107,6 +108,13 @@
 							{data.pendingSubmissionsCount}
 						</span>
 					{/if}
+				</a>
+				<a
+					href="/admin/audit"
+					onclick={() => (adminMenuOpen = false)}
+					class="block rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+				>
+					Journal
 				</a>
 			</nav>
 			<div class="border-t border-gray-200 p-4 space-y-2">

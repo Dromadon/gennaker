@@ -27,11 +27,26 @@ vi.mock('$lib/server/db/queries/reports', () => ({
 	updateReportStatus: vi.fn().mockResolvedValue(undefined)
 }))
 
+vi.mock('$lib/server/db/queries/audit', () => ({
+	insertAuditLog: vi.fn().mockResolvedValue(undefined)
+}))
+
+vi.mock('$lib/server/audit', () => ({
+	buildReportAuditMetadata: vi.fn().mockReturnValue({})
+}))
+
+const mockHeaders = { get: vi.fn().mockReturnValue(null) }
+
+function makeRequest(formData: FormData) {
+	return { formData: () => Promise.resolve(formData), headers: mockHeaders }
+}
+
 function makeEvent(isAdmin: boolean, extra: object = {}) {
 	return {
-		locals: { isAdmin },
+		locals: { isAdmin, adminId: 1 },
 		platform: { env: { DB: {} } },
 		url: new URL('http://localhost/admin/reports'),
+		request: { headers: mockHeaders },
 		...extra
 	} as unknown as Parameters<typeof load>[0]
 }
@@ -73,7 +88,7 @@ describe('action toggleStatus /admin/reports', () => {
 		await expect(
 			actions.toggleStatus({
 				...makeEvent(false),
-				request: { formData: () => Promise.resolve(formData) }
+				request: makeRequest(formData)
 			} as never)
 		).rejects.toMatchObject({ status: 403 })
 	})
@@ -83,7 +98,7 @@ describe('action toggleStatus /admin/reports', () => {
 		formData.append('status', 'resolu')
 		const result = await actions.toggleStatus({
 			...makeEvent(true),
-			request: { formData: () => Promise.resolve(formData) }
+			request: makeRequest(formData)
 		} as never)
 		expect((result as { status: number }).status).toBe(422)
 	})
@@ -94,7 +109,7 @@ describe('action toggleStatus /admin/reports', () => {
 		formData.append('status', 'en_cours')
 		const result = await actions.toggleStatus({
 			...makeEvent(true),
-			request: { formData: () => Promise.resolve(formData) }
+			request: makeRequest(formData)
 		} as never)
 		expect((result as { status: number }).status).toBe(422)
 	})
@@ -105,7 +120,7 @@ describe('action toggleStatus /admin/reports', () => {
 		formData.append('status', 'inconnu')
 		const result = await actions.toggleStatus({
 			...makeEvent(true),
-			request: { formData: () => Promise.resolve(formData) }
+			request: makeRequest(formData)
 		} as never)
 		expect((result as { status: number }).status).toBe(422)
 	})
@@ -114,10 +129,11 @@ describe('action toggleStatus /admin/reports', () => {
 		const { updateReportStatus } = await import('$lib/server/db/queries/reports')
 		const formData = new FormData()
 		formData.append('id', '1')
+		formData.append('questionId', '42')
 		formData.append('status', 'resolu')
 		const result = await actions.toggleStatus({
 			...makeEvent(true),
-			request: { formData: () => Promise.resolve(formData) }
+			request: makeRequest(formData)
 		} as never)
 		expect(updateReportStatus).toHaveBeenCalledWith({}, 1, 'resolu')
 		expect(result).toEqual({ updated: true })
@@ -127,10 +143,11 @@ describe('action toggleStatus /admin/reports', () => {
 		const { updateReportStatus } = await import('$lib/server/db/queries/reports')
 		const formData = new FormData()
 		formData.append('id', '1')
+		formData.append('questionId', '42')
 		formData.append('status', 'nouveau')
 		const result = await actions.toggleStatus({
 			...makeEvent(true),
-			request: { formData: () => Promise.resolve(formData) }
+			request: makeRequest(formData)
 		} as never)
 		expect(updateReportStatus).toHaveBeenCalledWith({}, 1, 'nouveau')
 		expect(result).toEqual({ updated: true })
