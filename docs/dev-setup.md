@@ -5,6 +5,21 @@
 - Node.js 22 (`fnm` ou `nvm` la sélectionneront automatiquement via `.node-version`)
 - `npm install` effectué
 
+## Configurer `.dev.vars`
+
+Créer un fichier `.dev.vars` à la racine du projet avec les variables suivantes :
+
+```bash
+# Clé HMAC pour signer les tokens de session admin — générer avec :
+# openssl rand -hex 32
+ADMIN_SESSION_SECRET=<valeur générée>
+
+# URL publique du bucket R2 local (ne pas modifier)
+R2_PUBLIC_URL=/r2-proxy
+```
+
+Ce fichier est chargé par Wrangler et injecté dans le Worker au démarrage (`npm run dev:cf`). Il est l'équivalent local des secrets configurés avec `wrangler secret put` en production.
+
 ## Configurer `.env.local`
 
 Créer un fichier `.env.local` à la racine du projet avec les variables suivantes :
