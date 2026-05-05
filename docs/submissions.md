@@ -34,6 +34,8 @@ L'admin peut **approuver** une soumission (ce qui crée automatiquement une ques
 
 `/admin/submissions` — lien dans la navigation admin. Un badge indique le nombre de soumissions `en_attente`.
 
+`/admin/submissions/[id]` — page dédiée à une soumission, accessible directement depuis la piste d'audit (`/admin/audit`). Affiche le même contenu que le panneau latéral. Les actions de modération (approuver / rejeter) y sont disponibles si la soumission est `en_attente`.
+
 ### Tableau des soumissions
 
 Colonnes : titre, catégorie / section, soumis par, date, statut.
@@ -77,6 +79,8 @@ Les soumissions peuvent être filtrées par statut : Tous / En attente / Approuv
 | `src/routes/soumettre/+page.server.ts` | Formulaire de soumission public (US-18) |
 | `src/routes/admin/submissions/+page.server.ts` | Load + actions `approve` / `reject` |
 | `src/routes/admin/submissions/+page.svelte` | Interface admin avec panneau latéral |
+| `src/routes/admin/submissions/[id]/+page.server.ts` | Load de la soumission par id (404 si absente) |
+| `src/routes/admin/submissions/[id]/+page.svelte` | Page dédiée (liens depuis l'audit) |
 | `src/routes/admin/+layout.server.ts` | Badge compteur nav (`pendingSubmissionsCount`) |
 | `src/routes/admin/+layout.svelte` | Lien "Soumissions" dans la nav admin |
 | `src/lib/components/QuestionPreview.svelte` | Composant mutualisé de prévisualisation (réutilisé tel quel) |

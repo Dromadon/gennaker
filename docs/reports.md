@@ -67,6 +67,8 @@ Codes de retour :
 
 `/admin/reports` — lien dans la navigation admin. Un badge rouge indique le nombre de signalements en statut `nouveau`.
 
+`/admin/reports/[id]` — page dédiée à un signalement, accessible directement depuis la piste d'audit (`/admin/audit`). Affiche le même contenu que le panneau latéral. L'action "Marquer résolu / Rouvrir" y est disponible.
+
 ### Tableau des signalements
 
 Colonnes : titre de la question, type de problème, date, statut, action.
@@ -113,6 +115,9 @@ Les signalements peuvent être filtrés par statut via les boutons en haut de pa
 | `src/lib/components/QuestionPreview.svelte` | Composant mutualisé de prévisualisation |
 | `src/routes/admin/reports/+page.server.ts` | Load + action `toggleStatus` |
 | `src/routes/admin/reports/+page.svelte` | Interface admin avec panneau latéral |
+| `src/routes/admin/reports/[id]/+page.server.ts` | Load du signalement par id (404 si absent) |
+| `src/routes/admin/reports/[id]/+page.svelte` | Page dédiée (liens depuis l'audit) |
+| `src/lib/server/db/queries/reports.ts` | `getReportById()` — requête avec JOINs pour la page dédiée |
 | `src/routes/admin/+layout.server.ts` | Badge compteur nav |
 | `src/routes/evaluation/+page.svelte` | Lien "Signaler un problème" sur les cartes question |
 | `src/routes/questions/+page.svelte` | Lien "Signaler un problème" dans la prévisualisation |

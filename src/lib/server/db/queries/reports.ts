@@ -167,6 +167,44 @@ export async function getAllReportsForExport(d1: D1Database): Promise<QuestionRe
 	}))
 }
 
+export async function getReportById(
+	d1: D1Database,
+	id: number
+): Promise<ReportAdminRow | null> {
+	const db = getDb(d1)
+	const rows = await db
+		.select({
+			id: questionReports.id,
+			questionId: questionReports.questionId,
+			questionTitle: questions.title,
+			questionMd: questions.questionMd,
+			correctionMd: questions.correctionMd,
+			sourceMd: questions.sourceMd,
+			categoryDisplayName: categories.displayName,
+			sectionDisplayName: sections.displayName,
+			difficulty: questions.difficulty,
+			applicableSupports: questions.applicableSupports,
+			problemType: questionReports.problemType,
+			description: questionReports.description,
+			email: questionReports.email,
+			status: questionReports.status,
+			createdAt: questionReports.createdAt
+		})
+		.from(questionReports)
+		.innerJoin(questions, eq(questions.id, questionReports.questionId))
+		.innerJoin(sections, eq(sections.id, questions.sectionId))
+		.innerJoin(categories, eq(categories.id, sections.categoryId))
+		.where(eq(questionReports.id, id))
+		.limit(1)
+
+	if (rows.length === 0) return null
+	return {
+		...rows[0],
+		problemType: rows[0].problemType as ProblemType,
+		status: rows[0].status as ReportStatus
+	}
+}
+
 export async function updateReportStatus(
 	d1: D1Database,
 	id: number,

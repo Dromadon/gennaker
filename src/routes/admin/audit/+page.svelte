@@ -34,8 +34,8 @@
 
 	const TARGET_LINKS: Record<string, (id: number) => string> = {
 		question: (id) => `/admin/questions/${id}/edit`,
-		submission: (id) => `/admin/submissions`,
-		report: (id) => `/admin/reports`
+		submission: (id) => `/admin/submissions/${id}`,
+		report: (id) => `/admin/reports/${id}`
 	}
 
 	function formatDate(ts: number): string {
