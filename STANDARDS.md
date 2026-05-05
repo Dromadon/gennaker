@@ -270,6 +270,31 @@ export const GET = async ({ url, platform }) => {
 
 ---
 
+## 6b. Formulaires SvelteKit (`use:enhance`)
+
+### Règle générale
+
+Toujours utiliser `use:enhance`. Ne jamais appeler `window.location.reload()` — utiliser `update()` ou `invalidateAll()` à la place.
+
+### Quand ajouter un callback
+
+| Situation | Approche |
+|-----------|----------|
+| Formulaire simple (redirect ou message serveur suffit) | `use:enhance` sans callback |
+| Fermer une dialog / modifier l'état UI après succès | Callback inline avec `await update()` |
+| Opérations multi-étapes (ex : upload R2 après D1) | Callback nommé (`handleEnhance`) |
+
+### `update()` vs `update({ reset: false })`
+
+- **`update()`** : par défaut, vide les champs du formulaire après succès (comportement HTML natif). À utiliser pour les formulaires de création ou d'action ponctuelle.
+- **`update({ reset: false })`** : conserve les valeurs saisies. À utiliser pour les formulaires d'**édition** d'une ressource existante.
+
+### Feedback utilisateur
+
+Le feedback de succès vient du `form` retourné par l'action serveur (via `fail()` ou `return {}`), affiché dans `+page.svelte` via `{#if form?.updated}`. Ne pas gérer le feedback dans le composant — c'est la responsabilité de la page.
+
+---
+
 ## 7. Base de données (Drizzle + D1)
 
 ### Règles

@@ -141,15 +141,6 @@
 	// Submit via enhance : SvelteKit gère D1, on enchaîne les uploads R2 après succès
 	let submitError = $state('')
 	let isSubmitting = $state(false)
-	let savedToast = $state(false)
-	let toastTimer: ReturnType<typeof setTimeout> | undefined
-
-	function showSavedToast() {
-		savedToast = true
-		clearTimeout(toastTimer)
-		toastTimer = setTimeout(() => { savedToast = false }, 3000)
-	}
-
 	function handleEnhance() {
 		isSubmitting = true
 		submitError = ''
@@ -197,7 +188,7 @@
 
 			if (result.type === 'failure' || result.type === 'error') {
 				isSubmitting = false
-				window.location.reload()
+				await update()
 				return
 			}
 
@@ -226,8 +217,8 @@
 			}
 
 			isSubmitting = false
-			showSavedToast()
-			window.location.reload()
+			window.scrollTo({ top: 0, behavior: 'smooth' })
+			await update({ reset: false })
 		}
 	}
 </script>
@@ -479,12 +470,6 @@
 		</button>
 	</div>
 </form>
-
-{#if savedToast}
-	<div class="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-lg bg-green-600 px-4 py-3 text-sm font-medium text-white shadow-lg transition-opacity">
-		✓ Question enregistrée
-	</div>
-{/if}
 
 <!-- Dialog aide markdown -->
 <MarkdownHelpDialog bind:dialog={markdownHelpDialog} />
