@@ -6,6 +6,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.isAdmin = false
 	event.locals.adminId = null
 	event.locals.adminRole = null
+	event.locals.mustChangePassword = false
 
 	const token = event.cookies.get('admin_session')
 	const secret = event.platform?.env.ADMIN_SESSION_SECRET ?? ''
@@ -20,6 +21,16 @@ export const handle: Handle = async ({ event, resolve }) => {
 				event.locals.isAdmin = true
 				event.locals.adminId = admin.id
 				event.locals.adminRole = admin.role
+				event.locals.mustChangePassword = admin.mustChangePassword
+
+				const path = event.url.pathname
+				if (
+					admin.mustChangePassword &&
+					path !== '/admin/profile' &&
+					path !== '/admin/login'
+				) {
+					return Response.redirect(new URL('/admin/profile?force=1', event.url), 302)
+				}
 			}
 		}
 	}

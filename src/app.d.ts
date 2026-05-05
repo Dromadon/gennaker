@@ -8,6 +8,7 @@ declare global {
 			isAdmin: boolean
 			adminId: number | null
 			adminRole: 'admin' | 'super_admin' | null
+			mustChangePassword: boolean
 		}
 		// interface PageData {}
 		// interface PageState {}

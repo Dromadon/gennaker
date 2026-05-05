@@ -75,7 +75,9 @@ npx wrangler d1 execute gennaker --local \
 
 ## Première connexion d'un nouvel admin
 
-Quand un super-admin crée un compte, `must_change_password` est positionné à `1`. À la connexion suivante, `hooks.server.ts` redirige vers `/admin/profile?force=1`.
+Quand un super-admin crée un compte, `must_change_password` est positionné à `1`.
+
+`hooks.server.ts` vérifie ce flag à **chaque requête** : tant qu'il vaut `1`, toute route `/admin/*` autre que `/admin/profile` et `/admin/login` est redirigée vers `/admin/profile?force=1`. Il est donc impossible de contourner le changement de mot de passe en naviguant directement vers une URL.
 
 Sur cette page :
 - Le champ "mot de passe actuel" est **absent** — l'admin vient de s'authentifier, le redemander est inutile.
