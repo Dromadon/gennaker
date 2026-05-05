@@ -66,6 +66,8 @@ export const actions: Actions = {
 			ipAddress: ip
 		})
 
+		locals.logger.info('submission.approve', { requestId: locals.requestId, submissionId: submission.id, newQuestionId, adminId: locals.adminId })
+
 		return { approved: true, newQuestionId }
 	},
 
@@ -93,6 +95,8 @@ export const actions: Actions = {
 			metadata: buildSubmissionAuditMetadata(submission, { rejectionNote: parsed.data.rejectionNote }),
 			ipAddress: request.headers.get('cf-connecting-ip') ?? request.headers.get('x-forwarded-for') ?? null
 		})
+
+		locals.logger.info('submission.reject', { requestId: locals.requestId, submissionId: parsed.data.id, adminId: locals.adminId })
 
 		return { rejected: true }
 	}

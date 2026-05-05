@@ -490,6 +490,7 @@ Voir [docs/admin-export.md](docs/admin-export.md) et [docs/dev-setup.md](docs/de
 R2_PUBLIC_URL        # domaine public du bucket R2
 ADMIN_EMAIL          # destinataire des notifications
 RESEND_API_KEY       # clé API Resend
+LOG_LEVEL            # niveau de log : 'info' (défaut) | 'verbose' | 'debug'
 ```
 
 ### Secrets Workers (`wrangler secret put`)
@@ -503,3 +504,44 @@ ADMIN_SESSION_SECRET # secret pour signer le cookie de session
 DB      → Cloudflare D1 (accès via env.DB dans les Workers)
 IMAGES  → Cloudflare R2 (accès via env.IMAGES dans les Workers)
 ```
+
+---
+
+## 12. Observabilité
+
+### Logger
+
+Le système de logging est défini dans `src/lib/server/logger/` :
+
+```
+src/lib/server/logger/
+├── types.ts             # Interfaces Logger, LoggerAdapter, LogContext, LogLevel
+├── index.ts             # Factory createConsoleLogger() + placeholder Logflare
+└── console-logger.ts    # ConsoleAdapter : JSON structuré → console (Workers Logs natifs)
+```
+
+Le `Logger` est injecté dans `event.locals.logger` par le hook global (`src/hooks.server.ts`). Un `requestId` UUID est généré par requête et propagé dans chaque entrée de log.
+
+L'architecture est découplée : l'interface `LoggerAdapter` permet de brancher un backend alternatif (ex. Logflare) sans toucher au code métier. Voir le commentaire dans `index.ts` pour le contrat d'implémentation.
+
+### Niveaux de log (`LOG_LEVEL`)
+
+| Niveau | Contenu |
+|--------|---------|
+| `info` (défaut) | C/U/D des objets métiers (questions, soumissions, signalements, import, export) + toutes les erreurs (R2, sessions invalides, login échoué, 4xx API, 5xx) |
+| `verbose` | Tout `info` + génération/retirage d'évaluation (support, format, durée) |
+| `debug` | Non implémenté — réservé pour le log de chaque requête HTTP |
+
+### Voir les logs
+
+En dev local (`npm run dev` / `npm run dev:cf`), les entrées JSON structurées apparaissent directement dans le terminal du serveur — `{ ts, level, message, requestId, ...ctx }`.
+
+En production, via le dashboard Cloudflare (Workers & Pages → Logs) ou en temps réel :
+
+```bash
+wrangler tail --format=pretty
+```
+
+### Basculer vers Logflare
+
+Implémenter un adapter conforme à `LoggerAdapter` (voir commentaire dans `index.ts`) et l'instancier dans `src/hooks.server.ts` à la place du `ConsoleAdapter`. Ajouter les bindings CF `LOGFLARE_API_KEY` (secret) et `LOGFLARE_SOURCE_ID` (var), et appeler via `platform.context.waitUntil(adapter.send(...))` pour ne pas bloquer la réponse.

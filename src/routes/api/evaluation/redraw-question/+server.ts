@@ -10,7 +10,7 @@ const schema = z.object({
 	support: z.enum(['deriveur', 'catamaran', 'windsurf', 'croisiere'])
 })
 
-export const POST: RequestHandler = async ({ request, platform }) => {
+export const POST: RequestHandler = async ({ request, platform, locals }) => {
 	const body = await request.json()
 	const parsed = schema.safeParse(body)
 	if (!parsed.success) throw error(400, 'Paramètres invalides')
@@ -25,5 +25,8 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 	if (replacementId === null) throw error(422, 'Aucune autre question disponible dans cette section')
 
 	const [replacement] = await getQuestionsByIds(db, [replacementId])
+
+	locals.logger.info('evaluation.redraw', { requestId: locals.requestId, sectionId, support, excludedCount: excludeQuestionIds.length, replacementId })
+
 	return json(replacement)
 }

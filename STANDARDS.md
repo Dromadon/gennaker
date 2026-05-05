@@ -93,6 +93,22 @@ throw error(404, 'Évaluation introuvable')
 
 Ne jamais avaler une erreur silencieusement (`catch (e) {}`). Si une erreur est ignorée volontairement, la documenter.
 
+### Logging
+
+Ne jamais utiliser `console.log`, `console.error` ou `console.warn` directement dans le code applicatif. Passer systématiquement par le logger injecté :
+
+```typescript
+// Dans les routes (locals disponibles)
+locals.logger.info('question.create', { requestId: locals.requestId, questionId: id })
+locals.logger.warn('r2.delete_errors', { requestId: locals.requestId, errors })
+locals.logger.error('import.failed', err, { requestId: locals.requestId })
+
+// Dans les libs server sans accès à locals : passer le logger en paramètre
+async function deleteImages(r2: R2Bucket, id: number, logger: Logger): Promise<void>
+```
+
+Le logger est disponible via `event.locals.logger` dans toutes les routes et handlers SvelteKit. Il est instancié dans `src/hooks.server.ts` avec le niveau défini par `LOG_LEVEL` (var Cloudflare).
+
 ---
 
 ## 3. Organisation des fichiers

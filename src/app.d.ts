@@ -9,6 +9,8 @@ declare global {
 			adminId: number | null
 			adminRole: 'admin' | 'super_admin' | null
 			mustChangePassword: boolean
+			logger: import('$lib/server/logger/types').Logger
+			requestId: string
 		}
 		// interface PageData {}
 		// interface PageState {}
@@ -20,6 +22,7 @@ declare global {
 				ADMIN_EMAIL: string
 				RESEND_API_KEY: string
 				ADMIN_SESSION_SECRET: string
+				LOG_LEVEL?: string
 			}
 		}
 	}

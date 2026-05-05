@@ -11,7 +11,7 @@ const schema = z.object({
 	format: z.enum(['standard', 'raccourcie', 'positionnement'])
 })
 
-export const GET: RequestHandler = async ({ url, platform }) => {
+export const GET: RequestHandler = async ({ url, platform, locals }) => {
 	const parsed = schema.safeParse({
 		support: url.searchParams.get('support'),
 		format: url.searchParams.get('format')
@@ -27,6 +27,7 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 	const sectionIds = template.slots.map((s) => s.sectionId)
 	const metaBySection = await getQuestionMetaBySection(db, sectionIds)
 
+	const t0 = Date.now()
 	const drawn = drawEvaluation(template, metaBySection)
 	if (!drawn.ok) throw error(422, drawn.error)
 
@@ -49,6 +50,8 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 			questions: slot.questionIds.map((id) => questionsById.get(id)!)
 		}))
 	}
+
+	locals.logger.info('evaluation.generate', { requestId: locals.requestId, support, format, questionCount: allIds.length, durationMs: Date.now() - t0 })
 
 	return json(evaluation)
 }

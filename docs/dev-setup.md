@@ -16,6 +16,10 @@ ADMIN_SESSION_SECRET=<valeur générée>
 
 # URL publique du bucket R2 local (ne pas modifier)
 R2_PUBLIC_URL=/r2-proxy
+
+# Niveau de log applicatif (optionnel, défaut : info)
+# Valeurs : info | verbose | debug
+# LOG_LEVEL=verbose
 ```
 
 Ce fichier est chargé par Wrangler et injecté dans le Worker au démarrage (`npm run dev:cf`). Il est l'équivalent local des secrets configurés avec `wrangler secret put` en production.
@@ -101,6 +105,18 @@ NODE_OPTIONS=--experimental-sqlite npx tsx scripts/dev/r2-list.ts 1
 
 # Lister toutes les clés R2
 NODE_OPTIONS=--experimental-sqlite npx tsx scripts/dev/r2-list.ts
+```
+
+## Voir les logs en dev
+
+Les logs JSON structurés apparaissent directement dans le terminal qui exécute `npm run dev` ou `npm run dev:cf` — pas de commande supplémentaire.
+
+Pour activer le niveau verbose (génération/retirage d'évaluation), décommenter `LOG_LEVEL=verbose` dans `.dev.vars` et relancer le serveur.
+
+En production, les logs sont accessibles via le dashboard Cloudflare (Workers & Pages → Logs) ou en temps réel avec :
+
+```bash
+wrangler tail --format=pretty
 ```
 
 ## Équivalents production

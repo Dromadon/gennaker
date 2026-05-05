@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { noopLogger } from '$lib/server/logger'
 import { load as listLoad, actions as listActions } from './+page.server'
 import { load as newLoad, actions as newActions } from './new/+page.server'
 
@@ -64,7 +65,7 @@ function makeRequest(formData: FormData) {
 
 function makeEvent(isAdmin: boolean, extra: object = {}) {
 	return {
-		locals: { isAdmin, adminId: 1 },
+		locals: { isAdmin, adminId: 1, logger: noopLogger, requestId: 'test' },
 		platform: { env: { DB: {} } },
 		url: new URL('http://localhost/admin/questions'),
 		request: { headers: mockHeaders },

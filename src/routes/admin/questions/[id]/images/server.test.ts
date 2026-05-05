@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { noopLogger } from '$lib/server/logger'
 import { POST } from './+server'
 
 const mockR2 = { put: vi.fn().mockResolvedValue(undefined) }
@@ -15,7 +16,7 @@ function makeEvent(
 	formData: FormData = new FormData()
 ) {
 	return {
-		locals: { isAdmin },
+		locals: { isAdmin, logger: noopLogger, requestId: 'test' },
 		params,
 		platform: { env: r2 ? { IMAGES: r2 } : {} },
 		request: { formData: () => Promise.resolve(formData) }

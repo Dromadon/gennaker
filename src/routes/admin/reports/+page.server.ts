@@ -48,6 +48,8 @@ export const actions: Actions = {
 			ipAddress: request.headers.get('cf-connecting-ip') ?? request.headers.get('x-forwarded-for') ?? null
 		})
 
+		locals.logger.info('report.toggleStatus', { requestId: locals.requestId, reportId: parsed.data.id, status: parsed.data.status, adminId: locals.adminId })
+
 		return { updated: true }
 	}
 }

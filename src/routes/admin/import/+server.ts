@@ -26,10 +26,12 @@ export const POST: RequestHandler = async ({ request, url, platform, locals }) =
 	try {
 		result = await importZip(db, r2, zipBytes, { wipe, only })
 	} catch (err) {
+		locals.logger.error('import.failed', err, { requestId: locals.requestId, adminId: locals.adminId, wipe, only })
 		const message = err instanceof Error ? err.message : String(err)
-		console.error('[import] erreur :', message)
 		error(500, message)
 	}
+
+	locals.logger.info('import.done', { requestId: locals.requestId, adminId: locals.adminId, wipe, only })
 
 	return json(result)
 }

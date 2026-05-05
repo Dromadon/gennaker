@@ -14,7 +14,7 @@ const loginSchema = z.object({
 })
 
 export const actions: Actions = {
-	default: async ({ request, platform, cookies }) => {
+	default: async ({ request, platform, cookies, locals }) => {
 		const data = await request.formData()
 		const parsed = loginSchema.safeParse({
 			email: data.get('email'),
@@ -29,10 +29,16 @@ export const actions: Actions = {
 		if (!db) return fail(500, { error: 'Erreur serveur' })
 
 		const admin = await findAdminByEmail(db, email)
-		if (!admin) return fail(401, { error: 'Identifiants incorrects' })
+		if (!admin) {
+			locals.logger.warn('login.failed', { requestId: locals.requestId, reason: 'admin introuvable' })
+			return fail(401, { error: 'Identifiants incorrects' })
+		}
 
 		const ok = await verifyPassword(admin.passwordHash, password)
-		if (!ok) return fail(401, { error: 'Identifiants incorrects' })
+		if (!ok) {
+			locals.logger.warn('login.failed', { requestId: locals.requestId, adminId: admin.id, reason: 'mot de passe invalide' })
+			return fail(401, { error: 'Identifiants incorrects' })
+		}
 
 		const token = await createSession(secret, { adminId: admin.id, role: admin.role })
 		cookies.set('admin_session', token, {

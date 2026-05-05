@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { noopLogger } from '$lib/server/logger'
 import { unzipSync } from 'fflate'
 import { GET } from './+server'
 
@@ -84,7 +85,7 @@ const mockR2 = {
 
 function makeEvent(isAdmin: boolean) {
 	return {
-		locals: { isAdmin },
+		locals: { isAdmin, logger: noopLogger, requestId: 'test' },
 		platform: { env: { DB: {}, IMAGES: mockR2 } }
 	} as unknown as Parameters<typeof GET>[0]
 }

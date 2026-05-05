@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { noopLogger } from '$lib/server/logger'
 import { actions, load } from './+page.server'
 
 const MOCK_SUBMISSION = {
@@ -83,7 +84,7 @@ function makeEvent(fields: Record<string, string>, isAdmin = true) {
 	return {
 		request: { formData: () => Promise.resolve(makeFormData(fields)), headers: mockHeaders },
 		platform: { env: { DB: {} } },
-		locals: { isAdmin, adminId: 1 }
+		locals: { isAdmin, adminId: 1, logger: noopLogger, requestId: 'test' }
 	} as unknown as Parameters<typeof actions.approve>[0]
 }
 
@@ -93,7 +94,7 @@ function makeLoadEvent(params: { isAdmin?: boolean; page?: string; status?: stri
 	if (page) url.searchParams.set('page', page)
 	if (status) url.searchParams.set('status', status)
 	return {
-		locals: { isAdmin },
+		locals: { isAdmin, logger: noopLogger, requestId: 'test' },
 		platform: { env: { DB: {} } },
 		url
 	} as unknown as Parameters<typeof load>[0]

@@ -92,6 +92,8 @@ export const actions: Actions = {
 			ipAddress: request.headers.get('cf-connecting-ip') ?? request.headers.get('x-forwarded-for') ?? null
 		})
 
+		locals.logger.info('question.update', { requestId: locals.requestId, questionId: id, adminId: locals.adminId })
+
 		// Supprimer toutes les images R2 non référencées dans le nouveau markdown (orphelines incluses)
 		if (r2) {
 			const newRefs = new Set([
@@ -99,7 +101,9 @@ export const actions: Actions = {
 				...extractImageRefs(parsed.data.correctionMd)
 			])
 			const { errors } = await deleteOrphanImages(r2, id, newRefs)
-			for (const err of errors) console.error('Erreur suppression R2:', err)
+			if (errors.length > 0) {
+				locals.logger.warn('r2.orphan_delete_errors', { requestId: locals.requestId, questionId: id, errors })
+			}
 		}
 
 		return { updated: true }
@@ -119,6 +123,7 @@ export const actions: Actions = {
 		if (r2) {
 			const { errors } = await deleteImagesForQuestion(r2, id)
 			if (errors.length > 0) {
+				locals.logger.warn('r2.delete_errors', { requestId: locals.requestId, questionId: id, errors })
 				return fail(500, {
 					deleteError: `Impossible de supprimer ${errors.length} image(s) R2. Suppression annulée. Erreurs : ${errors.join(', ')}`
 				})
@@ -126,6 +131,8 @@ export const actions: Actions = {
 		}
 
 		await deleteQuestion(d1, id)
+
+		locals.logger.info('question.delete', { requestId: locals.requestId, questionId: id, adminId: locals.adminId })
 
 		await insertAuditLog(d1, {
 			adminId: locals.adminId,

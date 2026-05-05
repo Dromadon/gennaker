@@ -1,8 +1,21 @@
 import type { Handle } from '@sveltejs/kit'
 import { verifySession } from '$lib/server/auth'
 import { findAdminById } from '$lib/server/db/queries/admins'
+import { createConsoleLogger } from '$lib/server/logger'
+import type { AppLogLevel } from '$lib/server/logger'
+
+function resolveLogLevel(raw: string | undefined): AppLogLevel {
+	if (raw === 'verbose' || raw === 'debug') return raw
+	return 'info'
+}
 
 export const handle: Handle = async ({ event, resolve }) => {
+	const logLevel = resolveLogLevel(event.platform?.env.LOG_LEVEL)
+	const requestId = crypto.randomUUID()
+	const logger = createConsoleLogger(logLevel)
+
+	event.locals.requestId = requestId
+	event.locals.logger = logger
 	event.locals.isAdmin = false
 	event.locals.adminId = null
 	event.locals.adminRole = null
@@ -31,9 +44,50 @@ export const handle: Handle = async ({ event, resolve }) => {
 				) {
 					return Response.redirect(new URL('/admin/profile?force=1', event.url), 302)
 				}
+			} else {
+				logger.warn('session.invalid', { requestId, reason: 'admin introuvable' })
 			}
+		} else if (token) {
+			logger.warn('session.invalid', { requestId, reason: 'token corrompu ou expiré' })
 		}
 	}
 
-	return resolve(event)
+	const t0 = Date.now()
+	let response: Response
+	try {
+		response = await resolve(event)
+	} catch (err) {
+		logger.error('request.unhandled_error', err, {
+			requestId,
+			method: event.request.method,
+			path: event.url.pathname,
+		})
+		throw err
+	}
+
+	const status = response.status
+	const durationMs = Date.now() - t0
+
+	// TODO debug level: log all requests (method, path, status, durationMs, adminId)
+
+	if (status >= 500) {
+		logger.error('request.error_5xx', undefined, {
+			requestId,
+			method: event.request.method,
+			path: event.url.pathname,
+			status,
+			durationMs,
+			adminId: event.locals.adminId,
+		})
+	} else if (status >= 400 && event.url.pathname.startsWith('/api/')) {
+		logger.warn('request.error_4xx', {
+			requestId,
+			method: event.request.method,
+			path: event.url.pathname,
+			status,
+			durationMs,
+		})
+	}
+
+	return response
 }

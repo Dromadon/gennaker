@@ -46,13 +46,13 @@ export const GET: RequestHandler = async ({ locals, platform }) => {
 			// Expected key format: "{id}/images/{filename}"
 			const parts = obj.key.split('/')
 			if (parts.length !== 3 || parts[1] !== 'images') {
-				console.error(`Clé R2 inattendue (ignorée) : ${obj.key}`)
+				locals.logger.warn('export.r2_unexpected_key', { requestId: locals.requestId, key: obj.key })
 				continue
 			}
 			const [idStr, , filename] = parts
 			const q = questionMap.get(Number(idStr))
 			if (!q) {
-				console.error(`Question inconnue pour clé R2 : ${obj.key}`)
+				locals.logger.warn('export.r2_unknown_question', { requestId: locals.requestId, key: obj.key })
 				continue
 			}
 			const zipKey = `${q.categorySlug}/${q.sectionSlug}/${q.id}/images/${filename}`
@@ -60,12 +60,14 @@ export const GET: RequestHandler = async ({ locals, platform }) => {
 				const r2obj = await r2.get(obj.key)
 				if (!r2obj) continue
 				files[zipKey] = new Uint8Array(await r2obj.arrayBuffer())
-			} catch {
-				console.error(`Erreur R2 : ${obj.key}`)
+			} catch (err) {
+				locals.logger.error('export.r2_get_error', err, { requestId: locals.requestId, key: obj.key })
 			}
 		}
 		cursor = listed.truncated ? listed.cursor : undefined
 	} while (cursor)
+
+	locals.logger.info('export.done', { requestId: locals.requestId, adminId: locals.adminId, questionsCount: questionRows.length })
 
 	const date = new Date().toISOString().slice(0, 10)
 	const filename = `gennaker-backup-${date}.zip`

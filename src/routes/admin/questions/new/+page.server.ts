@@ -57,6 +57,8 @@ export const actions: Actions = {
 
 		const id = await createQuestion(d1, parsed.data)
 
+		locals.logger.info('question.create', { requestId: locals.requestId, questionId: id, adminId: locals.adminId })
+
 		const after = await getQuestionAdminById(d1, id)
 		await insertAuditLog(d1, {
 			adminId: locals.adminId,

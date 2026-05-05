@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { noopLogger } from '$lib/server/logger'
 import { load, actions } from './+page.server'
 
 vi.mock('$lib/server/db/queries/reports', () => ({
@@ -43,7 +44,7 @@ function makeRequest(formData: FormData) {
 
 function makeEvent(isAdmin: boolean, extra: object = {}) {
 	return {
-		locals: { isAdmin, adminId: 1 },
+		locals: { isAdmin, adminId: 1, logger: noopLogger, requestId: 'test' },
 		platform: { env: { DB: {} } },
 		url: new URL('http://localhost/admin/reports'),
 		request: { headers: mockHeaders },
