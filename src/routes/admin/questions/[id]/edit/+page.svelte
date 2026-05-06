@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state'
 	import type { PageData, ActionData } from './$types'
 	import QuestionForm from '$lib/components/QuestionForm.svelte'
 
@@ -6,11 +7,13 @@
 
 	let deleteDialog: HTMLDialogElement
 	let deleteConfirm = $state('')
+
+	const backUrl = $derived(page.url.searchParams.get('back') ?? '/admin/questions')
 </script>
 
 <div class="mb-6 flex items-start justify-between">
 	<div>
-		<a href="/admin/questions" class="text-sm text-gray-500 hover:text-gray-900">← Questions</a>
+		<a href={backUrl} class="text-sm text-gray-500 hover:text-gray-900">← Questions</a>
 		<h1 class="mt-2 text-xl font-semibold text-gray-900">Modifier la question #{data.question.id}</h1>
 	</div>
 	<button

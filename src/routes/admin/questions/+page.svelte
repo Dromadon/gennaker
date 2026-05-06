@@ -44,6 +44,11 @@
 		return `/admin/questions${q ? '?' + q : ''}`
 	}
 
+	function buildEditUrl(id: number) {
+		const back = buildPageUrl(data.page)
+		return `/admin/questions/${id}/edit?back=${encodeURIComponent(back)}`
+	}
+
 	const supports = ['deriveur', 'catamaran', 'windsurf', 'croisiere']
 
 	const PROBLEM_LABELS: Record<string, string> = {
@@ -231,7 +236,7 @@
 				<!-- Actions -->
 				<div class="flex gap-2">
 					<a
-						href="/admin/questions/{selectedQuestion.id}/edit"
+						href={buildEditUrl(selectedQuestion.id)}
 						class="inline-flex items-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:border-blue-400 hover:bg-blue-100"
 					>
 						Modifier →
@@ -314,7 +319,7 @@
 		<div class="flex-1 overflow-y-auto p-4 space-y-4">
 			<div class="flex gap-2">
 				<a
-					href="/admin/questions/{selectedQuestion.id}/edit"
+					href={buildEditUrl(selectedQuestion.id)}
 					class="inline-flex items-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:border-blue-400 hover:bg-blue-100"
 				>
 					Modifier →
