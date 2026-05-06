@@ -48,6 +48,39 @@ export function drawEvaluation(
 			}
 		}
 
+		const selected: number[] = []
+		let remaining = pool
+
+		// 1. Question épinglée
+		if (slot.pinnedQuestionId !== null) {
+			const pinned = pool.find((q) => q.id === slot.pinnedQuestionId)
+			if (pinned) {
+				selected.push(pinned.id)
+				remaining = pool.filter((q) => q.id !== slot.pinnedQuestionId)
+			}
+		}
+
+		let needed = slot.questionCount - selected.length
+
+		// 2. Questions préférées (priorité sur la banque globale)
+		if (needed > 0 && slot.preferredQuestionIds.length > 0) {
+			const preferredSet = new Set(slot.preferredQuestionIds)
+			const preferredPool = remaining.filter((q) => preferredSet.has(q.id))
+			const fromPreferred = shuffle(preferredPool).slice(0, needed)
+			const fromPreferredSet = new Set(fromPreferred.map((q) => q.id))
+			for (const q of fromPreferred) selected.push(q.id)
+			remaining = remaining.filter((q) => !fromPreferredSet.has(q.id))
+			needed -= fromPreferred.length
+		}
+
+		// 3. Complément depuis la banque globale
+		if (needed > 0) {
+			const preferredSet = new Set(slot.preferredQuestionIds)
+			const fallbackPool = remaining.filter((q) => !preferredSet.has(q.id))
+			const fromFallback = shuffle(fallbackPool).slice(0, needed)
+			for (const q of fromFallback) selected.push(q.id)
+		}
+
 		slots.push({
 			slotId: slot.id,
 			sectionId: slot.sectionId,
@@ -56,7 +89,7 @@ export function drawEvaluation(
 			categoryDisplayName: slot.categoryDisplayName,
 			categorySlug: slot.categorySlug,
 			sectionSlug: slot.sectionSlug,
-			questionIds: shuffle(pool).slice(0, slot.questionCount).map((q) => q.id)
+			questionIds: selected
 		})
 	}
 

@@ -10,7 +10,11 @@ const makeMeta = (id: number, supports: string[] = [], sectionId = 1): QuestionM
 	answerSize: 'md'
 })
 
-const makeTemplate = (questionCount: number): EvaluationTemplate => ({
+const makeTemplate = (
+	questionCount: number,
+	pinnedQuestionId: number | null = null,
+	preferredQuestionIds: number[] = []
+): EvaluationTemplate => ({
 	id: 1,
 	support: 'deriveur',
 	format: 'standard',
@@ -24,7 +28,9 @@ const makeTemplate = (questionCount: number): EvaluationTemplate => ({
 			categorySlug: 'test-cat',
 			sectionSlug: 'test-section',
 			position: 1,
-			questionCount
+			questionCount,
+			pinnedQuestionId,
+			preferredQuestionIds
 		}
 	]
 })
@@ -90,6 +96,87 @@ describe('drawEvaluation', () => {
 		expect(result2.ok).toBe(true)
 		if (!result1.ok || !result2.ok) return
 		expect(result1.value.slots[0].questionIds).not.toEqual(result2.value.slots[0].questionIds)
+	})
+})
+
+describe('drawEvaluation — pinned/preferred', () => {
+	it('inclut systématiquement la question épinglée si disponible', () => {
+		const pool = [1, 2, 3, 4, 5].map((id) => makeMeta(id))
+		const result = drawEvaluation(makeTemplate(3, 1), { 1: pool })
+		expect(result.ok).toBe(true)
+		if (!result.ok) return
+		expect(result.value.slots[0].questionIds).toContain(1)
+	})
+
+	it('retourne uniquement la question épinglée si count = 1', () => {
+		const pool = [1, 2, 3].map((id) => makeMeta(id))
+		const result = drawEvaluation(makeTemplate(1, 2), { 1: pool })
+		expect(result.ok).toBe(true)
+		if (!result.ok) return
+		expect(result.value.slots[0].questionIds).toEqual([2])
+	})
+
+	it('dégrade silencieusement si la question épinglée est absente du pool', () => {
+		const pool = [1, 2, 3].map((id) => makeMeta(id))
+		const result = drawEvaluation(makeTemplate(2, 99), { 1: pool })
+		expect(result.ok).toBe(true)
+		if (!result.ok) return
+		expect(result.value.slots[0].questionIds).not.toContain(99)
+		expect(result.value.slots[0].questionIds).toHaveLength(2)
+	})
+
+	it('tire en priorité depuis la liste preferred si le pool est suffisant', () => {
+		const pool = [1, 2, 3, 4, 5].map((id) => makeMeta(id))
+		vi.spyOn(Math, 'random').mockReturnValue(0)
+		const result = drawEvaluation(makeTemplate(2, null, [3, 4, 5]), { 1: pool })
+		expect(result.ok).toBe(true)
+		if (!result.ok) return
+		const ids = result.value.slots[0].questionIds
+		expect(ids.every((id) => [3, 4, 5].includes(id))).toBe(true)
+	})
+
+	it('complète depuis la banque globale si preferred insuffisant', () => {
+		const pool = [1, 2, 3, 4, 5].map((id) => makeMeta(id))
+		const result = drawEvaluation(makeTemplate(4, null, [3]), { 1: pool })
+		expect(result.ok).toBe(true)
+		if (!result.ok) return
+		const ids = result.value.slots[0].questionIds
+		expect(ids).toHaveLength(4)
+		expect(ids).toContain(3)
+	})
+
+	it('combine pinned + preferred : épinglée en premier, count-1 depuis preferred', () => {
+		const pool = [1, 2, 3, 4, 5].map((id) => makeMeta(id))
+		vi.spyOn(Math, 'random').mockReturnValue(0)
+		const result = drawEvaluation(makeTemplate(3, 1, [2, 3, 4]), { 1: pool })
+		expect(result.ok).toBe(true)
+		if (!result.ok) return
+		const ids = result.value.slots[0].questionIds
+		expect(ids).toContain(1)
+		expect(ids).toHaveLength(3)
+		// les 2 autres viennent de preferred (2,3,4)
+		const others = ids.filter((id) => id !== 1)
+		expect(others.every((id) => [2, 3, 4].includes(id))).toBe(true)
+	})
+
+	it('avec pinned indispo : tire depuis preferred puis banque', () => {
+		const pool = [1, 2, 3, 4].map((id) => makeMeta(id))
+		vi.spyOn(Math, 'random').mockReturnValue(0)
+		const result = drawEvaluation(makeTemplate(2, 99, [1, 2]), { 1: pool })
+		expect(result.ok).toBe(true)
+		if (!result.ok) return
+		const ids = result.value.slots[0].questionIds
+		expect(ids).not.toContain(99)
+		expect(ids).toHaveLength(2)
+		expect(ids.every((id) => [1, 2].includes(id))).toBe(true)
+	})
+
+	it('ne change pas le comportement si preferredQuestionIds est vide', () => {
+		const pool = [1, 2, 3, 4, 5].map((id) => makeMeta(id))
+		const result = drawEvaluation(makeTemplate(3, null, []), { 1: pool })
+		expect(result.ok).toBe(true)
+		if (!result.ok) return
+		expect(result.value.slots[0].questionIds).toHaveLength(3)
 	})
 })
 

@@ -97,7 +97,8 @@ export async function getTemplate(
 
 export type TemplateSlotWithResolved = TemplateSlot & {
 	pinnedQuestionTitle: string | null
-	preferredQuestions: { id: number; title: string }[]
+	pinnedQuestionAvailable: boolean
+	preferredQuestions: { id: number; title: string; available: boolean }[]
 }
 
 export type TemplateWithSlots = {
@@ -150,22 +151,29 @@ export async function getAllTemplatesWithSlots(d1: D1Database): Promise<Template
 			for (const id of s.preferredQuestionIds) allIds.add(id)
 		}
 
-		const questionTitles = new Map<number, string>()
+		const questionData = new Map<number, { title: string; available: boolean }>()
 		if (allIds.size > 0) {
 			const rows = await db
-				.select({ id: questions.id, title: questions.title })
+				.select({ id: questions.id, title: questions.title, status: questions.status })
 				.from(questions)
 				.where(inArray(questions.id, [...allIds]))
-			for (const r of rows) questionTitles.set(r.id, r.title)
+			for (const r of rows) questionData.set(r.id, { title: r.title, available: r.status === 'publie' })
 		}
 
 		result.push({
 			...t,
-			slots: parsedSlots.map((s) => ({
-				...s,
-				pinnedQuestionTitle: s.pinnedQuestionId !== null ? (questionTitles.get(s.pinnedQuestionId) ?? null) : null,
-				preferredQuestions: s.preferredQuestionIds.map((id) => ({ id, title: questionTitles.get(id) ?? `#${id}` }))
-			}))
+			slots: parsedSlots.map((s) => {
+				const pinnedData = s.pinnedQuestionId !== null ? questionData.get(s.pinnedQuestionId) : undefined
+				return {
+					...s,
+					pinnedQuestionTitle: pinnedData?.title ?? null,
+					pinnedQuestionAvailable: pinnedData?.available ?? false,
+					preferredQuestions: s.preferredQuestionIds.map((id) => {
+						const d = questionData.get(id)
+						return { id, title: d?.title ?? `#${id}`, available: d?.available ?? false }
+					})
+				}
+			})
 		})
 	}
 
