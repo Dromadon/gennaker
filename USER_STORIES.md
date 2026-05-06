@@ -71,7 +71,7 @@ Créer `vitest.int.config.ts` avec `@cloudflare/vitest-pool-workers` (Miniflare)
 - Le tirage est aléatoire : deux générations successives produisent des questions différentes (dans la mesure où la banque le permet)
 
 **Hors périmètre**
-- Questions épinglées / par défaut
+- Questions épinglées / par défaut (voir US-21 et US-22)
 - Filtre par difficulté
 - Exclusion inter-slots (une même question peut apparaître deux fois si la banque est petite — pas de logique d'exclusion en MVP)
 
@@ -252,7 +252,8 @@ Les stories suivantes sont identifiées mais hors scope MVP, classées par prior
 | 4c | US-17 : Ajuster le nombre de questions par section après génération (voir ci-dessous) |
 | 4c | US-17 : Choisir le nombre de questions par section lors de la création d'une évaluation (voir ci-dessous) |
 | 6 | Gestion de la difficulté des questions (annotation + filtre au tirage) |
-| 7 | Questions épinglées et questions par défaut dans les templates |
+| 7 | US-21 : Épingler une question sur un slot de template (voir ci-dessous) |
+| 7 | US-22 : Définir des questions par défaut sur un slot de template (voir ci-dessous) |
 | 9 | US-18 : Soumission communautaire de questions |
 | 11 | US-19 : Interface admin : modération des soumissions |
 
@@ -742,5 +743,69 @@ _Interface_
 - MFA supplémentaire sur le lien magique
 
 **Dépend de** : US-20d (infrastructure email déjà en place) ou mise en place directe de Resend.
+
+---
+
+### US-21 — Épingler une question sur un slot de template
+
+**En tant que** administrateur,  
+**je veux** associer une question fixe à un slot de template (question épinglée),  
+**afin de** garantir qu'une question précise apparaît systématiquement dans toutes les évaluations générées depuis ce template.
+
+**Critères d'acceptation**
+
+_Association_
+- Depuis l'interface d'édition d'un template, chaque slot dispose d'un champ "Question épinglée" (picker de question)
+- Le picker filtre les questions publiées compatibles avec le support du template et la section du slot
+- Une seule question peut être épinglée par slot (champ nullable)
+- L'association est enregistrée dans `pinned_question_id` du slot
+- L'admin peut retirer l'épinglage (remettre le champ à null)
+
+_Comportement au tirage_
+- La question épinglée est systématiquement incluse dans le slot correspondant lors de la génération
+- Les `count - 1` questions restantes du slot sont tirées aléatoirement dans la banque (hors question épinglée)
+- Si `count = 1`, la question épinglée est l'unique question du slot
+
+_Cohérence_
+- Si la question épinglée est dépubliée ou supprimée, le slot est complété par un tirage aléatoire (dégradation silencieuse) ; un avertissement est visible lors de l'édition du slot de template
+- Un doublon entre slots est structurellement impossible : une question appartient à une section précise, et chaque slot correspond à une section
+
+**Hors périmètre**
+- Interface de gestion des templates (Priorité 3 du backlog)
+- Épinglage multiple par slot
+- Avertissement à la génération en cas de question épinglée indisponible
+
+**Dépend de** : Interface admin de gestion des templates et slots (Priorité 3).
+
+---
+
+### US-22 — Définir des questions par défaut sur un slot de template
+
+**En tant que** administrateur,  
+**je veux** définir une liste de questions "par défaut" sur un slot de template,  
+**afin d'** orienter le tirage vers les questions les plus pédagogiquement pertinentes tout en gardant une part d'aléatoire.
+
+**Critères d'acceptation**
+
+_Association_
+- Depuis l'édition d'un slot de template, un champ multi-sélection "Questions par défaut" permet d'ajouter plusieurs questions
+- Le picker filtre les questions publiées compatibles avec le support et la section du slot
+- L'ordre de la liste n'a pas d'importance (le tirage dans la liste est aléatoire)
+- Les questions sélectionnées sont enregistrées dans `preferred_question_ids` (JSON)
+- L'admin peut retirer des questions de la liste ou la vider entièrement
+
+_Comportement au tirage_
+- Les `count` questions du slot sont tirées en priorité depuis la liste des questions par défaut (tirage aléatoire dans la liste)
+- Si la liste contient moins de `count` questions disponibles, les slots restants sont complétés par un tirage aléatoire dans la banque globale du slot (mêmes critères de filtre)
+- Si `pinned_question_id` est défini sur le slot, il prime : la question épinglée est incluse, puis `count - 1` tirages sont faits en priorité dans la liste par défaut, puis dans la banque si insuffisant
+
+_Cohérence_
+- Une question dépubliée présente dans `preferred_question_ids` est ignorée silencieusement au tirage (pas de blocage) ; un avertissement est visible à l'édition du slot
+
+**Hors périmètre**
+- Pondération ou ordre de priorité au sein de la liste par défaut
+- Interface de visualisation "quelles évaluations utilisent cette question ?"
+
+**Dépend de** : Interface admin de gestion des templates et slots (Priorité 3).
 
 ---

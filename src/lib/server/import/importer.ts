@@ -204,7 +204,6 @@ async function importTemplates(db: AnyDb, templates: TemplateExportRow[]): Promi
 					sectionId: sectionRow.id,
 					position: slot.position,
 					questionCount: slot.questionCount,
-					difficultyFilter: slot.difficultyFilter,
 					pinnedQuestionId: slot.pinnedQuestionId ?? null,
 					preferredQuestionIds: slot.preferredQuestionIds ?? '[]'
 				})
@@ -213,7 +212,6 @@ async function importTemplates(db: AnyDb, templates: TemplateExportRow[]): Promi
 					set: {
 						sectionId: sectionRow.id,
 						questionCount: slot.questionCount,
-						difficultyFilter: slot.difficultyFilter,
 						pinnedQuestionId: slot.pinnedQuestionId ?? null,
 						preferredQuestionIds: slot.preferredQuestionIds ?? '[]'
 					}

@@ -64,7 +64,6 @@ export const templateSlots = sqliteTable('template_slots', {
 		.references(() => sections.id),
 	position: integer('position').notNull(),
 	questionCount: integer('question_count').notNull(),
-	difficultyFilter: text('difficulty_filter').notNull().default('any'), // 'any' | 'facile' | 'moyen' | 'difficile'
 	pinnedQuestionId: integer('pinned_question_id').references(() => questions.id),
 	// JSON stringifié : '[42, 17]'
 	preferredQuestionIds: text('preferred_question_ids').notNull().default('[]')

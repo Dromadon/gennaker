@@ -1,0 +1,1 @@
+ALTER TABLE `template_slots` DROP COLUMN `difficulty_filter`;

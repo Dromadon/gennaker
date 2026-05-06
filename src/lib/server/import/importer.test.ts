@@ -69,7 +69,6 @@ function createTestDb() {
 			section_id INTEGER NOT NULL REFERENCES sections(id),
 			position INTEGER NOT NULL,
 			question_count INTEGER NOT NULL,
-			difficulty_filter TEXT NOT NULL DEFAULT 'any',
 			pinned_question_id INTEGER REFERENCES questions(id),
 			preferred_question_ids TEXT NOT NULL DEFAULT '[]'
 		);
@@ -138,7 +137,6 @@ const TEMPLATES = [
 				sectionSlug: 'carte_meteo',
 				position: 1,
 				questionCount: 3,
-				difficultyFilter: 'any',
 				pinnedQuestionId: null,
 				preferredQuestionIds: '[]'
 			}

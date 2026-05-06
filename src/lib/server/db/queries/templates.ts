@@ -13,7 +13,6 @@ export type TemplateExportRow = {
 		sectionSlug: string
 		position: number
 		questionCount: number
-		difficultyFilter: string
 		pinnedQuestionId: number | null
 		preferredQuestionIds: string
 	}[]
@@ -35,7 +34,6 @@ export async function getAllTemplatesForExport(d1: D1Database): Promise<Template
 				sectionSlug: sections.slug,
 				position: templateSlots.position,
 				questionCount: templateSlots.questionCount,
-				difficultyFilter: templateSlots.difficultyFilter,
 				pinnedQuestionId: templateSlots.pinnedQuestionId,
 				preferredQuestionIds: templateSlots.preferredQuestionIds
 			})
