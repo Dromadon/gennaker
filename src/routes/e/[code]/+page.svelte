@@ -1,14 +1,13 @@
 <script lang="ts">
-	import { goto } from '$app/navigation'
 	import { page } from '$app/state'
-	import { evaluationStore, setSlotQuestions } from '$lib/stores/evaluation'
-	import type { EvaluationSlot, Question, QuestionPickRow } from '$lib/domain/types'
+	import type { PageData } from './$types'
+	import type { SharedEvaluationSlotWithUnavailable } from './+page.server'
+	import type { Question, QuestionPickRow } from '$lib/domain/types'
 	import { createMarkdownRenderer } from '$lib/markdown'
 	import QuestionPickerModal from '$lib/components/QuestionPickerModal.svelte'
 	import ReportModal from '$lib/components/ReportModal.svelte'
-	import ShareModal from '$lib/components/ShareModal.svelte'
 
-	const evaluation = $derived($evaluationStore)
+	let { data }: { data: PageData } = $props()
 
 	let showCorrection = $state(false)
 	let hideCategoriesOnPrint = $state(false)
@@ -17,29 +16,27 @@
 	let activeTab = $state<'structure' | 'impression'>('structure')
 	let desktopTab = $state<'structure' | 'impression'>('structure')
 	let redrawingSlotId = $state<number | null>(null)
-	let managerSlot = $state<EvaluationSlot | null>(null)
+	let managerSlot = $state<SharedEvaluationSlotWithUnavailable | null>(null)
 	let reportQuestionId = $state<number | null>(null)
 	let reportQuestionTitle = $state('')
-	let shareModalOpen = $state(false)
-	let shareUrl = $state('')
-	let sharing = $state(false)
 	let toastMessage = $state('')
 	let toastVisible = $state(false)
 	let toastTimer: ReturnType<typeof setTimeout> | null = null
 
-	$effect(() => {
-		if (!evaluation) goto('/')
-	})
+	let slots = $state<SharedEvaluationSlotWithUnavailable[]>(
+		data.expired ? [] : (data.slots as SharedEvaluationSlotWithUnavailable[])
+	)
+
+	const support = data.support
+	const format = data.format
 
 	const slotsByCategory = $derived(
-		evaluation
-			? evaluation.slots.reduce((acc, slot) => {
-					if (!acc.has(slot.categoryId))
-						acc.set(slot.categoryId, { name: slot.categoryDisplayName, slots: [] })
-					acc.get(slot.categoryId)!.slots.push(slot)
-					return acc
-				}, new Map<number, { name: string; slots: EvaluationSlot[] }>())
-			: new Map<number, { name: string; slots: EvaluationSlot[] }>()
+		slots.reduce((acc, slot) => {
+			if (!acc.has(slot.categoryId))
+				acc.set(slot.categoryId, { name: slot.categoryDisplayName, slots: [] })
+			acc.get(slot.categoryId)!.slots.push(slot)
+			return acc
+		}, new Map<number, { name: string; slots: SharedEvaluationSlotWithUnavailable[] }>())
 	)
 
 	function renderMd(md: string, questionId: number): string {
@@ -61,30 +58,30 @@
 		toastTimer = setTimeout(() => (toastVisible = false), 4000)
 	}
 
-	async function redrawSection(slot: EvaluationSlot) {
-		if (!evaluation || redrawingSlotId !== null) return
+	async function redrawSection(slot: SharedEvaluationSlotWithUnavailable) {
+		if (redrawingSlotId !== null) return
 		redrawingSlotId = slot.slotId
 		const drawn: Question[] = []
-		// Pour chaque question du slot, on tire un remplacement en excluant toutes les questions déjà tirées + celles du tirage en cours
 		for (const q of slot.questions) {
 			const excludeIds = [...slot.questions.map((x) => x.id), ...drawn.map((x) => x.id)]
 			try {
 				const res = await fetch('/api/evaluation/redraw-question', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ sectionId: slot.sectionId, excludeQuestionIds: excludeIds, support: evaluation.support })
+					body: JSON.stringify({ sectionId: slot.sectionId, excludeQuestionIds: excludeIds, support })
 				})
 				if (res.ok) {
 					drawn.push(await res.json())
 				} else {
-					// Banque épuisée pour cette question : on conserve l'originale
 					drawn.push(q)
 				}
 			} catch {
 				drawn.push(q)
 			}
 		}
-		setSlotQuestions(slot.slotId, drawn)
+		slots = slots.map((s) =>
+			s.slotId === slot.slotId ? { ...s, questions: drawn, unavailableCount: 0 } : s
+		)
 		showToast('Section re-tirée')
 		redrawingSlotId = null
 	}
@@ -102,36 +99,17 @@
 			applicableSupports: c.applicableSupports,
 			answerSize: c.answerSize
 		}))
-		setSlotQuestions(slotId, newQuestions)
+		slots = slots.map((s) =>
+			s.slotId === slotId ? { ...s, questions: newQuestions, unavailableCount: 0 } : s
+		)
 		showToast(newQuestions.length === 0 ? 'Section désactivée' : 'Section mise à jour')
 		managerSlot = null
 	}
 
-	async function shareEvaluation() {
-		if (!evaluation || sharing) return
-		sharing = true
-		try {
-			const res = await fetch('/api/evaluation/share', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(evaluation)
-			})
-			if (!res.ok) { showToast('Erreur lors du partage'); return }
-			const { url } = await res.json()
-			shareUrl = url
-			shareModalOpen = true
-		} catch {
-			showToast('Erreur réseau')
-		} finally {
-			sharing = false
-		}
-	}
-
 	function printEvaluation() {
-		if (!evaluation) return
 		const date = new Date().toISOString().slice(0, 10)
 		const prev = document.title
-		document.title = `Evaluation-${evaluation.support}-${evaluation.format}-${date}`
+		document.title = `Evaluation-${support}-${format}-${date}`
 		window.addEventListener('afterprint', () => { document.title = prev }, { once: true })
 		window.print()
 	}
@@ -148,12 +126,21 @@
 	</div>
 {/if}
 
-{#if evaluation}
+{#if data.expired}
+	<div class="flex min-h-screen items-center justify-center px-4">
+		<div class="text-center">
+			<p class="mb-4 text-lg font-semibold text-gray-800">Ce lien a expiré</p>
+			<p class="mb-6 text-sm text-gray-500">Générez une nouvelle évaluation depuis la page d'accueil.</p>
+			<a href="/" class="rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">
+				Retour à l'accueil
+			</a>
+		</div>
+	</div>
+{:else}
 	<div class="flex min-h-screen print:block">
 
 		<!-- Panel latéral desktop (droite) -->
 		<aside class="hidden lg:flex w-56 shrink-0 border-l border-gray-200 sticky top-0 h-screen flex-col order-last print:hidden">
-			<!-- Onglets -->
 			<div class="flex border-b border-gray-200 px-2">
 				<button
 					onclick={() => (desktopTab = 'structure')}
@@ -168,7 +155,6 @@
 					Impression
 				</button>
 			</div>
-			<!-- Contenu -->
 			<div class="flex-1 overflow-y-auto p-4">
 				{#if desktopTab === 'structure'}
 					{#each slotsByCategory.entries() as [categoryId, category]}
@@ -223,7 +209,7 @@
 					</svg>
 				</a>
 				<h1 class="flex-1 min-w-0 truncate text-base font-semibold capitalize px-1">
-					{evaluation.support} — {evaluation.format}
+					{support} — {format}
 				</h1>
 				<button
 					onclick={() => (showCorrection = !showCorrection)}
@@ -232,17 +218,6 @@
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-					</svg>
-				</button>
-				<button
-					onclick={shareEvaluation}
-					disabled={sharing}
-					class="flex items-center justify-center rounded-md p-1.5 text-gray-500 hover:bg-gray-100 disabled:opacity-40"
-					aria-label="Partager"
-					title="Partager"
-				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
 					</svg>
 				</button>
 				<button
@@ -261,20 +236,8 @@
 				<!-- Header desktop -->
 				<header class="mb-8 hidden lg:flex items-center justify-between print:hidden">
 					<h1 class="text-2xl font-bold capitalize">
-						Évaluation {evaluation.support} — {evaluation.format}
+						Évaluation {support} — {format}
 					</h1>
-					<div class="flex items-center gap-2">
-					<button
-						onclick={shareEvaluation}
-						disabled={sharing}
-						class="flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-50 disabled:opacity-40"
-						aria-label="Partager"
-					>
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-						</svg>
-						Partager
-					</button>
 					<button
 						onclick={() => (showCorrection = !showCorrection)}
 						class="flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors {showCorrection ? 'border-gray-800 bg-gray-800 text-white' : 'border-gray-200 text-gray-500 hover:bg-gray-50'}"
@@ -285,11 +248,10 @@
 						</svg>
 						Correction
 					</button>
-				</div>
 				</header>
 
-				{#each evaluation.slots as slot, i}
-					{@const prevSlot = i > 0 ? evaluation.slots[i - 1] : null}
+				{#each slots as slot, i}
+					{@const prevSlot = i > 0 ? slots[i - 1] : null}
 					{@const newCategory = !prevSlot || prevSlot.categoryId !== slot.categoryId}
 
 					{#if newCategory}
@@ -298,13 +260,12 @@
 						</h2>
 					{/if}
 
-					<section class="mb-6 print:divide-y print:divide-gray-200 {slot.questions.length === 0 ? 'print:hidden' : ''}">
+					<section class="mb-6 print:divide-y print:divide-gray-200 {slot.questions.length === 0 && slot.unavailableCount === 0 ? 'print:hidden' : ''}">
 						<div class="mb-2 flex items-center justify-between break-after-avoid {hideSectionsOnPrint ? 'print:hidden' : ''}">
 							<h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">
 								{slot.sectionDisplayName}
 							</h3>
 							<div class="print:hidden flex items-center gap-1">
-								<!-- Choisir les questions -->
 								<button
 									onclick={() => (managerSlot = slot)}
 									disabled={redrawingSlotId !== null || managerSlot !== null}
@@ -315,7 +276,6 @@
 									</svg>
 									Choisir
 								</button>
-								<!-- Re-tirer toute la section -->
 								<button
 									onclick={() => redrawSection(slot)}
 									disabled={redrawingSlotId !== null || managerSlot !== null}
@@ -330,7 +290,13 @@
 							</div>
 						</div>
 
-						{#if slot.questions.length === 0}
+						{#if slot.unavailableCount > 0}
+							<p class="mb-3 rounded-lg border border-dashed border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-700 print:hidden">
+								{slot.unavailableCount} question{slot.unavailableCount > 1 ? 's' : ''} indisponible{slot.unavailableCount > 1 ? 's' : ''} — re-tirez ou sélectionnez une question manuellement
+							</p>
+						{/if}
+
+						{#if slot.questions.length === 0 && slot.unavailableCount === 0}
 							<p class="mb-6 rounded-lg border border-dashed border-gray-200 px-5 py-4 text-sm text-gray-400 italic print:hidden">
 								Section désactivée — aucune question
 							</p>
@@ -448,7 +414,7 @@
 		<QuestionPickerModal
 			open={true}
 			slot={managerSlot}
-			support={evaluation.support}
+			support={support}
 			selectedIds={managerSlot.questions.map((q) => q.id)}
 			onapply={handleManage}
 			onclose={() => (managerSlot = null)}
@@ -460,10 +426,5 @@
 		questionTitle={reportQuestionTitle}
 		onclose={() => { reportQuestionId = null }}
 		onsuccess={() => showToast('Signalement envoyé, merci')}
-	/>
-	<ShareModal
-		open={shareModalOpen}
-		url={shareUrl}
-		onclose={() => (shareModalOpen = false)}
 	/>
 {/if}

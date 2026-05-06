@@ -98,3 +98,75 @@ Clic 🔍 sur l'en-tête d'une section (vue /evaluation)
 
 Endpoint : `src/routes/api/evaluation/question-candidates/+server.ts`  
 Store : `src/lib/stores/evaluation.ts → setSlotQuestions()`
+
+---
+
+## Flux — partage d'une évaluation (US-23)
+
+```
+Clic "Partager" (barre mobile ou header desktop, vue /evaluation)
+  │
+  ├─ POST /api/evaluation/share
+  │    body: Evaluation complète (depuis evaluationStore)
+  │
+  ├─ Serveur :
+  │    Valide avec Zod
+  │    Mappe slots → SharedEvaluationSlotJson[] (garde slotId, sectionId, categoryId,
+  │      displayNames, slugs, questionIds uniquement — pas le contenu des questions)
+  │    Génère shortCode (nanoid 6 chars alphanumériques)
+  │    INSERT INTO shared_evaluations (short_code, support_slug, format, slots_json,
+  │      created_at, expires_at = now + 30j)
+  │    → retourne { url: '/e/{shortCode}' }
+  │
+  └─ Client :
+       Ouvre ShareModal avec l'URL complète
+       Bouton "Copier le lien" → clipboard
+
+Query : `src/lib/server/db/queries/shared-evaluations.ts → createSharedEvaluation()`
+```
+
+### Format slots_json (stocké en D1)
+
+```json
+[
+  {
+    "slotId": 1,
+    "sectionId": 10,
+    "categoryId": 2,
+    "sectionDisplayName": "Météo",
+    "categoryDisplayName": "Navigation",
+    "categorySlug": "navigation",
+    "sectionSlug": "meteo",
+    "questionIds": [42, 17]
+  }
+]
+```
+
+Seuls les IDs des questions sont persistés. Le contenu complet est rechargé depuis D1 à chaque consultation.
+
+---
+
+## Flux — consultation d'un lien partagé
+
+```
+GET /e/{code}
+  │
+  ├─ +page.server.ts (SvelteKit SSR, Worker Cloudflare) :
+  │    Valide code (6 chars alphanumériques) → 400 si invalide
+  │    getSharedEvaluation(db, code) → null si inexistant → 404
+  │    Vérifie expiresAt < now → retourne { expired: true } (page affiche message)
+  │    getQuestionsByIds(allIds) pour tous les questionIds du snapshot
+  │    Questions absentes (supprimées depuis le partage) → unavailableCount par slot
+  │    → retourne { expired: false, support, format, slots, expiresAt }
+  │
+  └─ +page.svelte :
+       Affiche l'évaluation (même structure que /evaluation)
+       Si expired → message "Ce lien a expiré — générez une nouvelle évaluation"
+       Si unavailableCount > 0 → encart orange par slot concerné
+       Re-tirage (↺) et sélection manuelle (🔍) fonctionnent localement
+         → appellent les mêmes APIs existantes (redraw-question, question-candidates)
+         → ne modifient pas le snapshot en D1
+```
+
+Expiration : vérifiée à la lecture uniquement (`expires_at` en D1). Aucune purge serveur automatique.
+

@@ -6,7 +6,7 @@
 	let { children } = $props();
 
 	const isAdmin = $derived(page.url.pathname.startsWith('/admin'));
-	const isEvaluation = $derived(page.url.pathname.startsWith('/evaluation'));
+	const isEvaluation = $derived(page.url.pathname.startsWith('/evaluation') || page.url.pathname.startsWith('/e/'));
 </script>
 
 <svelte:head>

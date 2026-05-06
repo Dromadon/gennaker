@@ -244,18 +244,12 @@ Les stories suivantes sont identifiées mais hors scope MVP, classées par prior
 
 | Priorité | Story |
 |----------|-------|
-| 1 | Partage d'une évaluation via lien court (short code, expiration 30 jours) |
+| 1 | US-23 : Partage d'une évaluation via lien court (short code, expiration 30 jours) ✅ |
 | 2c | US-13 : Sources des questions — affichage et gestion (voir ci-dessous) |
 | 3 | Interface admin : gestion des templates et slots |
 | 4 | Modification de structure : ajouter / supprimer un slot dans une évaluation |
-| 4b | US-06 : Re-tirer toutes les questions d'un slot (bouton par slot dans le panneau latéral) |
-| 4c | US-17 : Ajuster le nombre de questions par section après génération (voir ci-dessous) |
-| 4c | US-17 : Choisir le nombre de questions par section lors de la création d'une évaluation (voir ci-dessous) |
 | 6 | Gestion de la difficulté des questions (annotation + filtre au tirage) |
-| 7 | US-21 : Épingler une question sur un slot de template (voir ci-dessous) |
-| 7 | US-22 : Définir des questions par défaut sur un slot de template (voir ci-dessous) |
-| 9 | US-18 : Soumission communautaire de questions |
-| 11 | US-19 : Interface admin : modération des soumissions |
+
 
 ---
 
@@ -746,7 +740,7 @@ _Interface_
 
 ---
 
-### US-21 — Épingler une question sur un slot de template
+### US-21 ✅ — Épingler une question sur un slot de template
 
 **En tant que** administrateur,  
 **je veux** associer une question fixe à un slot de template (question épinglée),  
@@ -779,7 +773,7 @@ _Cohérence_
 
 ---
 
-### US-22 — Définir des questions par défaut sur un slot de template
+### US-22 ✅ — Définir des questions par défaut sur un slot de template
 
 **En tant que** administrateur,  
 **je veux** définir une liste de questions "par défaut" sur un slot de template,  
@@ -807,5 +801,49 @@ _Cohérence_
 - Interface de visualisation "quelles évaluations utilisent cette question ?"
 
 **Dépend de** : Interface admin de gestion des templates et slots (Priorité 3).
+
+---
+
+### US-23 ✅ — Partager une évaluation via lien court
+
+**En tant que** formateur,  
+**je veux** générer un lien court partageable depuis une évaluation que j'ai générée,  
+**afin de** transmettre exactement cette évaluation à des collègues ou stagiaires sans qu'ils aient à reconfigurer le tirage.
+
+**Critères d'acceptation**
+
+_Génération du lien_
+- Un bouton "Partager" est accessible depuis la page évaluation, à côté du toggle correction (US-03), y compris sur mobile
+- En cliquant, le snapshot de l'évaluation (template + liste ordonnée des questions sélectionnées, y compris les re-tirages manuels effectués) est persisté en D1 avec :
+  - un code court aléatoire (6 caractères alphanumériques, ex. `abc12x`)
+  - une expiration à 30 jours à compter de la création
+- L'URL générée est de la forme `/e/{code}`
+- Une modale s'ouvre affichant l'URL avec un bouton "Copier le lien" ; la modale indique explicitement :
+  - que le lien est valable 30 jours
+  - que les modifications apportées à l'évaluation après partage (re-tirages, sélections manuelles) ne sont pas répercutées sur le lien
+
+_Consultation via le lien_
+- La route `/e/{code}` est accessible sans authentification (lien public)
+- Elle affiche l'évaluation telle qu'elle a été partagée : mêmes questions, même ordre, même structure de sections
+- Le destinataire peut re-tirer des questions (US-06/US-07) et sélectionner manuellement (US-14) ; ces modifications restent locales à sa session et ne modifient pas le snapshot partagé
+- Le toggle correction (US-03) et les options d'impression (US-04/US-08) fonctionnent normalement
+
+_Expiration_
+- Après 30 jours, le code n'est plus valide : la route `/e/{code}` affiche un message clair ("Ce lien a expiré — générez une nouvelle évaluation")
+- Aucune purge automatique n'est requise côté serveur : la validité est vérifiée à la lecture (champ `expires_at` en D1)
+
+_Questions supprimées (edge case)_
+- Si une question du snapshot a été supprimée de la banque entre le partage et la consultation, elle est omise et un encart signale que l'évaluation est incomplète ("1 question indisponible — re-tirez ou sélectionnez une question manuellement")
+- Aucune logique de re-tirage automatique n'est déclenchée côté serveur
+
+**Hors périmètre**
+- Authentification requise pour consulter un lien (accès public sans compte)
+- Modification du snapshot par le destinataire (lecture + re-tirage local uniquement)
+- Partage avec permissions restreintes (liste blanche d'emails, lien privé)
+- Invalidation manuelle d'un lien par l'émetteur
+- Renouvellement de l'expiration
+- Statistiques de consultation (nombre de vues)
+- Les re-tirages du destinataire ne créent pas un nouveau lien partagé
+- Interface admin pour lister ou gérer les snapshots partagés
 
 ---

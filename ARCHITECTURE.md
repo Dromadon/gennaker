@@ -49,20 +49,25 @@ gennaker/
 │   │   │   │   ├── schema.ts        -- schéma Drizzle (source de vérité)
 │   │   │   │   ├── index.ts         -- connexion D1 via binding Cloudflare
 │   │   │   │   └── queries/         -- requêtes réutilisables par domaine
-│   │   │   ├── services/
-│   │   │   │   ├── draw.ts          -- logique de tirage des questions
-│   │   │   │   ├── share.ts         -- création/lecture des liens partagés
-│   │   │   │   └── storage.ts       -- upload/suppression images R2
+│   │   │   │       ├── questions.ts
+│   │   │   │       ├── templates.ts
+│   │   │   │       ├── shared-evaluations.ts  -- création/lecture des liens partagés (US-23)
+│   │   │   │       └── …
+│   │   │   ├── export.ts            -- import/export ZIP (D1 + R2)
 │   │   │   └── auth.ts              -- vérification session admin
+│   │   ├── domain/                  -- logique métier pure (pas de dépendance Cloudflare)
+│   │   │   ├── draw.ts              -- tirage des questions
+│   │   │   └── types.ts             -- types domaine
 │   │   ├── components/              -- composants Svelte réutilisables
-│   │   └── types.ts                 -- types partagés client/serveur
+│   │   └── stores/                  -- état client (Svelte stores)
 │   │
 │   └── routes/
 │       ├── +page.svelte             -- accueil : choix support × format
 │       ├── evaluation/
 │       │   └── +page.svelte         -- évaluation en cours (générée, modifiable)
 │       ├── e/[code]/
-│       │   └── +page.svelte         -- évaluation partagée (lecture seule)
+│       │   ├── +page.server.ts      -- chargement SSR du snapshot (check expiry, questions supprimées)
+│       │   └── +page.svelte         -- évaluation partagée (re-tirage local possible)
 │       ├── questions/
 │       │   └── +page.svelte         -- banque publique de questions
 │       ├── soumettre/
