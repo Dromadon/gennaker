@@ -538,7 +538,7 @@
 			</button>
 			<button
 				onclick={confirmModification}
-				class="rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+				class="rounded-md bg-yellow-500 px-4 py-2 text-sm font-medium text-white hover:bg-yellow-600"
 			>
 				Continuer
 			</button>
