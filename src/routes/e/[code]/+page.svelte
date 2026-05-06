@@ -6,6 +6,7 @@
 	import { createMarkdownRenderer } from '$lib/markdown'
 	import QuestionPickerModal from '$lib/components/QuestionPickerModal.svelte'
 	import ReportModal from '$lib/components/ReportModal.svelte'
+	import ShareModal from '$lib/components/ShareModal.svelte'
 
 	let { data }: { data: PageData } = $props()
 
@@ -22,6 +23,12 @@
 	let toastMessage = $state('')
 	let toastVisible = $state(false)
 	let toastTimer: ReturnType<typeof setTimeout> | null = null
+	let modificationWarningShown = $state(false)
+	let modificationWarningOpen = $state(false)
+	let modificationWarningCallback = $state<(() => void) | null>(null)
+	let shareModalOpen = $state(false)
+	let shareUrl = $state('')
+	let sharing = $state(false)
 
 	let slots = $state<SharedEvaluationSlotWithUnavailable[]>(
 		data.expired ? [] : (data.slots as SharedEvaluationSlotWithUnavailable[])
@@ -56,6 +63,47 @@
 		toastMessage = msg
 		toastVisible = true
 		toastTimer = setTimeout(() => (toastVisible = false), 4000)
+	}
+
+	function withModificationWarning(action: () => void) {
+		if (modificationWarningShown) {
+			action()
+		} else {
+			modificationWarningCallback = action
+			modificationWarningOpen = true
+		}
+	}
+
+	function confirmModification() {
+		modificationWarningShown = true
+		modificationWarningOpen = false
+		modificationWarningCallback?.()
+		modificationWarningCallback = null
+	}
+
+	function cancelModification() {
+		modificationWarningOpen = false
+		modificationWarningCallback = null
+	}
+
+	async function shareEvaluation() {
+		if (sharing) return
+		sharing = true
+		try {
+			const res = await fetch('/api/evaluation/share', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ support, format, slots })
+			})
+			if (!res.ok) { showToast('Erreur lors du partage'); return }
+			const { url } = await res.json() as { url: string }
+			shareUrl = url
+			shareModalOpen = true
+		} catch {
+			showToast('Erreur réseau')
+		} finally {
+			sharing = false
+		}
 	}
 
 	async function redrawSection(slot: SharedEvaluationSlotWithUnavailable) {
@@ -221,6 +269,16 @@
 					</svg>
 				</button>
 				<button
+					onclick={shareEvaluation}
+					disabled={sharing}
+					class="flex items-center justify-center rounded-md p-1.5 text-gray-500 hover:bg-gray-100 disabled:opacity-50"
+					aria-label="Partager"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+					</svg>
+				</button>
+				<button
 					onclick={() => (panelOpen = true)}
 					class="flex items-center justify-center rounded-md p-1.5 text-gray-500 hover:bg-gray-100"
 					aria-label="Menu"
@@ -238,16 +296,30 @@
 					<h1 class="text-2xl font-bold capitalize">
 						Évaluation {support} — {format}
 					</h1>
-					<button
-						onclick={() => (showCorrection = !showCorrection)}
-						class="flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors {showCorrection ? 'border-gray-800 bg-gray-800 text-white' : 'border-gray-200 text-gray-500 hover:bg-gray-50'}"
-						aria-label="Afficher la correction"
-					>
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-						</svg>
-						Correction
-					</button>
+					<div class="flex items-center gap-2">
+						<button
+							onclick={shareEvaluation}
+							disabled={sharing}
+							class="flex items-center gap-2 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-50 disabled:opacity-50"
+							aria-label="Partager"
+							title="Partager cette évaluation"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+							</svg>
+							Partager
+						</button>
+						<button
+							onclick={() => (showCorrection = !showCorrection)}
+							class="flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors {showCorrection ? 'border-gray-800 bg-gray-800 text-white' : 'border-gray-200 text-gray-500 hover:bg-gray-50'}"
+							aria-label="Afficher la correction"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+							</svg>
+							Correction
+						</button>
+					</div>
 				</header>
 
 				{#each slots as slot, i}
@@ -267,7 +339,7 @@
 							</h3>
 							<div class="print:hidden flex items-center gap-1">
 								<button
-									onclick={() => (managerSlot = slot)}
+									onclick={() => withModificationWarning(() => (managerSlot = slot))}
 									disabled={redrawingSlotId !== null || managerSlot !== null}
 									class="flex items-center gap-1 rounded border border-gray-200 bg-white px-1.5 py-0.5 text-xs text-gray-400 transition-colors hover:border-gray-400 hover:text-gray-600 disabled:opacity-40"
 								>
@@ -277,7 +349,7 @@
 									Choisir
 								</button>
 								<button
-									onclick={() => redrawSection(slot)}
+									onclick={() => withModificationWarning(() => redrawSection(slot))}
 									disabled={redrawingSlotId !== null || managerSlot !== null}
 									class="flex items-center justify-center rounded border border-gray-200 bg-white p-0.5 text-gray-400 transition-colors hover:border-gray-400 hover:text-gray-600 disabled:opacity-40"
 									aria-label="Re-tirer toutes les questions de cette section"
@@ -427,4 +499,50 @@
 		onclose={() => { reportQuestionId = null }}
 		onsuccess={() => showToast('Signalement envoyé, merci')}
 	/>
+	<ShareModal
+		open={shareModalOpen}
+		url={shareUrl}
+		onclose={() => (shareModalOpen = false)}
+	/>
+{/if}
+
+{#if modificationWarningOpen}
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+	<dialog
+		open
+		class="fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm rounded-lg p-0 shadow-xl backdrop:bg-black/40"
+		onkeydown={(e) => e.key === 'Escape' && cancelModification()}
+	>
+		<div class="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+			<h2 class="text-base font-semibold text-gray-900">Modifier cette évaluation ?</h2>
+			<button onclick={cancelModification} class="rounded-md p-1 text-gray-400 hover:text-gray-700" aria-label="Fermer">
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+				</svg>
+			</button>
+		</div>
+		<div class="px-5 py-4">
+			<p class="text-sm text-gray-600">
+				Vous consultez une évaluation partagée. Vos modifications (re-tirages, sélections manuelles) sont <strong>locales</strong> et n'altèrent pas le lien original.
+			</p>
+			<p class="mt-2 text-sm text-gray-600">
+				Pour enregistrer vos modifications, utilisez le bouton <strong>Partager</strong> pour générer un nouveau lien.
+			</p>
+		</div>
+		<div class="flex justify-end gap-2 border-t border-gray-200 px-5 py-3">
+			<button
+				onclick={cancelModification}
+				class="rounded-md border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:border-gray-400 hover:text-gray-900"
+			>
+				Annuler
+			</button>
+			<button
+				onclick={confirmModification}
+				class="rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+			>
+				Continuer
+			</button>
+		</div>
+	</dialog>
+	<div class="fixed inset-0 z-40 bg-black/40" role="presentation"></div>
 {/if}
