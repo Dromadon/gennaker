@@ -60,3 +60,17 @@ export function buildReportAuditMetadata(
 ): Record<string, unknown> {
 	return { reportId, questionId, newStatus }
 }
+
+export type SlotSnapshot = {
+	slotId: number
+	templateId: number
+	pinnedQuestionId: number | null
+	preferredQuestionIds: number[]
+}
+
+export function buildSlotAuditMetadata(
+	before: SlotSnapshot,
+	after: SlotSnapshot
+): Record<string, unknown> {
+	return { before, after }
+}

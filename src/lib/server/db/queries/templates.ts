@@ -1,7 +1,7 @@
-import { and, eq } from 'drizzle-orm'
+import { and, eq, inArray } from 'drizzle-orm'
 import { getDb } from '../index'
-import { categories, evaluationTemplates, sections, templateSlots } from '../schema'
-import type { EvaluationTemplate, Format, Support } from '$lib/domain/types'
+import { categories, evaluationTemplates, questions, sections, templateSlots } from '../schema'
+import type { EvaluationTemplate, Format, Support, TemplateSlot } from '$lib/domain/types'
 
 export type TemplateExportRow = {
 	id: number
@@ -74,7 +74,9 @@ export async function getTemplate(
 			categorySlug: categories.slug,
 			sectionSlug: sections.slug,
 			position: templateSlots.position,
-			questionCount: templateSlots.questionCount
+			questionCount: templateSlots.questionCount,
+			pinnedQuestionId: templateSlots.pinnedQuestionId,
+			preferredQuestionIds: templateSlots.preferredQuestionIds
 		})
 		.from(templateSlots)
 		.innerJoin(sections, eq(sections.id, templateSlots.sectionId))
@@ -86,6 +88,122 @@ export async function getTemplate(
 		id: templateRow.id,
 		support,
 		format,
-		slots: slotRows
+		slots: slotRows.map((s) => ({
+			...s,
+			preferredQuestionIds: JSON.parse(s.preferredQuestionIds) as number[]
+		}))
 	}
+}
+
+export type TemplateSlotWithResolved = TemplateSlot & {
+	pinnedQuestionTitle: string | null
+	preferredQuestions: { id: number; title: string }[]
+}
+
+export type TemplateWithSlots = {
+	id: number
+	supportSlug: string
+	format: string
+	slots: TemplateSlotWithResolved[]
+}
+
+export async function getAllTemplatesWithSlots(d1: D1Database): Promise<TemplateWithSlots[]> {
+	const db = getDb(d1)
+
+	const templateRows = await db
+		.select({ id: evaluationTemplates.id, supportSlug: evaluationTemplates.supportSlug, format: evaluationTemplates.format })
+		.from(evaluationTemplates)
+		.orderBy(evaluationTemplates.supportSlug, evaluationTemplates.format)
+
+	const result: TemplateWithSlots[] = []
+
+	for (const t of templateRows) {
+		const slotRows = await db
+			.select({
+				id: templateSlots.id,
+				sectionId: templateSlots.sectionId,
+				categoryId: sections.categoryId,
+				sectionDisplayName: sections.displayName,
+				categoryDisplayName: categories.displayName,
+				categorySlug: categories.slug,
+				sectionSlug: sections.slug,
+				position: templateSlots.position,
+				questionCount: templateSlots.questionCount,
+				pinnedQuestionId: templateSlots.pinnedQuestionId,
+				preferredQuestionIds: templateSlots.preferredQuestionIds
+			})
+			.from(templateSlots)
+			.innerJoin(sections, eq(sections.id, templateSlots.sectionId))
+			.innerJoin(categories, eq(categories.id, sections.categoryId))
+			.where(eq(templateSlots.templateId, t.id))
+			.orderBy(templateSlots.position)
+
+		const parsedSlots = slotRows.map((s) => ({
+			...s,
+			preferredQuestionIds: JSON.parse(s.preferredQuestionIds) as number[]
+		}))
+
+		// Batch-résoudre tous les IDs de questions référencés dans ce template
+		const allIds = new Set<number>()
+		for (const s of parsedSlots) {
+			if (s.pinnedQuestionId !== null) allIds.add(s.pinnedQuestionId)
+			for (const id of s.preferredQuestionIds) allIds.add(id)
+		}
+
+		const questionTitles = new Map<number, string>()
+		if (allIds.size > 0) {
+			const rows = await db
+				.select({ id: questions.id, title: questions.title })
+				.from(questions)
+				.where(inArray(questions.id, [...allIds]))
+			for (const r of rows) questionTitles.set(r.id, r.title)
+		}
+
+		result.push({
+			...t,
+			slots: parsedSlots.map((s) => ({
+				...s,
+				pinnedQuestionTitle: s.pinnedQuestionId !== null ? (questionTitles.get(s.pinnedQuestionId) ?? null) : null,
+				preferredQuestions: s.preferredQuestionIds.map((id) => ({ id, title: questionTitles.get(id) ?? `#${id}` }))
+			}))
+		})
+	}
+
+	return result
+}
+
+export async function getTemplateSlotById(
+	d1: D1Database,
+	slotId: number
+): Promise<{ id: number; templateId: number; pinnedQuestionId: number | null; preferredQuestionIds: number[] } | null> {
+	const db = getDb(d1)
+	const row = await db
+		.select({
+			id: templateSlots.id,
+			templateId: templateSlots.templateId,
+			pinnedQuestionId: templateSlots.pinnedQuestionId,
+			preferredQuestionIds: templateSlots.preferredQuestionIds
+		})
+		.from(templateSlots)
+		.where(eq(templateSlots.id, slotId))
+		.get()
+
+	if (!row) return null
+	return { ...row, preferredQuestionIds: JSON.parse(row.preferredQuestionIds) as number[] }
+}
+
+export type SlotPatch = {
+	pinnedQuestionId: number | null
+	preferredQuestionIds: number[]
+}
+
+export async function updateTemplateSlot(d1: D1Database, slotId: number, patch: SlotPatch): Promise<void> {
+	const db = getDb(d1)
+	await db
+		.update(templateSlots)
+		.set({
+			pinnedQuestionId: patch.pinnedQuestionId,
+			preferredQuestionIds: JSON.stringify(patch.preferredQuestionIds)
+		})
+		.where(eq(templateSlots.id, slotId))
 }

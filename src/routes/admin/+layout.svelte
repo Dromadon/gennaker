@@ -11,6 +11,7 @@
 			<span class="text-sm font-semibold text-gray-700">Gennaker — Admin</span>
 			<a href="/admin" class="text-sm text-gray-500 hover:text-gray-900">Tableau de bord</a>
 			<a href="/admin/questions" class="text-sm text-gray-500 hover:text-gray-900">Questions</a>
+			<a href="/admin/templates" class="text-sm text-gray-500 hover:text-gray-900">Templates</a>
 			<a href="/admin/reports" class="relative text-sm text-gray-500 hover:text-gray-900">
 				Signalements
 				{#if data.pendingReportsCount > 0}
@@ -84,6 +85,13 @@
 					class="block rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
 				>
 					Questions
+				</a>
+				<a
+					href="/admin/templates"
+					onclick={() => (adminMenuOpen = false)}
+					class="block rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+				>
+					Templates
 				</a>
 				<a
 					href="/admin/reports"

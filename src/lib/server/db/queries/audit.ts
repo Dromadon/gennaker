@@ -21,7 +21,7 @@ export async function insertAuditLog(
 	entry: {
 		adminId: number | null
 		action: string
-		targetType: 'question' | 'submission' | 'report'
+		targetType: 'question' | 'submission' | 'report' | 'template_slot'
 		targetId: number | null
 		metadata: Record<string, unknown>
 		ipAddress: string | null

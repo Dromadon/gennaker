@@ -35,6 +35,8 @@ export type TemplateSlot = {
 	sectionSlug: string
 	position: number
 	questionCount: number
+	pinnedQuestionId: number | null
+	preferredQuestionIds: number[]
 }
 
 export type EvaluationTemplate = {

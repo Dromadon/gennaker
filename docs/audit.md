@@ -30,6 +30,7 @@ Journal des actions administrateurs stocké en D1, consultable depuis `/admin/au
 | `submission.reject` | Rejet d'une soumission |
 | `report.resolve` | Passage d'un signalement à `resolu` |
 | `report.reopen` | Réouverture d'un signalement (`nouveau`) |
+| `template_slot.update` | Modification du pin ou des préférées d'un slot |
 
 ---
 
@@ -74,6 +75,15 @@ Pour un rejet, `newQuestionId` est absent et `rejectionNote` peut être présent
   "reportId": 3,
   "questionId": 42,
   "newStatus": "resolu"
+}
+```
+
+### Slots de template (update)
+
+```json
+{
+  "before": { "slotId": 12, "templateId": 3, "pinnedQuestionId": null, "preferredQuestionIds": [] },
+  "after":  { "slotId": 12, "templateId": 3, "pinnedQuestionId": 42,   "preferredQuestionIds": [17, 55] }
 }
 ```
 
