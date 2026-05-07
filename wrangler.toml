@@ -19,8 +19,6 @@ bucket_name = "gennaker-questions"
 
 [vars]
 R2_PUBLIC_URL = "https://pub-0e064f00c5ed41ab8c84f152a44329c8.r2.dev"
-ADMIN_EMAIL = ""
-RESEND_API_KEY = ""
 
 # Secrets (via `wrangler secret put`) :
 # ADMIN_SESSION_SECRET

@@ -31,8 +31,6 @@ Renseigner les variables dans la section `[vars]` :
 ```toml
 [vars]
 R2_PUBLIC_URL = "https://pub-xxxx.r2.dev"   # ou domaine personnalisé
-ADMIN_EMAIL = "admin@monsite.com"            # email de l'administrateur principal
-RESEND_API_KEY = "re_xxxx"                  # clé API Resend pour les emails
 ```
 
 ## Étape 4 — Appliquer le schéma DB

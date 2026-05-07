@@ -19,8 +19,6 @@ declare global {
 				DB: D1Database
 				IMAGES: R2Bucket
 				R2_PUBLIC_URL: string
-				ADMIN_EMAIL: string
-				RESEND_API_KEY: string
 				ADMIN_SESSION_SECRET: string
 				LOG_LEVEL?: string
 			}
