@@ -88,6 +88,28 @@ Aucun token API custom n'est nécessaire : `wrangler deploy` utilise l'authentif
 
 Le déploiement est ensuite automatique à chaque push sur `master`.
 
+## Configurer un domaine personnalisé
+
+Par défaut, l'application est accessible sur `gennaker.[user].workers.dev`. Pour utiliser votre propre domaine :
+
+1. **Configurer les DNS** chez votre registrar :
+   - **Méthode CNAME** (recommandée) : `CNAME @ gennaker.[user].workers.dev` ou `CNAME www gennaker.[user].workers.dev`
+   - **Méthode A/AAAA** : utiliser les IPs fournies par Cloudflare dans le dashboard
+
+2. **Ajouter le domaine dans Cloudflare Workers** :
+   - Dashboard → Workers & Pages → sélectionner `gennaker`
+   - Onglet *Custom domains* → *Set up a custom domain*
+   - Saisir votre domaine (ex : `gennaker.example.com`)
+   - Cloudflare génère automatiquement le certificat SSL (quelques minutes)
+
+3. **Mettre à jour la variable d'import** (optionnel) :
+   Si vous utilisez `npm run prod:seed` depuis un environnement local, ajoutez dans `.env.local` :
+   ```bash
+   IMPORT_REMOTE_URL=https://votre-domaine.com
+   ```
+
+Aucune modification du code source n'est nécessaire — les URLs de l'application sont relatives.
+
 ## Déploiements suivants
 
 Après chaque changement de schéma, appliquer la migration **avant** de pousser le code :

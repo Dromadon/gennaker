@@ -36,8 +36,9 @@ ADMIN_SESSION_TOKEN=<valeur du cookie admin_session>
 # Mettre http://localhost:8787 si on utilise npm run dev:cf
 # IMPORT_LOCAL_URL=http://localhost:8787
 
-# URL de l'app de production (pour les imports --remote)
-IMPORT_REMOTE_URL=https://gennaker.pages.dev
+# URL de votre instance de production (pour les imports --remote)
+# Utiliser votre domaine personnalisé si configuré, sinon gennaker.[user].workers.dev
+IMPORT_REMOTE_URL=https://votre-domaine.com
 ```
 
 **Comment obtenir `ADMIN_SESSION_TOKEN`** : se connecter sur l'instance de production (`/admin/login`), puis copier la valeur du cookie `admin_session` depuis les DevTools du navigateur (Onglet Application → Cookies). Ce token est valable 7 jours.
