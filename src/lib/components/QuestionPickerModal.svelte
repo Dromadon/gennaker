@@ -26,6 +26,7 @@
 	let exitingId = $state<number | null>(null)
 	let justAddedId = $state<number | null>(null)
 	let justReturnedId = $state<number | null>(null)
+	let sortOrder = $state<'asc' | 'desc'>('asc')
 
 	const ANIM_DURATION = 300
 	const DEBOUNCE_MS = 300
@@ -105,7 +106,22 @@
 		if (e.target === dialog) onclose()
 	}
 
-	const available = $derived(candidates.filter((c) => !localSelected.has(c.id) || leavingIds.has(c.id)))
+	function toggleSort() {
+		sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'
+	}
+
+	function difficultyValue(difficulty: 'facile' | 'moyen' | 'difficile'): number {
+		return difficulty === 'facile' ? 1 : difficulty === 'moyen' ? 2 : 3
+	}
+
+	const available = $derived(
+		candidates
+			.filter((c) => !localSelected.has(c.id) || leavingIds.has(c.id))
+			.sort((a, b) => {
+				const diff = difficultyValue(a.difficulty) - difficultyValue(b.difficulty)
+				return sortOrder === 'asc' ? diff : -diff
+			})
+	)
 
 	const supportLabels: Record<string, string> = {
 		deriveur: 'DÉR',
@@ -183,6 +199,22 @@
 	<div class="flex flex-col flex-1 min-h-0">
 		<div class="shrink-0 flex items-center gap-3 px-5 py-2 bg-gray-50 border-b border-gray-100">
 			<span class="text-xs font-semibold uppercase tracking-wide text-gray-500 shrink-0">Ajouter</span>
+			<button
+				onclick={toggleSort}
+				class="shrink-0 rounded p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+				aria-label="Trier par difficulté {sortOrder === 'asc' ? 'décroissante' : 'croissante'}"
+				title="Difficulté {sortOrder === 'asc' ? 'croissante' : 'décroissante'}"
+			>
+				{#if sortOrder === 'asc'}
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+					</svg>
+				{:else}
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
+					</svg>
+				{/if}
+			</button>
 			<input
 				type="text"
 				bind:value={search}
