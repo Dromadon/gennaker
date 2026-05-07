@@ -199,22 +199,6 @@
 	<div class="flex flex-col flex-1 min-h-0">
 		<div class="shrink-0 flex items-center gap-3 px-5 py-2 bg-gray-50 border-b border-gray-100">
 			<span class="text-xs font-semibold uppercase tracking-wide text-gray-500 shrink-0">Ajouter</span>
-			<button
-				onclick={toggleSort}
-				class="shrink-0 rounded p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-				aria-label="Trier par difficulté {sortOrder === 'asc' ? 'décroissante' : 'croissante'}"
-				title="Difficulté {sortOrder === 'asc' ? 'croissante' : 'décroissante'}"
-			>
-				{#if sortOrder === 'asc'}
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-					</svg>
-				{:else}
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
-					</svg>
-				{/if}
-			</button>
 			<input
 				type="text"
 				bind:value={search}
@@ -222,6 +206,17 @@
 				placeholder="Rechercher…"
 				class="flex-1 rounded border border-gray-200 px-2 py-1 text-xs focus:border-blue-400 focus:outline-none"
 			/>
+			<button
+				onclick={toggleSort}
+				class="shrink-0 flex items-center gap-1.5 rounded px-2 py-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+				aria-label="Trier par difficulté {sortOrder === 'asc' ? 'décroissante' : 'croissante'}"
+				title="Trier par difficulté"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M3 7h6m0 10H3m15-7h6m-6-7l-4 4m4-4l4 4m-4 14l-4-4m4 4l4-4" />
+				</svg>
+				<span class="text-xs font-medium">{sortOrder === 'asc' ? 'Croissant' : 'Décroissant'}</span>
+			</button>
 		</div>
 		<div class="overflow-y-auto flex-1">
 			{#if loading}
