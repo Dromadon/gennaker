@@ -29,7 +29,7 @@ Ce fichier est chargé par Wrangler et injecté dans le Worker au démarrage (`n
 Créer un fichier `.env.local` à la racine du projet avec les variables suivantes :
 
 ```bash
-# Token de session admin — généré une fois depuis /admin/login (cookie admin_session)
+# Token de session admin — nécessaire pour les scripts d'import (dev:seed)
 ADMIN_SESSION_TOKEN=<valeur du cookie admin_session>
 
 # URL locale du serveur de dev (défaut : http://localhost:5173 pour npm run dev)
@@ -41,7 +41,14 @@ ADMIN_SESSION_TOKEN=<valeur du cookie admin_session>
 IMPORT_REMOTE_URL=https://votre-domaine.com
 ```
 
-**Comment obtenir `ADMIN_SESSION_TOKEN`** : se connecter sur l'instance de production (`/admin/login`), puis copier la valeur du cookie `admin_session` depuis les DevTools du navigateur (Onglet Application → Cookies). Ce token est valable 7 jours.
+**À quoi sert `ADMIN_SESSION_TOKEN` ?** Ce token authentifie les scripts d'import (`npm run dev:seed`) qui peuplent l'environnement de dev avec les données d'un export ZIP (questions, images, templates, etc.).
+
+**Comment l'obtenir ?**
+
+- **Environnement de dev vierge** : il faut d'abord créer le premier compte admin. Voir la section [Bootstrap (premier super_admin)](auth.md#bootstrap-premier-super_admin) dans `auth.md`. Ensuite, se connecter sur `/admin/login` et récupérer le cookie.
+- **Environnement existant** : se connecter sur `/admin/login`, puis copier la valeur du cookie `admin_session` depuis les DevTools du navigateur (Onglet Application → Cookies).
+
+Le token est valable 7 jours.
 
 ## Étapes
 
@@ -118,11 +125,4 @@ En production, les logs sont accessibles via le dashboard Cloudflare (Workers & 
 
 ```bash
 wrangler tail --format=pretty
-```
-
-## Équivalents production
-
-```bash
-# Peupler l'environnement de production (après une migration de schéma par ex.)
-npm run prod:seed -- --file gennaker-backup-YYYY-MM-DD.zip
 ```
