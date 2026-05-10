@@ -33,12 +33,21 @@ Page évaluation
 
 ## Règles de filtrage des candidats
 
-Appliquées côté serveur dans `POST /api/evaluation/question-candidates` :
+### Filtres appliqués côté serveur (sécurité)
+
+Appliqués dans `POST /api/evaluation/question-candidates` :
 
 1. **Section fixée** — uniquement les questions de la section du slot
 2. **Support respecté** — questions avec `applicableSupports` non vide uniquement si le support de l'évaluation y figure ; `[]` = tous supports
 3. **Statut publié** — seules les questions `status = 'publie'`
-4. **Recherche texte** — filtre insensible à la casse sur le titre (paramètre optionnel `search`)
+
+### Filtres appliqués côté client (performance)
+
+Appliqués en temps réel dans le composant `QuestionPickerModal.svelte` via `$derived` :
+
+1. **Recherche texte** — filtre instantané insensible à la casse sur le titre
+2. **Tri par difficulté** — croissant ou décroissant
+3. **Exclusion des questions sélectionnées** — masquage des questions actives (sauf pendant animation)
 
 ## Cas particulier : section désactivée
 

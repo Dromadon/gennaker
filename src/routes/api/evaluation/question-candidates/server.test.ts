@@ -83,18 +83,6 @@ describe('POST /api/evaluation/question-candidates', () => {
 		expect(ids).not.toContain(2) // deriveur uniquement
 	})
 
-	it('filtre par search (insensible à la casse) sur le titre', async () => {
-		const res = await POST(makeRequest({ sectionId: 10, support: 'deriveur', search: 'balisage' }))
-		const data = await res.json() as QuestionPickRow[]
-		expect(data).toHaveLength(1)
-		expect(data[0].id).toBe(2)
-	})
-
-	it('retourne un tableau vide si aucun candidat ne correspond', async () => {
-		const res = await POST(makeRequest({ sectionId: 10, support: 'deriveur', search: 'inexistant' }))
-		const data = await res.json() as QuestionPickRow[]
-		expect(data).toHaveLength(0)
-	})
 
 	it('retourne les champs QuestionPickRow complets', async () => {
 		const res = await POST(makeRequest({ sectionId: 10, support: 'deriveur' }))

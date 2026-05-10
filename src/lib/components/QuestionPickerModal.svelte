@@ -16,7 +16,6 @@
 	let search = $state('')
 	let candidates = $state<QuestionPickRow[]>([])
 	let loading = $state(false)
-	let debounceTimer: ReturnType<typeof setTimeout> | null = null
 	let localSelected = $state<Map<number, QuestionPickRow>>(new Map())
 	// Animation de transition : la question reste visible le temps du slide-out avant que localSelected change.
 	// leavingIds est un Set (pas un scalaire) car lu dans $derived(available) — exitingId est un scalaire
@@ -29,14 +28,13 @@
 	let sortOrder = $state<'asc' | 'desc'>('asc')
 
 	const ANIM_DURATION = 300
-	const DEBOUNCE_MS = 300
 
 	$effect(() => {
 		if (open) {
 			dialog?.showModal()
 			search = ''
 			localSelected = new Map()
-			fetchCandidates('')
+			fetchCandidates()
 		} else {
 			dialog?.close()
 		}
@@ -53,13 +51,13 @@
 		}
 	})
 
-	async function fetchCandidates(searchTerm: string) {
+	async function fetchCandidates() {
 		loading = true
 		try {
 			const res = await fetch('/api/evaluation/question-candidates', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ sectionId: slot.sectionId, support, search: searchTerm || undefined })
+				body: JSON.stringify({ sectionId: slot.sectionId, support })
 			})
 			if (res.ok) candidates = await res.json()
 		} finally {
@@ -67,10 +65,6 @@
 		}
 	}
 
-	function onSearchInput() {
-		if (debounceTimer) clearTimeout(debounceTimer)
-		debounceTimer = setTimeout(() => fetchCandidates(search), DEBOUNCE_MS)
-	}
 
 	function addQuestion(candidate: QuestionPickRow, el: HTMLElement) {
 		el.style.backgroundColor = '#eff6ff'
@@ -114,8 +108,14 @@
 		return difficulty === 'facile' ? 1 : difficulty === 'moyen' ? 2 : 3
 	}
 
+	const filteredBySearch = $derived(
+		search.trim() === ''
+			? candidates
+			: candidates.filter((c) => c.title.toLowerCase().includes(search.toLowerCase()))
+	)
+
 	const available = $derived(
-		candidates
+		filteredBySearch
 			.filter((c) => !localSelected.has(c.id) || leavingIds.has(c.id))
 			.sort((a, b) => {
 				const diff = difficultyValue(a.difficulty) - difficultyValue(b.difficulty)
@@ -202,7 +202,6 @@
 			<input
 				type="text"
 				bind:value={search}
-				oninput={onSearchInput}
 				placeholder="Rechercher…"
 				class="flex-1 rounded border border-gray-200 px-2 py-1 text-xs focus:border-blue-400 focus:outline-none"
 			/>

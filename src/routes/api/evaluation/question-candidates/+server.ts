@@ -6,8 +6,7 @@ import type { QuestionPickRow, Support } from '$lib/domain/types'
 
 const schema = z.object({
 	sectionId: z.number().int().positive(),
-	support: z.enum(['deriveur', 'catamaran', 'windsurf', 'croisiere']),
-	search: z.string().optional()
+	support: z.enum(['deriveur', 'catamaran', 'windsurf', 'croisiere'])
 })
 
 export const POST: RequestHandler = async ({ request, platform }) => {
@@ -15,11 +14,10 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 	const parsed = schema.safeParse(body)
 	if (!parsed.success) throw error(400, 'Paramètres invalides')
 
-	const { sectionId, support, search } = parsed.data
+	const { sectionId, support } = parsed.data
 	const db = platform!.env.DB
 
 	const pool = await getQuestionCandidates(db, sectionId)
-	const searchLower = search?.toLowerCase()
 
 	const candidates: QuestionPickRow[] = pool
 		.filter(
@@ -27,7 +25,6 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 				q.applicableSupports.length === 0 ||
 				(q.applicableSupports as Support[]).includes(support)
 		)
-		.filter((q) => !searchLower || q.title.toLowerCase().includes(searchLower))
 		.map((q) => ({
 			id: q.id,
 			title: q.title,
