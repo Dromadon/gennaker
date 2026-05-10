@@ -209,14 +209,14 @@
 			/>
 			<button
 				onclick={toggleSort}
-				class="shrink-0 flex items-center gap-1.5 rounded px-2 py-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+				class="shrink-0 flex items-center gap-1.5 rounded border border-gray-200 bg-white px-2 py-1 text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-colors"
 				aria-label="Trier par difficulté {sortOrder === 'asc' ? 'décroissante' : 'croissante'}"
 				title="Trier par difficulté"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 transition-transform {sortOrder === 'desc' ? 'rotate-180' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
 				</svg>
-				<span class="text-xs font-medium">{sortOrder === 'asc' ? 'Croissant' : 'Décroissant'}</span>
+				<span class="text-xs font-medium">Difficulté</span>
 			</button>
 		</div>
 		<div class="overflow-y-auto flex-1">
