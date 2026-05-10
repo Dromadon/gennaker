@@ -191,7 +191,9 @@
 				{/each}
 			</ul>
 		{:else}
-			<p class="px-5 py-3 text-sm text-gray-400 italic">Aucune question — la section sera désactivée.</p>
+			<p class="px-5 py-3 text-sm text-gray-400 italic">
+				{loading ? 'Chargement...' : 'Aucune question — la section sera désactivée.'}
+			</p>
 		{/if}
 	</div>
 
