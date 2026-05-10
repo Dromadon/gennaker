@@ -97,12 +97,13 @@ Avant de proposer ou d'implémenter une solution technique :
 
 ## 6. Avant chaque commit
 
-Vérifier systématiquement les quatre points suivants :
+Vérifier systématiquement les cinq points suivants :
 
 1. **Tests** : `npm run test` passe sans erreur. Si des tests d'intégration sont concernés : `npm run test:int` aussi.
-2. **Code propre** : pas de `console.log` de debug, pas de code commenté sans explication, pas de `TODO` non intentionnel, pas de `any` TypeScript.
-3. **Build** : si la modification touche les routes ou le bundling, vérifier que `npm run build` passe.
-4. **Documentation** : les fichiers identifiés en section 4.3 ont été mis à jour.
+2. **Check TypeScript/Svelte** : `npm run check` passe sans erreur. Corriger toutes les erreurs de typage avant de continuer.
+3. **Code propre** : pas de `console.log` de debug, pas de code commenté sans explication, pas de `TODO` non intentionnel, pas de `any` TypeScript.
+4. **Build** : si la modification touche les routes ou le bundling, vérifier que `npm run build` passe.
+5. **Documentation** : les fichiers identifiés en section 4.3 ont été mis à jour.
 
 Ne jamais committer un état où les tests échouent, même partiellement.
 
