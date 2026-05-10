@@ -142,6 +142,7 @@
 							<th class="px-4 py-3">Statut</th>
 						{/if}
 						<th class="w-8 px-2 py-3"></th>
+						<th class="w-8 px-2 py-3"></th>
 					</tr>
 				</thead>
 				<tbody class="divide-y divide-gray-100">
@@ -167,6 +168,18 @@
 								</td>
 							{/if}
 							<td class="w-8 px-2 py-3 text-center">
+								{#if !q.correctionMd.trim()}
+									<span
+										class="inline-flex items-center justify-center rounded-full bg-red-100 p-1 text-red-600"
+										title="Correction manquante"
+									>
+										<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+										</svg>
+									</span>
+								{/if}
+							</td>
+							<td class="w-8 px-2 py-3 text-center">
 								{#if (data.reportsByQuestionId[q.id] ?? []).length > 0}
 									<span
 										class="inline-flex items-center justify-center rounded-full bg-yellow-100 px-1.5 py-0.5 text-xs font-medium text-yellow-700"
@@ -177,7 +190,7 @@
 						</tr>
 					{:else}
 						<tr>
-							<td colspan={selectedQuestion ? 3 : 7} class="px-4 py-8 text-center text-gray-400">Aucune question trouvée</td>
+							<td colspan={selectedQuestion ? 4 : 8} class="px-4 py-8 text-center text-gray-400">Aucune question trouvée</td>
 						</tr>
 					{/each}
 				</tbody>
