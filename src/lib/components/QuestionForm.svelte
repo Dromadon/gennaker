@@ -218,7 +218,7 @@
 
 			isSubmitting = false
 			window.scrollTo({ top: 0, behavior: 'smooth' })
-			await update({ reset: false })
+			await update()
 		}
 	}
 </script>

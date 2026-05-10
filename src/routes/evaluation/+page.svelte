@@ -117,7 +117,7 @@
 				body: JSON.stringify(evaluation)
 			})
 			if (!res.ok) { showToast('Erreur lors du partage'); return }
-			const { url } = await res.json()
+			const { url } = await res.json() as { url: string }
 			shareUrl = url
 			shareModalOpen = true
 		} catch {

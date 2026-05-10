@@ -2,7 +2,7 @@
 	import { page } from '$app/state'
 	import type { PageData } from './$types'
 	import type { SharedEvaluationSlotWithUnavailable } from './+page.server'
-	import type { Question, QuestionPickRow } from '$lib/domain/types'
+	import type { Question, QuestionPickRow, Support } from '$lib/domain/types'
 	import { createMarkdownRenderer } from '$lib/markdown'
 	import QuestionPickerModal from '$lib/components/QuestionPickerModal.svelte'
 	import ReportModal from '$lib/components/ReportModal.svelte'
@@ -34,7 +34,7 @@
 		data.expired ? [] : (data.slots as SharedEvaluationSlotWithUnavailable[])
 	)
 
-	const support = data.support
+	const support = data.support as Support
 	const format = data.format
 
 	const slotsByCategory = $derived(
