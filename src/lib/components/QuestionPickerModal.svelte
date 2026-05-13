@@ -8,9 +8,10 @@
 		selectedIds: number[]
 		onapply: (selected: QuestionPickRow[]) => void
 		onclose: () => void
+		emptyMessage?: string
 	}
 
-	let { open, slot, support, selectedIds, onapply, onclose }: Props = $props()
+	let { open, slot, support, selectedIds, onapply, onclose, emptyMessage = 'Aucune question — la section sera désactivée.' }: Props = $props()
 
 	let dialog = $state<HTMLDialogElement | null>(null)
 	let search = $state('')
@@ -192,7 +193,7 @@
 			</ul>
 		{:else}
 			<p class="px-5 py-3 text-sm text-gray-400 italic">
-				{loading ? 'Chargement...' : 'Aucune question — la section sera désactivée.'}
+				{loading ? 'Chargement...' : emptyMessage}
 			</p>
 		{/if}
 	</div>

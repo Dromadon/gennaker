@@ -185,12 +185,14 @@
 								{/if}
 							</td>
 							<td class="w-8 px-2 py-3 text-center">
-								{#if (data.reportsByQuestionId[q.id] ?? []).length > 0}
+								{#each [(data.reportsByQuestionId[q.id] ?? []).filter(r => r.status === 'nouveau')] as unresolvedReports}
+								{#if unresolvedReports.length > 0}
 									<span
 										class="inline-flex items-center justify-center rounded-full bg-yellow-100 px-1.5 py-0.5 text-xs font-medium text-yellow-700"
-										title="{data.reportsByQuestionId[q.id].length} signalement{data.reportsByQuestionId[q.id].length > 1 ? 's' : ''}"
-									>{data.reportsByQuestionId[q.id].length}</span>
+										title="{unresolvedReports.length} signalement{unresolvedReports.length > 1 ? 's' : ''} non résolu{unresolvedReports.length > 1 ? 's' : ''}"
+									>{unresolvedReports.length}</span>
 								{/if}
+							{/each}
 							</td>
 						</tr>
 					{:else}
