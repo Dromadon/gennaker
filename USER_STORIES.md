@@ -244,10 +244,8 @@ Les stories suivantes sont identifiées mais hors scope MVP, classées par prior
 
 | Priorité | Story |
 |----------|-------|
-| 1 | US-23 : Partage d'une évaluation via lien court (short code, expiration 30 jours) ✅ |
 | 2c | US-13 : Sources des questions — affichage et gestion (voir ci-dessous) |
 | 3 | Interface admin : gestion des templates et slots |
-| 4 | Modification de structure : ajouter / supprimer un slot dans une évaluation |
 | 6 | Gestion de la difficulté des questions (annotation + filtre au tirage) |
 
 
