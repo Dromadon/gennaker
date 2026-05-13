@@ -4,6 +4,8 @@
 	import type { CategoryWithSections } from '$lib/domain/types'
 	import type { QuestionRow } from '$lib/domain/types'
 	import QuestionPreview from '$lib/components/QuestionPreview.svelte'
+	import { PROBLEM_LABELS, REPORT_STATUS_BADGE, SUPPORT_SLUGS } from '$lib/constants/labels'
+	import { formatDate } from '$lib/utils/formatting'
 
 	let { data }: { data: PageData } = $props()
 
@@ -49,28 +51,9 @@
 		return `/admin/questions/${id}/edit?back=${encodeURIComponent(back)}`
 	}
 
-	const supports = ['deriveur', 'catamaran', 'windsurf', 'croisiere']
+	const supports = SUPPORT_SLUGS
 
-	const PROBLEM_LABELS: Record<string, string> = {
-		enonce_incorrect: 'Énoncé incorrect',
-		correction_incorrecte: 'Correction incorrecte',
-		question_doublon: 'Doublon',
-		mise_en_forme: 'Mise en forme',
-		autre: 'Autre'
-	}
-
-	const STATUS_BADGE: Record<string, string> = {
-		nouveau: 'bg-yellow-100 text-yellow-700',
-		resolu: 'bg-green-100 text-green-700'
-	}
-
-	function formatDate(ts: number): string {
-		return new Date(ts * 1000).toLocaleDateString('fr-FR', {
-			day: '2-digit',
-			month: '2-digit',
-			year: 'numeric'
-		})
-	}
+	const STATUS_BADGE = REPORT_STATUS_BADGE
 </script>
 
 <div class="mb-6 flex items-center justify-between">

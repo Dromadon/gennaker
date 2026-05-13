@@ -4,24 +4,12 @@
 	import type { TemplateSlotWithResolved, TemplateWithSlots } from '$lib/server/db/queries/templates'
 	import QuestionPickerModal from '$lib/components/QuestionPickerModal.svelte'
 	import type { EvaluationSlot, Support } from '$lib/domain/types'
+	import { SUPPORT_LABELS, FORMAT_LABELS, SUPPORT_SLUGS, FORMAT_SLUGS } from '$lib/constants/labels'
 
 	let { data, form }: { data: PageData; form: ActionData } = $props()
 
-	const SUPPORT_LABELS: Record<string, string> = {
-		deriveur: 'Dériveur',
-		catamaran: 'Catamaran',
-		windsurf: 'Windsurf',
-		croisiere: 'Croisière'
-	}
-
-	const FORMAT_LABELS: Record<string, string> = {
-		standard: 'Standard',
-		raccourcie: 'Raccourcie',
-		positionnement: 'Positionnement'
-	}
-
-	const supportOrder = ['deriveur', 'catamaran', 'windsurf', 'croisiere']
-	const formatOrder = ['standard', 'raccourcie', 'positionnement']
+	const supportOrder = SUPPORT_SLUGS
+	const formatOrder = FORMAT_SLUGS
 
 	const availableSupports = supportOrder.filter((s) => data.templates.some((t) => t.supportSlug === s))
 	const availableFormats = formatOrder.filter((f) => data.templates.some((t) => t.format === f))
@@ -34,7 +22,7 @@
 	)
 
 	// Slots groupés par catégorie pour l'affichage
-	const slotsByCategory = $derived(() => {
+	const slotsByCategory = $derived.by(() => {
 		if (!currentTemplate) return []
 		const map = new Map<string, { categoryDisplayName: string; slots: TemplateSlotWithResolved[] }>()
 		for (const slot of currentTemplate.slots) {
@@ -69,7 +57,7 @@
 	}
 
 	// Construit un EvaluationSlot factice pour QuestionPickerModal
-	const pickerSlot = $derived((): EvaluationSlot | null => {
+	const pickerSlot = $derived.by((): EvaluationSlot | null => {
 		if (!selectedSlot) return null
 		return {
 			slotId: selectedSlot.id,
@@ -83,9 +71,9 @@
 		}
 	})
 
-	const pickerSupport = $derived((): Support => (currentTemplate?.supportSlug ?? 'deriveur') as Support)
+	const pickerSupport = $derived((currentTemplate?.supportSlug ?? 'deriveur') as Support)
 
-	const pickerSelectedIds = $derived((): number[] => {
+	const pickerSelectedIds = $derived.by((): number[] => {
 		if (!selectedSlot) return []
 		if (pickerMode === 'pinned') return selectedSlot.pinnedQuestionId !== null ? [selectedSlot.pinnedQuestionId] : []
 		return selectedSlot.preferredQuestionIds
@@ -158,7 +146,7 @@
 		<!-- Colonne gauche : slots groupés par catégorie -->
 		<div class="min-w-0 transition-all duration-300 {selectedSlot ? 'lg:w-96 lg:shrink-0' : 'flex-1'} overflow-hidden">
 			<div class="overflow-hidden rounded-lg border border-gray-200">
-				{#each slotsByCategory() as group, gi}
+				{#each slotsByCategory as group, gi}
 					<!-- En-tête catégorie -->
 					<div class="{gi > 0 ? 'border-t-4 border-gray-200' : ''} bg-gray-50 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">
 						{group.categoryDisplayName}
@@ -363,12 +351,12 @@
 {/if}
 
 <!-- QuestionPickerModal -->
-{#if pickerSlot() && pickerSupport()}
+{#if pickerSlot && pickerSupport}
 	<QuestionPickerModal
 		open={pickerOpen}
-		slot={pickerSlot()!}
-		support={pickerSupport()}
-		selectedIds={pickerSelectedIds()}
+		slot={pickerSlot}
+		support={pickerSupport}
+		selectedIds={pickerSelectedIds}
 		onapply={handlePickerApply}
 		onclose={() => (pickerOpen = false)}
 		emptyMessage={pickerEmptyMessage}

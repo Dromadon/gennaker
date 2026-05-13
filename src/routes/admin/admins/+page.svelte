@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms'
 	import { invalidateAll } from '$app/navigation'
 	import type { ActionData, PageData } from './$types'
+	import { formatDateTime } from '$lib/utils/formatting'
 	let { data, form }: { data: PageData; form: ActionData } = $props()
 
 	let showCreateForm = $state(false)
@@ -118,7 +119,7 @@
 						</td>
 						<td class="px-4 py-3 text-gray-500">
 							{#if admin.lastLoginAt}
-								{new Date(admin.lastLoginAt * 1000).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+								{formatDateTime(admin.lastLoginAt)}
 							{:else}
 								<span class="text-gray-400">Jamais connecté</span>
 							{/if}

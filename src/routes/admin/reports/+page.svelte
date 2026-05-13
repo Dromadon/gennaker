@@ -1,51 +1,26 @@
 <script lang="ts">
 	import { page } from '$app/state'
 	import type { PageData, ActionData } from './$types'
-	import type { ReportAdminRow, ReportStatus } from '$lib/server/db/queries/reports'
+	import type { ReportAdminRow } from '$lib/server/db/queries/reports'
 	import QuestionPreview from '$lib/components/QuestionPreview.svelte'
+	import { PROBLEM_LABELS, REPORT_STATUS_LABELS, REPORT_STATUS_BADGE } from '$lib/constants/labels'
+	import { formatDate } from '$lib/utils/formatting'
+	import { createToast } from '$lib/utils/toast.svelte'
 
 	let { data, form }: { data: PageData; form: ActionData } = $props()
 
-	let toastVisible = $state(false)
-	let toastTimer: ReturnType<typeof setTimeout> | null = null
+	const toast = createToast()
 
 	$effect(() => {
-		if (form?.updated) {
-			if (toastTimer) clearTimeout(toastTimer)
-			toastVisible = true
-			toastTimer = setTimeout(() => (toastVisible = false), 4000)
-		}
+		if (form?.updated) toast.show('Statut mis à jour.')
 	})
 
 	const PAGE_SIZE = 30
 
-	const STATUS_LABELS: Record<ReportStatus, string> = {
-		nouveau: 'Nouveau',
-		resolu: 'Résolu'
-	}
-
-	const PROBLEM_LABELS: Record<string, string> = {
-		enonce_incorrect: 'Énoncé incorrect',
-		correction_incorrecte: 'Correction incorrecte',
-		question_doublon: 'Doublon',
-		mise_en_forme: 'Mise en forme',
-		autre: 'Autre'
-	}
-
-	const STATUS_BADGE: Record<ReportStatus, string> = {
-		nouveau: 'bg-yellow-100 text-yellow-700',
-		resolu: 'bg-green-100 text-green-700'
-	}
+	const STATUS_LABELS = REPORT_STATUS_LABELS
+	const STATUS_BADGE = REPORT_STATUS_BADGE
 
 	let selectedReport = $state<ReportAdminRow | null>(null)
-
-	function formatDate(ts: number): string {
-		return new Date(ts * 1000).toLocaleDateString('fr-FR', {
-			day: '2-digit',
-			month: '2-digit',
-			year: 'numeric'
-		})
-	}
 
 	function truncate(s: string | null, max = 80): string {
 		if (!s) return '—'
@@ -317,10 +292,10 @@
 	</div>
 {/if}
 
-{#if toastVisible}
+{#if toast.visible}
 	<div class="fixed top-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-lg bg-gray-900 px-4 py-3 text-sm text-white shadow-lg">
-		<span>Statut mis à jour.</span>
-		<button onclick={() => (toastVisible = false)} class="text-gray-400 hover:text-white" aria-label="Fermer">
+		<span>{toast.message}</span>
+		<button onclick={() => toast.hide()} class="text-gray-400 hover:text-white" aria-label="Fermer">
 			<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 				<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 			</svg>

@@ -2,49 +2,31 @@
 	import { page } from '$app/state'
 	import { enhance } from '$app/forms'
 	import type { PageData, ActionData } from './$types'
-	import type { SubmissionAdminRow, SubmissionStatus } from '$lib/server/db/queries/submissions'
+	import type { SubmissionAdminRow } from '$lib/server/db/queries/submissions'
 	import QuestionPreview from '$lib/components/QuestionPreview.svelte'
+	import { SUBMISSION_STATUS_LABELS, SUBMISSION_STATUS_BADGE } from '$lib/constants/labels'
+	import { formatDate } from '$lib/utils/formatting'
+	import { createToast } from '$lib/utils/toast.svelte'
 
 	let { data, form }: { data: PageData; form: ActionData } = $props()
 
-	let toastMessage = $state<string | null>(null)
-	let toastTimer: ReturnType<typeof setTimeout> | null = null
+	const toast = createToast()
 
 	$effect(() => {
-		if (form?.approved || form?.rejected) {
-			if (toastTimer) clearTimeout(toastTimer)
-			toastMessage = form.approved ? 'Soumission approuvée.' : 'Soumission rejetée.'
-			toastTimer = setTimeout(() => (toastMessage = null), 4000)
-		}
+		if (form?.approved) toast.show('Soumission approuvée.')
+		else if (form?.rejected) toast.show('Soumission rejetée.')
 	})
 
 	const PAGE_SIZE = 20
 
-	const STATUS_LABELS: Record<SubmissionStatus, string> = {
-		en_attente: 'En attente',
-		approuve: 'Approuvé',
-		rejete: 'Rejeté'
-	}
-
-	const STATUS_BADGE: Record<SubmissionStatus, string> = {
-		en_attente: 'bg-yellow-100 text-yellow-700',
-		approuve: 'bg-green-100 text-green-700',
-		rejete: 'bg-red-100 text-red-700'
-	}
+	const STATUS_LABELS = SUBMISSION_STATUS_LABELS
+	const STATUS_BADGE = SUBMISSION_STATUS_BADGE
 
 	let selectedId = $state<number | null>(null)
 	const selectedSubmission = $derived(
 		selectedId !== null ? (data.rows.find((r) => r.id === selectedId) ?? null) : null
 	)
 	let rejectionNote = $state('')
-
-	function formatDate(ts: number): string {
-		return new Date(ts * 1000).toLocaleDateString('fr-FR', {
-			day: '2-digit',
-			month: '2-digit',
-			year: 'numeric'
-		})
-	}
 
 	function truncate(s: string, max = 60): string {
 		return s.length > max ? s.slice(0, max) + '…' : s
@@ -378,10 +360,10 @@
 	</div>
 {/if}
 
-{#if toastMessage}
+{#if toast.visible}
 	<div class="fixed top-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-lg bg-gray-900 px-4 py-3 text-sm text-white shadow-lg">
-		<span>{toastMessage}</span>
-		<button onclick={() => (toastMessage = null)} class="text-gray-400 hover:text-white" aria-label="Fermer">
+		<span>{toast.message}</span>
+		<button onclick={() => toast.hide()} class="text-gray-400 hover:text-white" aria-label="Fermer">
 			<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 				<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 			</svg>

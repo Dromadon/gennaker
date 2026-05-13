@@ -7,6 +7,7 @@
 	import QuestionPickerModal from '$lib/components/QuestionPickerModal.svelte'
 	import ReportModal from '$lib/components/ReportModal.svelte'
 	import ShareModal from '$lib/components/ShareModal.svelte'
+	import { createToast } from '$lib/utils/toast.svelte'
 
 	const evaluation = $derived($evaluationStore)
 
@@ -23,9 +24,7 @@
 	let shareModalOpen = $state(false)
 	let shareUrl = $state('')
 	let sharing = $state(false)
-	let toastMessage = $state('')
-	let toastVisible = $state(false)
-	let toastTimer: ReturnType<typeof setTimeout> | null = null
+	const toast = createToast()
 
 	$effect(() => {
 		if (!evaluation) goto('/')
@@ -55,10 +54,7 @@
 	}
 
 	function showToast(msg: string) {
-		if (toastTimer) clearTimeout(toastTimer)
-		toastMessage = msg
-		toastVisible = true
-		toastTimer = setTimeout(() => (toastVisible = false), 4000)
+		toast.show(msg)
 	}
 
 	async function redrawSection(slot: EvaluationSlot) {
@@ -137,10 +133,10 @@
 	}
 </script>
 
-{#if toastVisible}
+{#if toast.visible}
 	<div class="fixed top-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-lg bg-gray-900 px-4 py-3 text-sm text-white shadow-lg print:hidden">
-		<span>{toastMessage}</span>
-		<button onclick={() => (toastVisible = false)} class="text-gray-400 hover:text-white" aria-label="Fermer">
+		<span>{toast.message}</span>
+		<button onclick={() => toast.hide()} class="text-gray-400 hover:text-white" aria-label="Fermer">
 			<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 				<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 			</svg>

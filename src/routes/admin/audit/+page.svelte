@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types'
 	import type { AuditLogRow } from '$lib/server/db/queries/audit'
+	import { formatDateTime } from '$lib/utils/formatting'
 
 	let { data }: { data: PageData } = $props()
 
@@ -36,16 +37,6 @@
 		question: (id) => `/admin/questions/${id}/edit`,
 		submission: (id) => `/admin/submissions/${id}`,
 		report: (id) => `/admin/reports/${id}`
-	}
-
-	function formatDate(ts: number): string {
-		return new Date(ts * 1000).toLocaleString('fr-FR', {
-			day: '2-digit',
-			month: '2-digit',
-			year: 'numeric',
-			hour: '2-digit',
-			minute: '2-digit'
-		})
 	}
 
 	const PAGE_SIZE = 50
@@ -169,7 +160,7 @@
 					<tbody class="divide-y divide-gray-100">
 						{#each data.rows as row}
 							<tr class="hover:bg-gray-50">
-								<td class="px-4 py-3 text-gray-500 whitespace-nowrap">{formatDate(row.createdAt)}</td>
+								<td class="px-4 py-3 text-gray-500 whitespace-nowrap">{formatDateTime(row.createdAt)}</td>
 								<td class="px-4 py-3 text-gray-700">{row.adminName ?? '—'}</td>
 								<td class="px-4 py-3">
 									<span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {ACTION_COLORS[row.action] ?? 'bg-gray-100 text-gray-700'}">
@@ -236,7 +227,7 @@
 		<div class="relative w-full max-w-2xl rounded-lg bg-white shadow-xl">
 			<div class="flex items-center justify-between border-b border-gray-200 px-4 py-3">
 				<span class="text-sm font-medium text-gray-800">
-					{ACTION_LABELS[modalRow.action] ?? modalRow.action} — {formatDate(modalRow.createdAt)}
+					{ACTION_LABELS[modalRow.action] ?? modalRow.action} — {formatDateTime(modalRow.createdAt)}
 				</span>
 				<button
 					onclick={() => (modalRow = null)}
