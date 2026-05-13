@@ -379,6 +379,26 @@ export async function getQuestionsByIds(
 	}))
 }
 
+export async function getAvailableQuestionCountsBySection(
+	d1: D1Database,
+	supportSlug: string
+): Promise<Map<number, number>> {
+	const rows = await getDb(d1)
+		.select({ sectionId: questions.sectionId, availableCount: count() })
+		.from(questions)
+		.where(
+			and(
+				eq(questions.status, 'publie'),
+				or(
+					eq(questions.applicableSupports, '[]'),
+					like(questions.applicableSupports, `%"${supportSlug}"%`)
+				)
+			)
+		)
+		.groupBy(questions.sectionId)
+	return new Map(rows.map((r) => [r.sectionId, r.availableCount]))
+}
+
 export async function getQuestionById(
 	d1: D1Database,
 	id: number

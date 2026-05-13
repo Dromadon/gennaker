@@ -2,6 +2,7 @@ import { and, eq, inArray } from 'drizzle-orm'
 import { getDb } from '../index'
 import { categories, evaluationTemplates, questions, sections, templateSlots } from '../schema'
 import type { EvaluationTemplate, Format, Support, TemplateSlot } from '$lib/domain/types'
+import { getAvailableQuestionCountsBySection } from './questions'
 
 export type TemplateExportRow = {
 	id: number
@@ -99,6 +100,7 @@ export type TemplateSlotWithResolved = TemplateSlot & {
 	pinnedQuestionTitle: string | null
 	pinnedQuestionAvailable: boolean
 	preferredQuestions: { id: number; title: string; available: boolean }[]
+	availableQuestionCount: number
 }
 
 export type TemplateWithSlots = {
@@ -115,6 +117,15 @@ export async function getAllTemplatesWithSlots(d1: D1Database): Promise<Template
 		.select({ id: evaluationTemplates.id, supportSlug: evaluationTemplates.supportSlug, format: evaluationTemplates.format })
 		.from(evaluationTemplates)
 		.orderBy(evaluationTemplates.supportSlug, evaluationTemplates.format)
+
+	// Une requête par support distinct, en parallèle (max 4), avant la boucle
+	const distinctSupports = [...new Set(templateRows.map((t) => t.supportSlug))]
+	const countMaps = await Promise.all(
+		distinctSupports.map((s) => getAvailableQuestionCountsBySection(d1, s))
+	)
+	const availableCountsBySupport = new Map<string, Map<number, number>>(
+		distinctSupports.map((s, i) => [s, countMaps[i]])
+	)
 
 	const result: TemplateWithSlots[] = []
 
@@ -160,6 +171,8 @@ export async function getAllTemplatesWithSlots(d1: D1Database): Promise<Template
 			for (const r of rows) questionData.set(r.id, { title: r.title, available: r.status === 'publie' })
 		}
 
+		const countsBySection = availableCountsBySupport.get(t.supportSlug) ?? new Map<number, number>()
+
 		result.push({
 			...t,
 			slots: parsedSlots.map((s) => {
@@ -171,7 +184,8 @@ export async function getAllTemplatesWithSlots(d1: D1Database): Promise<Template
 					preferredQuestions: s.preferredQuestionIds.map((id) => {
 						const d = questionData.get(id)
 						return { id, title: d?.title ?? `#${id}`, available: d?.available ?? false }
-					})
+					}),
+					availableQuestionCount: countsBySection.get(s.sectionId) ?? 0
 				}
 			})
 		})

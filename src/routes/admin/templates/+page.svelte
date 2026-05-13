@@ -91,6 +91,10 @@
 		return selectedSlot.preferredQuestionIds
 	})
 
+	const pickerEmptyMessage = $derived(
+		pickerMode === 'pinned' ? 'Aucune question épinglée.' : 'Aucune question préférée.'
+	)
+
 	let setPinnedForm: HTMLFormElement
 	let setPreferredForm: HTMLFormElement
 	let setPinnedQuestionIdInput: HTMLInputElement
@@ -169,7 +173,8 @@
 						>
 							<span class="flex-1 text-gray-700">{slot.sectionDisplayName}</span>
 							{#if !selectedSlot}
-								<span class="w-10 shrink-0 text-right text-xs text-gray-400">{slot.questionCount} q.</span>
+								<span class="w-8 shrink-0 text-right text-xs text-gray-400">{slot.questionCount}</span>
+								<span class="w-12 shrink-0 text-right text-xs text-gray-300">/ {slot.availableQuestionCount}</span>
 							{/if}
 							<span class="ml-2 flex w-12 shrink-0 items-center justify-end gap-1">
 								{#if slot.pinnedQuestionId !== null}
@@ -196,7 +201,7 @@
 						<div>
 							<p class="text-xs text-gray-400 uppercase tracking-wide">{slot.categoryDisplayName}</p>
 							<h2 class="mt-1 text-base font-semibold text-gray-900">{slot.sectionDisplayName}</h2>
-							<p class="mt-0.5 text-sm text-gray-500">{slot.questionCount} question{slot.questionCount > 1 ? 's' : ''}</p>
+							<p class="mt-0.5 text-sm text-gray-500">{slot.questionCount} tirée{slot.questionCount > 1 ? 's' : ''} sur {slot.availableQuestionCount} disponible{slot.availableQuestionCount > 1 ? 's' : ''}</p>
 						</div>
 						<button onclick={closePanel} class="text-gray-400 hover:text-gray-600" aria-label="Fermer">✕</button>
 					</div>
@@ -204,6 +209,12 @@
 					{#if form && 'error' in form}
 						<p class="mb-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{form.error}</p>
 					{/if}
+
+					<!-- Encart explicatif -->
+					<div class="mb-6 rounded-md bg-gray-50 border border-gray-200 px-3 py-2.5 text-xs text-gray-500 space-y-1.5">
+						<p><span class="font-medium text-gray-700">📌 Question épinglée</span> — toujours tirée pour ce slot, garantie.</p>
+						<p><span class="font-medium text-gray-700">⭐ Questions préférées</span> — tirées en priorité ; le complément est pris dans la banque aléatoirement.</p>
+					</div>
 
 					<!-- Question épinglée -->
 					<div class="mb-6">
@@ -286,11 +297,17 @@
 			</button>
 		</div>
 		<div class="flex-1 overflow-y-auto p-4 space-y-6">
-			<p class="text-sm text-gray-500">{slot.questionCount} question{slot.questionCount > 1 ? 's' : ''}</p>
+			<p class="text-sm text-gray-500">{slot.questionCount} tirée{slot.questionCount > 1 ? 's' : ''} sur {slot.availableQuestionCount} disponible{slot.availableQuestionCount > 1 ? 's' : ''}</p>
 
 			{#if form && 'error' in form}
 				<p class="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{form.error}</p>
 			{/if}
+
+			<!-- Encart explicatif -->
+			<div class="rounded-md bg-gray-50 border border-gray-200 px-3 py-2.5 text-xs text-gray-500 space-y-1.5">
+				<p><span class="font-medium text-gray-700">📌 Question épinglée</span> — toujours tirée pour ce slot, garantie.</p>
+				<p><span class="font-medium text-gray-700">⭐ Questions préférées</span> — tirées en priorité ; le complément est pris dans la banque aléatoirement.</p>
+			</div>
 
 			<!-- Question épinglée -->
 			<div>
@@ -354,5 +371,6 @@
 		selectedIds={pickerSelectedIds()}
 		onapply={handlePickerApply}
 		onclose={() => (pickerOpen = false)}
+		emptyMessage={pickerEmptyMessage}
 	/>
 {/if}
