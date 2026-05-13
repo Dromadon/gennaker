@@ -29,9 +29,7 @@
 		onclose
 	}: Props = $props()
 
-	function renderMd(md: string) {
-		return createMarkdownRenderer(questionId, r2BaseUrl)(md)
-	}
+	const renderMd = $derived(createMarkdownRenderer(questionId, r2BaseUrl))
 </script>
 
 <div class="mb-4 flex items-start justify-between gap-2">

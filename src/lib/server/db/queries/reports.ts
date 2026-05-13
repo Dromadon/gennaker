@@ -2,7 +2,7 @@ import { count, eq, inArray } from 'drizzle-orm'
 import { getDb } from '../index'
 import { categories, questionReports, questions, sections } from '../schema'
 
-const PAGE_SIZE = 30
+export const PAGE_SIZE = 30
 
 export type ProblemType =
 	| 'enonce_incorrect'

@@ -7,6 +7,7 @@
 	import QuestionPickerModal from '$lib/components/QuestionPickerModal.svelte'
 	import ReportModal from '$lib/components/ReportModal.svelte'
 	import ShareModal from '$lib/components/ShareModal.svelte'
+	import { createToast } from '$lib/utils/toast.svelte'
 
 	let { data }: { data: PageData } = $props()
 
@@ -20,12 +21,11 @@
 	let managerSlot = $state<SharedEvaluationSlotWithUnavailable | null>(null)
 	let reportQuestionId = $state<number | null>(null)
 	let reportQuestionTitle = $state('')
-	let toastMessage = $state('')
-	let toastVisible = $state(false)
-	let toastTimer: ReturnType<typeof setTimeout> | null = null
-	let modificationWarningShown = $state(false)
-	let modificationWarningOpen = $state(false)
-	let modificationWarningCallback = $state<(() => void) | null>(null)
+	const toast = createToast()
+	// Première modification après partage : on demande confirmation avant d'exécuter l'action.
+	let userHasAcknowledgedWarning = $state(false)
+	let showModificationWarning = $state(false)
+	let pendingActionAfterWarning = $state<(() => void) | null>(null)
 	let shareModalOpen = $state(false)
 	let shareUrl = $state('')
 	let sharing = $state(false)
@@ -46,8 +46,12 @@
 		}, new Map<number, { name: string; slots: SharedEvaluationSlotWithUnavailable[] }>())
 	)
 
+	const mdRenderers = new Map<number, (md: string) => string>()
 	function renderMd(md: string, questionId: number): string {
-		return createMarkdownRenderer(questionId, page.data.r2BaseUrl)(md)
+		if (!mdRenderers.has(questionId)) {
+			mdRenderers.set(questionId, createMarkdownRenderer(questionId, page.data.r2BaseUrl))
+		}
+		return mdRenderers.get(questionId)!(md)
 	}
 
 	const answerHeightStyle: Record<string, string> = {
@@ -58,32 +62,25 @@
 		xl: 'height:14rem'
 	}
 
-	function showToast(msg: string) {
-		if (toastTimer) clearTimeout(toastTimer)
-		toastMessage = msg
-		toastVisible = true
-		toastTimer = setTimeout(() => (toastVisible = false), 4000)
-	}
-
 	function withModificationWarning(action: () => void) {
-		if (modificationWarningShown) {
+		if (userHasAcknowledgedWarning) {
 			action()
 		} else {
-			modificationWarningCallback = action
-			modificationWarningOpen = true
+			pendingActionAfterWarning = action
+			showModificationWarning = true
 		}
 	}
 
 	function confirmModification() {
-		modificationWarningShown = true
-		modificationWarningOpen = false
-		modificationWarningCallback?.()
-		modificationWarningCallback = null
+		userHasAcknowledgedWarning = true
+		showModificationWarning = false
+		pendingActionAfterWarning?.()
+		pendingActionAfterWarning = null
 	}
 
 	function cancelModification() {
-		modificationWarningOpen = false
-		modificationWarningCallback = null
+		showModificationWarning = false
+		pendingActionAfterWarning = null
 	}
 
 	async function shareEvaluation() {
@@ -95,12 +92,12 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ support, format, slots })
 			})
-			if (!res.ok) { showToast('Erreur lors du partage'); return }
+			if (!res.ok) { toast.show('Erreur lors du partage'); return }
 			const { url } = await res.json() as { url: string }
 			shareUrl = url
 			shareModalOpen = true
 		} catch {
-			showToast('Erreur réseau')
+			toast.show('Erreur réseau')
 		} finally {
 			sharing = false
 		}
@@ -130,7 +127,7 @@
 		slots = slots.map((s) =>
 			s.slotId === slot.slotId ? { ...s, questions: drawn, unavailableCount: 0 } : s
 		)
-		showToast('Section re-tirée')
+		toast.show('Section re-tirée')
 		redrawingSlotId = null
 	}
 
@@ -150,7 +147,7 @@
 		slots = slots.map((s) =>
 			s.slotId === slotId ? { ...s, questions: newQuestions, unavailableCount: 0 } : s
 		)
-		showToast(newQuestions.length === 0 ? 'Section désactivée' : 'Section mise à jour')
+		toast.show(newQuestions.length === 0 ? 'Section désactivée' : 'Section mise à jour')
 		managerSlot = null
 	}
 
@@ -163,10 +160,10 @@
 	}
 </script>
 
-{#if toastVisible}
+{#if toast.visible}
 	<div class="fixed top-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-lg bg-gray-900 px-4 py-3 text-sm text-white shadow-lg print:hidden">
-		<span>{toastMessage}</span>
-		<button onclick={() => (toastVisible = false)} class="text-gray-400 hover:text-white" aria-label="Fermer">
+		<span>{toast.message}</span>
+		<button onclick={() => toast.hide()} class="text-gray-400 hover:text-white" aria-label="Fermer">
 			<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 				<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 			</svg>
@@ -497,7 +494,7 @@
 		questionId={reportQuestionId ?? 0}
 		questionTitle={reportQuestionTitle}
 		onclose={() => { reportQuestionId = null }}
-		onsuccess={() => showToast('Signalement envoyé, merci')}
+		onsuccess={() => toast.show('Signalement envoyé, merci')}
 	/>
 	<ShareModal
 		open={shareModalOpen}
@@ -506,7 +503,7 @@
 	/>
 {/if}
 
-{#if modificationWarningOpen}
+{#if showModificationWarning}
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<dialog
 		open

@@ -3,7 +3,7 @@ import { getDb } from '../index'
 import { categories, communitySubmissions, questionReports, questions, sections, supports, templateSlots } from '../schema'
 import type { Question, QuestionAdminDetail, QuestionRow, QuestionListRow, Support, AnswerSize } from '$lib/domain/types'
 
-const PAGE_SIZE = 20
+export const PAGE_SIZE = 20
 
 export type QuestionInput = {
 	title: string

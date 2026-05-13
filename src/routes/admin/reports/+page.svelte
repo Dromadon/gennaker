@@ -15,8 +15,6 @@
 		if (form?.updated) toast.show('Statut mis à jour.')
 	})
 
-	const PAGE_SIZE = 30
-
 	const STATUS_LABELS = REPORT_STATUS_LABELS
 	const STATUS_BADGE = REPORT_STATUS_BADGE
 
@@ -27,7 +25,7 @@
 		return s.length > max ? s.slice(0, max) + '…' : s
 	}
 
-	const totalPages = $derived(Math.ceil(data.total / PAGE_SIZE))
+	const totalPages = $derived(Math.ceil(data.total / data.pageSize))
 
 	function statusUrl(status: string | null): string {
 		const u = new URL('/admin/reports', 'http://x')

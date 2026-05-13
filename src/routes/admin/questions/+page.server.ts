@@ -1,7 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit'
 import type { Actions, PageServerLoad } from './$types'
 import { getAllCategoriesWithSections } from '$lib/server/db/queries/categories'
-import { deleteQuestion, getQuestionAdminById, listQuestions } from '$lib/server/db/queries/questions'
+import { deleteQuestion, getQuestionAdminById, listQuestions, PAGE_SIZE } from '$lib/server/db/queries/questions'
 import { getReportsByQuestionIds, type QuestionReportSummary } from '$lib/server/db/queries/reports'
 import { insertAuditLog } from '$lib/server/db/queries/audit'
 import { buildQuestionAuditMetadata } from '$lib/server/audit'
@@ -30,7 +30,7 @@ export const load: PageServerLoad = async ({ url, platform, locals }) => {
 		{}
 	)
 
-	return { rows, total, page, categories, filters: { categoryId, sectionId, support, status }, reportsByQuestionId }
+	return { rows, total, page, pageSize: PAGE_SIZE, categories, filters: { categoryId, sectionId, support, status }, reportsByQuestionId }
 }
 
 export const actions: Actions = {

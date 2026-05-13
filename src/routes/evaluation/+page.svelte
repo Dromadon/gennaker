@@ -41,8 +41,12 @@
 			: new Map<number, { name: string; slots: EvaluationSlot[] }>()
 	)
 
+	const mdRenderers = new Map<number, (md: string) => string>()
 	function renderMd(md: string, questionId: number): string {
-		return createMarkdownRenderer(questionId, page.data.r2BaseUrl)(md)
+		if (!mdRenderers.has(questionId)) {
+			mdRenderers.set(questionId, createMarkdownRenderer(questionId, page.data.r2BaseUrl))
+		}
+		return mdRenderers.get(questionId)!(md)
 	}
 
 	const answerHeightStyle: Record<string, string> = {

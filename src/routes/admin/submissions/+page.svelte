@@ -17,8 +17,6 @@
 		else if (form?.rejected) toast.show('Soumission rejetée.')
 	})
 
-	const PAGE_SIZE = 20
-
 	const STATUS_LABELS = SUBMISSION_STATUS_LABELS
 	const STATUS_BADGE = SUBMISSION_STATUS_BADGE
 
@@ -32,7 +30,7 @@
 		return s.length > max ? s.slice(0, max) + '…' : s
 	}
 
-	const totalPages = $derived(Math.ceil(data.total / PAGE_SIZE))
+	const totalPages = $derived(Math.ceil(data.total / data.pageSize))
 
 	function statusUrl(status: string | null): string {
 		const u = new URL('/admin/submissions', 'http://x')

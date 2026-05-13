@@ -1,7 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit'
 import { z } from 'zod'
 import type { Actions, PageServerLoad } from './$types'
-import { getReportsAdmin, updateReportStatus } from '$lib/server/db/queries/reports'
+import { getReportsAdmin, updateReportStatus, PAGE_SIZE } from '$lib/server/db/queries/reports'
 import { insertAuditLog } from '$lib/server/db/queries/audit'
 import { buildReportAuditMetadata } from '$lib/server/audit'
 
@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ locals, platform, url }) => {
 
 	const { rows, total } = await getReportsAdmin(db, { status: statusFilter, page })
 
-	return { rows, total, page, statusFilter }
+	return { rows, total, page, pageSize: PAGE_SIZE, statusFilter }
 }
 
 const toggleStatusSchema = z.object({

@@ -9,8 +9,7 @@
 
 	let { data }: { data: PageData } = $props()
 
-	const PAGE_SIZE = 20
-	const totalPages = $derived(Math.ceil(data.total / PAGE_SIZE))
+	const totalPages = $derived(Math.ceil(data.total / data.pageSize))
 
 	let selectedCategory = $state(data.filters.categoryId ? String(data.filters.categoryId) : '')
 	let selectedSection = $state(data.filters.sectionId ? String(data.filters.sectionId) : '')

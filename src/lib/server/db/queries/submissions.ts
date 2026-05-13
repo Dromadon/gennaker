@@ -35,7 +35,7 @@ export async function createCommunitySubmission(
 	return result[0].id
 }
 
-const PAGE_SIZE = 20
+export const PAGE_SIZE = 20
 
 export type SubmissionStatus = 'en_attente' | 'approuve' | 'rejete'
 

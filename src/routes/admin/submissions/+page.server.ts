@@ -5,7 +5,8 @@ import {
 	approveSubmission,
 	getSubmissionById,
 	getSubmissionsAdmin,
-	rejectSubmission
+	rejectSubmission,
+	PAGE_SIZE
 } from '$lib/server/db/queries/submissions'
 import { getQuestionAdminById } from '$lib/server/db/queries/questions'
 import { insertAuditLog } from '$lib/server/db/queries/audit'
@@ -20,7 +21,7 @@ export const load: PageServerLoad = async ({ locals, platform, url }) => {
 
 	const { rows, total } = await getSubmissionsAdmin(db, { status: statusFilter, page })
 
-	return { rows, total, page, statusFilter }
+	return { rows, total, page, pageSize: PAGE_SIZE, statusFilter }
 }
 
 const approveSchema = z.object({
