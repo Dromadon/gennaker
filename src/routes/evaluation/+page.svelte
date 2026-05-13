@@ -259,11 +259,11 @@
 			<div class="mx-auto max-w-3xl px-4 py-10 print:px-0 print:py-0">
 
 				<!-- Header desktop -->
-				<header class="mb-8 hidden lg:flex items-center justify-between print:hidden">
+				<header class="mb-8 hidden lg:flex items-center justify-between print:flex print:pt-8">
 					<h1 class="text-2xl font-bold capitalize">
 						Évaluation {evaluation.support} — {evaluation.format}
 					</h1>
-					<div class="flex items-center gap-2">
+					<div class="flex items-center gap-2 print:hidden">
 					<button
 						onclick={shareEvaluation}
 						disabled={sharing}
@@ -288,12 +288,18 @@
 				</div>
 				</header>
 
+				<p class="mb-8 text-xs italic text-gray-500 print:mb-4">
+					Votre objectif est de répondre de façon synthétique aux questions, en expliquant les points qui vous semblent essentiels dans votre raisonnement. Une bonne réponse sans explication n'est pas comptabilisée, mais de manière générale, une réponse ne doit pas excéder quelques lignes. Un schéma est souvent le bienvenu.
+				</p>
+
+				<p class="hidden print:block mb-8 text-xs text-gray-400">Évaluation générée par Gennaker.app ⛵</p>
+
 				{#each evaluation.slots as slot, i}
 					{@const prevSlot = i > 0 ? evaluation.slots[i - 1] : null}
 					{@const newCategory = !prevSlot || prevSlot.categoryId !== slot.categoryId}
 
 					{#if newCategory}
-						<h2 id="cat-{slot.categoryId}" class="mt-10 mb-4 border-b-2 border-gray-800 pb-1 text-lg font-bold uppercase tracking-wide break-after-avoid print:mt-6 {hideCategoriesOnPrint ? 'print:hidden' : ''}">
+						<h2 id="cat-{slot.categoryId}" class="mt-10 mb-4 border-b border-gray-800 pb-1 text-lg font-bold uppercase tracking-wide break-after-avoid print:mt-6 {hideCategoriesOnPrint ? 'print:hidden' : ''}">
 							{slot.categoryDisplayName}
 						</h2>
 					{/if}
