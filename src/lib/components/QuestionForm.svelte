@@ -94,7 +94,7 @@
 			: null
 	)
 
-	const BAR = 'border-yellow-400'
+	const DIRTY_BORDER = 'border-yellow-400'
 
 	const border = $derived({
 		title:      errors.title      ? 'border-red-400' : '',
@@ -226,7 +226,7 @@
 
 <form method="POST" {action} use:enhance={handleEnhance} class="space-y-6">
 	<!-- Titre -->
-	<div class="border-l-2 pl-2 transition {dirty?.title ? BAR : 'border-transparent'}">
+	<div class="border-l-2 pl-2 transition {dirty?.title ? DIRTY_BORDER : 'border-transparent'}">
 		<label for="title" class="block text-sm font-medium text-gray-700 mb-1">Titre court</label>
 		<p class="text-xs text-gray-400 mb-1">Identifiant de navigation — n'apparaît pas dans le sujet. Ex. "Définition d'une dépression"</p>
 		<input
@@ -240,7 +240,7 @@
 	</div>
 
 	<!-- Catégorie / Section avec verrouillage -->
-	<div class="flex gap-3 items-start border-l-2 pl-2 transition {dirty?.location ? BAR : 'border-transparent'}">
+	<div class="flex gap-3 items-start border-l-2 pl-2 transition {dirty?.location ? DIRTY_BORDER : 'border-transparent'}">
 		<div class="flex-1">
 			<label for="category" class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
 			<select
@@ -291,7 +291,7 @@
 
 	<!-- Difficulté / Answer size / Status -->
 	<div class="grid grid-cols-3 gap-4">
-		<div class="border-l-2 pl-2 transition {dirty?.difficulty ? BAR : 'border-transparent'}">
+		<div class="border-l-2 pl-2 transition {dirty?.difficulty ? DIRTY_BORDER : 'border-transparent'}">
 			<label for="difficulty" class="block text-sm font-medium text-gray-700 mb-1">Difficulté</label>
 			<select
 				id="difficulty"
@@ -304,7 +304,7 @@
 				{/each}
 			</select>
 		</div>
-		<div class="border-l-2 pl-2 transition {dirty?.answerSize ? BAR : 'border-transparent'}">
+		<div class="border-l-2 pl-2 transition {dirty?.answerSize ? DIRTY_BORDER : 'border-transparent'}">
 			<label for="answerSize" class="block text-sm font-medium text-gray-700 mb-1">Taille réponse</label>
 			<select
 				id="answerSize"
@@ -317,7 +317,7 @@
 				{/each}
 			</select>
 		</div>
-		<div class="border-l-2 pl-2 transition {dirty?.status ? BAR : 'border-transparent'}">
+		<div class="border-l-2 pl-2 transition {dirty?.status ? DIRTY_BORDER : 'border-transparent'}">
 			<label for="status" class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
 			<select
 				id="status"
@@ -333,7 +333,7 @@
 	</div>
 
 	<!-- Supports applicables -->
-	<div class="border-l-2 pl-2 transition {dirty?.applicableSupports ? BAR : 'border-transparent'}">
+	<div class="border-l-2 pl-2 transition {dirty?.applicableSupports ? DIRTY_BORDER : 'border-transparent'}">
 		<fieldset>
 			<legend class="block text-sm font-medium text-gray-700 mb-2">Supports applicables (vide = tous)</legend>
 			<div class="flex gap-4">
@@ -360,7 +360,7 @@
 	</div>
 
 	<!-- Éditeur markdown : énoncé -->
-	<div class="border-l-2 pl-2 transition {dirty?.questionMd ? BAR : 'border-transparent'}">
+	<div class="border-l-2 pl-2 transition {dirty?.questionMd ? DIRTY_BORDER : 'border-transparent'}">
 		<div class="flex items-center justify-between mb-1">
 			<label for="questionMd" class="block text-sm font-medium text-gray-700">Énoncé</label>
 			<button type="button" onclick={() => markdownHelpDialog?.showModal()} class="text-xs text-gray-400 hover:text-gray-600">? Aide markdown</button>
@@ -392,7 +392,7 @@
 	</div>
 
 	<!-- Éditeur markdown : correction -->
-	<div class="border-l-2 pl-2 transition {dirty?.correctionMd ? BAR : 'border-transparent'}">
+	<div class="border-l-2 pl-2 transition {dirty?.correctionMd ? DIRTY_BORDER : 'border-transparent'}">
 		<label for="correctionMd" class="block text-sm font-medium text-gray-700 mb-1">Correction</label>
 		<div class="border border-gray-200 rounded-md transition {errors.correctionMd ? 'border-red-400' : ''}">
 			<div class="lg:grid lg:grid-cols-2 lg:gap-0">
@@ -434,7 +434,7 @@
 	/>
 
 	<!-- Source -->
-	<div class="border-l-2 pl-2 transition {dirty?.sourceMd ? BAR : 'border-transparent'}">
+	<div class="border-l-2 pl-2 transition {dirty?.sourceMd ? DIRTY_BORDER : 'border-transparent'}">
 		<label for="sourceMd" class="block text-sm font-medium text-gray-700 mb-1">Source (optionnel)</label>
 		<input
 			id="sourceMd"

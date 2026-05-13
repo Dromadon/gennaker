@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms'
+	import { tick } from 'svelte'
 	import type { PageData, ActionData } from './$types'
 	import type { TemplateSlotWithResolved, TemplateWithSlots } from '$lib/server/db/queries/templates'
 	import QuestionPickerModal from '$lib/components/QuestionPickerModal.svelte'
@@ -83,10 +84,10 @@
 		pickerMode === 'pinned' ? 'Aucune question épinglée.' : 'Aucune question préférée.'
 	)
 
-	let setPinnedForm: HTMLFormElement
-	let setPreferredForm: HTMLFormElement
-	let setPinnedQuestionIdInput: HTMLInputElement
-	let setPreferredQuestionIdsInput: HTMLInputElement
+	let setPinnedForm = $state<HTMLFormElement | undefined>(undefined)
+	let setPreferredForm = $state<HTMLFormElement | undefined>(undefined)
+	let pendingPinnedQuestionId = $state('')
+	let pendingPreferredQuestionIds = $state('')
 
 	// Après soumission réussie, resynchronise selectedSlot depuis data rechargée par use:enhance
 	function resyncSelectedSlot() {
@@ -98,15 +99,17 @@
 		}
 	}
 
-	function handlePickerApply(selected: { id: number }[]) {
+	async function handlePickerApply(selected: { id: number }[]) {
 		pickerOpen = false
 		if (!selectedSlot) return
 		if (pickerMode === 'pinned') {
-			setPinnedQuestionIdInput.value = selected.length > 0 ? String(selected[0].id) : ''
-			setPinnedForm.requestSubmit()
+			pendingPinnedQuestionId = selected.length > 0 ? String(selected[0].id) : ''
+			await tick()
+			setPinnedForm?.requestSubmit()
 		} else {
-			setPreferredQuestionIdsInput.value = JSON.stringify(selected.map((q) => q.id))
-			setPreferredForm.requestSubmit()
+			pendingPreferredQuestionIds = JSON.stringify(selected.map((q) => q.id))
+			await tick()
+			setPreferredForm?.requestSubmit()
 		}
 	}
 </script>
@@ -254,14 +257,14 @@
 						</button>
 					</div>
 
-						<!-- Formulaires cachés -->
+						<!-- Formulaires cachés déclenchés par handlePickerApply -->
 					<form method="POST" action="?/setPinned" use:enhance={() => async ({ result, update }) => { await update(); if (result.type === 'success') resyncSelectedSlot() }} class="hidden" bind:this={setPinnedForm}>
 						<input type="hidden" name="slotId" value={slot.id} />
-						<input type="hidden" name="questionId" bind:this={setPinnedQuestionIdInput} />
+						<input type="hidden" name="questionId" value={pendingPinnedQuestionId} />
 					</form>
 					<form method="POST" action="?/setPreferred" use:enhance={() => async ({ result, update }) => { await update(); if (result.type === 'success') resyncSelectedSlot() }} class="hidden" bind:this={setPreferredForm}>
 						<input type="hidden" name="slotId" value={slot.id} />
-						<input type="hidden" name="questionIds" bind:this={setPreferredQuestionIdsInput} />
+						<input type="hidden" name="questionIds" value={pendingPreferredQuestionIds} />
 					</form>
 				</div>
 			</div>
