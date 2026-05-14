@@ -145,7 +145,7 @@
 		isSubmitting = true
 		submitError = ''
 
-		return async ({ result, update }: { result: import('@sveltejs/kit').ActionResult; update: () => Promise<void> }) => {
+		return async ({ result, update }: { result: import('@sveltejs/kit').ActionResult; update: (options?: { reset?: boolean; invalidateAll?: boolean }) => Promise<void> }) => {
 			if (result.type === 'redirect') {
 				// Création : extraire l'ID depuis l'URL de redirection pour uploader les images avant de suivre
 				const match = result.location.match(/\/admin\/questions\/(\d+)\/edit/)
@@ -171,7 +171,7 @@
 					if (uploadErrors.length > 0) {
 						submitError = `Question créée, mais ${uploadErrors.length} image(s) n'ont pas pu être uploadées : ${uploadErrors.join(', ')}`
 						isSubmitting = false
-						await update()
+						await update({ reset: false })
 						return
 					}
 				} else if (newId === null && pendingImages.size > 0) {
@@ -182,13 +182,13 @@
 					}
 				}
 
-				await update()
+				await update({ reset: false })
 				return
 			}
 
 			if (result.type === 'failure' || result.type === 'error') {
 				isSubmitting = false
-				await update()
+				await update({ reset: false })
 				return
 			}
 
@@ -218,7 +218,7 @@
 
 			isSubmitting = false
 			window.scrollTo({ top: 0, behavior: 'smooth' })
-			await update()
+			await update({ reset: false })
 		}
 	}
 </script>
