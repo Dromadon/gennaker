@@ -229,15 +229,6 @@ Créer `vitest.int.config.ts` avec `@cloudflare/vitest-pool-workers` (Miniflare)
 
 ---
 
-
-## Chores techniques
-
-| ID | Description |
-|----|-------------|
-| C-01 | Supprimer les scripts de migration one-shot (`scripts/migrate-content.ts`, `scripts/migrate-images.ts`, `scripts/download-lfs-images.sh`) et le dossier `archive/` une fois la base de données de prod alimentée et les images uploadées sur R2 |
-
----
-
 ## Post-MVP (backlog)
 
 Les stories suivantes sont identifiées mais hors scope MVP, classées par priorité approximative.
